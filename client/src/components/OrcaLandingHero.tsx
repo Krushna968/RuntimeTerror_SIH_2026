@@ -1,13 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { 
   ArrowRight, 
-  Satellite, 
-  Fish, 
-  ShieldCheck, 
-  AlertTriangle,
   Sparkles, 
-  Compass, 
-  ChevronRight 
+  Compass 
 } from 'lucide-react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
@@ -182,33 +177,14 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
         className="absolute inset-0 pointer-events-none z-0 opacity-80" 
       />
 
-      {/* 6. Main Clean Focused Hero Section */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-32 pb-24 max-w-5xl mx-auto w-full my-auto">
-        {/* Live Telemetry Ticker Pill with Glow */}
-        <motion.div 
-          initial={{ opacity: 0, y: -15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-6 flex items-center space-x-2.5 px-4 py-2 rounded-full bg-zinc-900/80 border border-cyan-400/40 backdrop-blur-xl shadow-[0_0_20px_rgba(6,182,212,0.25)]"
-        >
-          <span className="flex h-2.5 w-2.5 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-90"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400"></span>
-          </span>
-          <span className="text-xs font-semibold text-zinc-200">
-            <strong className="text-white">ISRO Oceansat-3 (EOS-06)</strong> & INSAT-3DR TIR Live Telemetry Synced
-          </span>
-          <span className="text-xs font-mono font-bold text-slate-950 bg-cyan-400 px-2.5 py-0.5 rounded-full shadow-sm">
-            15 PFZ Hotspots
-          </span>
-        </motion.div>
-
+      {/* 6. Main Ultra-Clean, Focused Hero Section */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-36 pb-24 max-w-5xl mx-auto w-full my-auto">
         {/* Cinematic High-Impact Headline */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="space-y-4 max-w-4xl mx-auto"
+          transition={{ duration: 0.7 }}
+          className="space-y-5 max-w-4xl mx-auto"
         >
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] select-none text-white drop-shadow-lg">
             The Agentic Brain for the <span className="bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(0,240,255,0.6)]">Indian Ocean</span>
@@ -219,51 +195,16 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
           </p>
         </motion.div>
 
-        {/* Interactive Query Launcher Pills */}
+        {/* Primary CTA Action Buttons */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.25 }}
-          className="mt-8 flex flex-wrap items-center justify-center gap-2.5 max-w-3xl mx-auto"
-        >
-          <button
-            onClick={() => onExplorePlatform('chat')}
-            className="px-4 py-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-cyan-500/40 hover:border-cyan-400 text-xs font-medium text-zinc-200 hover:text-white transition-all cursor-pointer flex items-center space-x-2 group backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-          >
-            <Fish className="w-3.5 h-3.5 text-cyan-400 group-hover:scale-110 transition-transform" />
-            <span>"Where is the nearest Tuna PFZ from Kochi today?"</span>
-            <ChevronRight className="w-3 h-3 opacity-70 group-hover:translate-x-0.5 transition-transform" />
-          </button>
-
-          <button
-            onClick={() => onExplorePlatform('safety')}
-            className="px-4 py-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-emerald-500/40 hover:border-emerald-400 text-xs font-medium text-zinc-200 hover:text-white transition-all cursor-pointer flex items-center space-x-2 group backdrop-blur-md shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
-            <span>"Is it safe to venture into the sea tomorrow morning?"</span>
-            <ChevronRight className="w-3 h-3 opacity-70 group-hover:translate-x-0.5 transition-transform" />
-          </button>
-
-          <button
-            onClick={() => onExplorePlatform('map')}
-            className="px-4 py-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-red-500/40 hover:border-red-400 text-xs font-medium text-zinc-200 hover:text-white transition-all cursor-pointer flex items-center space-x-2 group backdrop-blur-md shadow-[0_0_15px_rgba(239,68,68,0.15)] hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
-          >
-            <AlertTriangle className="w-3.5 h-3.5 text-red-400 group-hover:scale-110 transition-transform" />
-            <span>"Check Sri Lanka IMBL boundary proximity"</span>
-            <ChevronRight className="w-3 h-3 opacity-70 group-hover:translate-x-0.5 transition-transform" />
-          </button>
-        </motion.div>
-
-        {/* Primary CTA Buttons */}
-        <motion.div 
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.35 }}
-          className="mt-9 flex flex-col sm:flex-row items-center gap-4"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-12 flex flex-col sm:flex-row items-center gap-4"
         >
           <button 
             onClick={() => onExplorePlatform('chat')}
-            className="px-8 py-3.5 rounded-full text-sm font-bold text-slate-950 bg-white hover:bg-zinc-100 transition-all shadow-[0_0_35px_rgba(0,240,255,0.5)] active:scale-95 cursor-pointer flex items-center space-x-2.5 group"
+            className="px-8 py-4 rounded-full text-sm font-bold text-slate-950 bg-white hover:bg-zinc-100 transition-all shadow-[0_0_35px_rgba(0,240,255,0.5)] active:scale-95 cursor-pointer flex items-center space-x-2.5 group"
           >
             <Sparkles className="w-4 h-4 text-cyan-600 group-hover:rotate-45 transition-transform" />
             <span>Launch AI Decision Studio</span>
@@ -272,7 +213,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
 
           <button 
             onClick={() => onExplorePlatform('map')}
-            className="px-8 py-3.5 rounded-full text-sm font-semibold text-white bg-zinc-900/90 hover:bg-zinc-800 border border-cyan-400/50 hover:border-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.2)] transition-all flex items-center space-x-2 active:scale-95 cursor-pointer backdrop-blur-md"
+            className="px-8 py-4 rounded-full text-sm font-semibold text-white bg-zinc-900/90 hover:bg-zinc-800 border border-cyan-400/50 hover:border-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.2)] transition-all flex items-center space-x-2 active:scale-95 cursor-pointer backdrop-blur-md"
           >
             <Compass className="w-4 h-4 text-cyan-400" />
             <span>GIS Command Map</span>
