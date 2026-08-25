@@ -36,7 +36,7 @@ import {
   QrCode
 } from 'lucide-react';
 
-const API_BASE = (import.meta as any).env?.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
+const API_BASE = (import.meta as any).env?.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://orca-backend-0dxj.onrender.com');
 
 export function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin'>('home');

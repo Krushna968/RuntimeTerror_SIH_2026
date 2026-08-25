@@ -5,7 +5,7 @@ import {
   Compass
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import KineticGrid from '@/components/ui/kinetic-grid';
+import KineticGrid from './ui/kinetic-grid';
 
 interface OrcaLandingHeroProps {
   onExplorePlatform: (tab: 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin') => void;
