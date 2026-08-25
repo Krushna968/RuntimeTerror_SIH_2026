@@ -31,7 +31,9 @@ import {
   Wind,
   ShieldCheck,
   Printer,
-  QrCode
+  QrCode,
+  MessageSquare,
+  Mic
 } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8000';
@@ -48,6 +50,7 @@ export function App() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isBulletinModalOpen, setIsBulletinModalOpen] = useState<boolean>(false);
   const [isSOSModalOpen, setIsSOSModalOpen] = useState<boolean>(false);
+  const [isFloatingChatOpen, setIsFloatingChatOpen] = useState<boolean>(false);
 
   // Initial load
   useEffect(() => {
@@ -240,7 +243,7 @@ export function App() {
                             Autonomous Multi-Agent DAG Execution Graph
                           </h2>
                           <p className="text-xs text-zinc-400 font-medium">
-                            Real-time collaborative task decomposition & telemetry
+                            Powered by NVIDIA NIM (Meta Llama-3.1-8B) & 6 Domain Agents
                           </p>
                         </div>
                       </div>
@@ -461,6 +464,35 @@ export function App() {
           </main>
         </>
       )}
+
+      {/* Floating AI Voice & Chat Assistant Button (Always available on bottom right) */}
+      <div className="fixed bottom-6 right-6 z-[900]">
+        {isFloatingChatOpen ? (
+          <div className="relative w-[380px] sm:w-[420px] h-[580px] shadow-2xl rounded-3xl overflow-hidden border border-zinc-700">
+            <button
+              onClick={() => setIsFloatingChatOpen(false)}
+              className="absolute top-3 right-3 z-50 p-1.5 rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 transition-all cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <AgentChatDrawer
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+              latestResponse={latestResponse}
+              currentLang={currentLang}
+            />
+          </div>
+        ) : (
+          <button
+            onClick={() => setIsFloatingChatOpen(true)}
+            className="flex items-center space-x-2.5 px-5 py-3.5 rounded-full bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white font-black text-sm shadow-[0_0_25px_rgba(6,182,212,0.6)] border border-cyan-300/40 hover:scale-105 active:scale-95 transition-all cursor-pointer group"
+          >
+            <Sparkles className="w-5 h-5 animate-spin-slow group-hover:rotate-45 transition-transform" />
+            <span>Talk to ORCA AI</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+          </button>
+        )}
+      </div>
 
       {/* Advisory Export Modal */}
       <AdvisoryExportModal
