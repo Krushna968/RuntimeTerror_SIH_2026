@@ -31,19 +31,19 @@ export const Header: React.FC<HeaderProps> = ({
   const isMap = activeTab === 'map';
   const isChat = activeTab === 'chat';
 
-  // Dynamic header container classes
+  // Smooth vertical fade gradient on Map page (darker at top, fading out towards bottom)
   const headerBgClass = isMap 
-    ? 'bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-lg text-white' 
+    ? 'bg-gradient-to-b from-black/85 via-black/40 to-transparent pb-8 pt-5 text-white border-none shadow-none' 
     : isChat
-      ? 'bg-transparent text-zinc-900'
-      : 'bg-transparent text-white';
+      ? 'bg-transparent text-zinc-900 py-4'
+      : 'bg-transparent text-white py-4';
 
   const getNavLinkClass = (tabKey: HeaderProps['activeTab']) => {
     const isActive = activeTab === tabKey;
     if (isMap) {
       return isActive 
-        ? 'text-cyan-300 font-black' 
-        : 'text-zinc-200 hover:text-white font-semibold';
+        ? 'text-cyan-300 font-black drop-shadow-sm' 
+        : 'text-zinc-100 hover:text-white font-semibold drop-shadow-sm';
     }
     if (isChat) {
       return isActive 
@@ -56,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className={`absolute top-0 left-0 right-0 z-50 w-full px-6 sm:px-12 lg:px-20 py-4 flex items-center justify-between font-['Outfit',sans-serif] pointer-events-auto transition-all ${headerBgClass}`}>
+    <header className={`absolute top-0 left-0 right-0 z-50 w-full px-6 sm:px-12 lg:px-20 flex items-center justify-between font-['Outfit',sans-serif] pointer-events-auto transition-all ${headerBgClass}`}>
       {/* Brand Logo */}
       <div 
         onClick={() => setActiveTab('home')}
