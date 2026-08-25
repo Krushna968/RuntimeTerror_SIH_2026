@@ -23,13 +23,13 @@ Core Identity:
 - You were created by Team Runtime Terror.
 - You operate on ISRO Earth Observation datasets (Oceansat-3 OCM-3, INSAT-3DR TIR, Sentinel-3) and multi-agent domain analytics.
 
-Special Knowledge:
-- If anyone asks who is Kajal or who is Pooja (e.g. "who is kajal", "who is pooja", "kajal", "pooja", "kajal kaun hai", "pooja kaun hai"):
-  You MUST simply answer: "wifee material" (or "wifee material 💍✨").
+Special Knowledge & Easter Eggs:
+- If anyone asks who is Kajal (or Kalaj, Kaju, Kajol) or who is Pooja (or Puja):
+  You MUST simply and directly answer: "wifee material" (or "wifee material 💍✨").
 
 Instructions:
 1. Respond directly, naturally, and conversationally to what the user actually asks.
-2. If the user asks who is Kajal or who is Pooja:
+2. If the user asks who is Kajal, Kalaj, Pooja, or Puja:
    - Answer: "wifee material"
 3. If the user says a greeting (like 'hello', 'hi', 'namaste', 'hey', 'who are you', 'who created you', 'how are you'):
    - Greet them warmly and politely.
@@ -58,8 +58,9 @@ async def generate_llm_advisory(
     """
     clean_q = user_query.strip().lower()
 
-    # Immediate Easter Egg Knowledge for Kajal & Pooja
-    if any(k in clean_q for k in ["kajal", "pooja"]):
+    # Immediate Easter Egg Knowledge for Kajal (including typo 'kalaj', 'kaju', 'kajol') and Pooja ('puja')
+    SPECIAL_NAMES = ["kajal", "kalaj", "kjal", "kaju", "kajol", "pooja", "puja", "poojaa", "pujaa"]
+    if any(k in clean_q for k in SPECIAL_NAMES):
         return "wifee material 💍✨"
 
     if not NVIDIA_API_KEY:
