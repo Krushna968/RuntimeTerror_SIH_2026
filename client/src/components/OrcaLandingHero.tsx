@@ -17,7 +17,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Interactive mouse tracker for dynamic 3D tilt and fluid spotlight
+  // Interactive mouse tracker for dynamic fluid spotlight
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const smoothMouseX = useSpring(mouseX, { damping: 20, stiffness: 120 });
@@ -69,7 +69,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
           const baseY = j * stepY + stepY / 2;
 
           // Wave displacement formula
-          const wave = Math.sin(time + i * 0.28) * Math.cos(time + j * 0.22) * 22;
+          const wave = Math.sin(time + i * 0.28) * Math.cos(time + j * 0.22) * 20;
           const posX = baseX + Math.cos(time * 0.9 + j * 0.25) * 10;
           const posY = baseY + wave;
 
@@ -89,7 +89,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
 
           // Connect adjacent nodes with current lines
           if (i < cols - 1) {
-            const nextWave = Math.sin(time + (i + 1) * 0.28) * Math.cos(time + j * 0.22) * 22;
+            const nextWave = Math.sin(time + (i + 1) * 0.28) * Math.cos(time + j * 0.22) * 20;
             const nextX = (i + 1) * stepX + stepX / 2 + Math.cos(time * 0.9 + j * 0.25) * 10;
             const nextY = baseY + nextWave;
 
@@ -119,7 +119,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
     <div 
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative min-h-screen w-full bg-[#050811] text-white flex flex-col justify-between overflow-hidden font-['Outfit',sans-serif] selection:bg-cyan-500 selection:text-slate-950"
+      className="relative h-screen max-h-screen w-full bg-[#050811] text-white flex flex-col justify-between overflow-hidden font-['Outfit',sans-serif] selection:bg-cyan-500 selection:text-slate-950"
     >
       {/* 1. Interactive Dynamic Cursor Follower Spotlight (Ultra-Bright) */}
       <motion.div
@@ -178,35 +178,35 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
         className="absolute inset-0 pointer-events-none z-0 opacity-80" 
       />
 
-      {/* 6. Main Left-Aligned Hero Section */}
-      <main className="relative z-10 flex-1 flex flex-col items-start justify-center text-left px-6 sm:px-12 lg:px-20 pt-36 pb-24 max-w-7xl mx-auto w-full my-auto">
-        {/* Cinematic Left-Aligned Display Headline */}
+      {/* 6. Main Left-Aligned Calibrated Hero Section */}
+      <main className="relative z-10 flex-1 flex flex-col items-start justify-center text-left px-6 sm:px-12 lg:px-20 pt-24 sm:pt-28 pb-8 max-w-7xl mx-auto w-full my-auto">
+        {/* Calibrated Display Headline */}
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7 }}
-          className="space-y-6 max-w-3xl"
+          className="space-y-4 max-w-3xl"
         >
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] select-none text-white drop-shadow-lg">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] select-none text-white drop-shadow-lg">
             The Agentic Brain<br />
             for the <span className="bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(0,240,255,0.6)]">Indian Ocean</span>
           </h1>
 
-          <p className="text-zinc-200 text-base sm:text-lg md:text-xl max-w-2xl font-normal leading-relaxed pt-1">
+          <p className="text-zinc-200 text-sm sm:text-base md:text-lg max-w-2xl font-normal leading-relaxed pt-1">
             Autonomous multi-agent platform reasoning over ISRO satellite oceanography, SST-chlorophyll thermal fronts, and IMBL geofencing to empower 4 million+ coastal fishermen.
           </p>
         </motion.div>
 
-        {/* Primary CTA Action Buttons (Left-Aligned) */}
+        {/* Primary CTA Action Buttons */}
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-10 flex flex-col sm:flex-row items-center gap-4"
+          className="mt-8 flex flex-col sm:flex-row items-center gap-3.5"
         >
           <button 
             onClick={() => onExplorePlatform('chat')}
-            className="px-8 py-4 rounded-full text-sm font-bold text-slate-950 bg-white hover:bg-zinc-100 transition-all shadow-[0_0_35px_rgba(0,240,255,0.5)] active:scale-95 cursor-pointer flex items-center space-x-2.5 group"
+            className="px-7 py-3.5 rounded-full text-sm font-bold text-slate-950 bg-white hover:bg-zinc-100 transition-all shadow-[0_0_30px_rgba(0,240,255,0.45)] active:scale-95 cursor-pointer flex items-center space-x-2.5 group"
           >
             <Sparkles className="w-4 h-4 text-cyan-600 group-hover:rotate-45 transition-transform" />
             <span>Launch AI Decision Studio</span>
@@ -215,7 +215,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
 
           <button 
             onClick={() => onExplorePlatform('map')}
-            className="px-8 py-4 rounded-full text-sm font-semibold text-white bg-zinc-900/90 hover:bg-zinc-800 border border-cyan-400/50 hover:border-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.2)] transition-all flex items-center space-x-2 active:scale-95 cursor-pointer backdrop-blur-md"
+            className="px-7 py-3.5 rounded-full text-sm font-semibold text-white bg-zinc-900/90 hover:bg-zinc-800 border border-cyan-400/50 hover:border-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.2)] transition-all flex items-center space-x-2 active:scale-95 cursor-pointer backdrop-blur-md"
           >
             <Compass className="w-4 h-4 text-cyan-400" />
             <span>GIS Command Map</span>
@@ -224,7 +224,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
       </main>
 
       {/* 7. Bottom Footer Strip */}
-      <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-6 border-t border-zinc-800/60 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-400 gap-3">
+      <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-4 border-t border-zinc-800/60 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-400 gap-2">
         <div>
           Created by <strong className="text-zinc-200">Team Runtime Terror</strong> for ISRO · Smart India Hackathon 2026
         </div>
