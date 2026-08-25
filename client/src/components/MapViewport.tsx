@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { 
   Layers, 
   Eye, 
@@ -62,7 +63,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
 
     // Center on Indian Peninsula / Arabian Sea & Bay of Bengal
     const map = L.map(mapContainerRef.current, {
-      center: [13.0, 78.5],
+      center: [14.0, 78.5],
       zoom: 6,
       minZoom: 4,
       maxZoom: 14,
@@ -95,11 +96,44 @@ export const MapViewport: React.FC<MapViewportProps> = ({
 
     mapInstanceRef.current = map;
 
+    // Force invalidateSize after mount & layout computation
+    const timer1 = setTimeout(() => {
+      map.invalidateSize();
+    }, 150);
+
+    const timer2 = setTimeout(() => {
+      map.invalidateSize();
+    }, 500);
+
+    // ResizeObserver to handle any window/tab resizing
+    const resizeObserver = new ResizeObserver(() => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    });
+
+    if (mapContainerRef.current) {
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
     return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      resizeObserver.disconnect();
       map.remove();
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Invalidate size whenever tab or active state updates
+  useEffect(() => {
+    if (mapInstanceRef.current) {
+      const t = setTimeout(() => {
+        mapInstanceRef.current?.invalidateSize();
+      }, 100);
+      return () => clearTimeout(t);
+    }
+  }, [pfzHotspots, activeRoute]);
 
   // Render IMBL and MPAs
   useEffect(() => {
@@ -345,9 +379,13 @@ export const MapViewport: React.FC<MapViewportProps> = ({
   }, [isSimulatingVessel, activeRoute]);
 
   return (
-    <div className="relative w-full h-full min-h-[520px] overflow-hidden rounded-3xl border border-slate-200 shadow-lg bg-white">
+    <div className="relative w-full h-full min-h-[520px] flex-1 overflow-hidden rounded-3xl border border-slate-200 shadow-lg bg-slate-100 flex flex-col">
       {/* Map Canvas */}
-      <div ref={mapContainerRef} className="w-full h-full min-h-[520px]" />
+      <div 
+        ref={mapContainerRef} 
+        className="w-full h-full min-h-[520px] flex-1" 
+        style={{ width: '100%', height: '100%', minHeight: '520px' }} 
+      />
 
       {/* Floating Layer Control Panel (Bright Glass) */}
       <div className="absolute top-4 left-4 z-[400] bg-white/95 backdrop-blur-md p-3.5 rounded-2xl border border-slate-200 shadow-xl max-w-xs space-y-2.5 text-xs text-slate-800">
