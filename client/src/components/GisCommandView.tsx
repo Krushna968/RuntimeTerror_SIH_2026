@@ -3,11 +3,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { 
   Layers, 
-  Eye, 
-  EyeOff, 
   Play, 
   RotateCcw,
-  Sparkles, 
   Volume2, 
   VolumeX, 
   Mic, 
@@ -16,8 +13,8 @@ import {
   Compass, 
   Copy, 
   Check,
-  Loader2,
-  MapPin
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { PFZHotspot, NavigationRoute, WeatherObservation, SatelliteTelemetry, ChatResponsePayload } from '../types';
 
@@ -34,6 +31,19 @@ interface GisCommandViewProps {
   currentLang: string;
   onMapClickCoord: (lat: number, lon: number) => void;
 }
+
+const INDIAN_PORTS = [
+  { id: 'kochi', name: 'Kochi Harbour', lat: 9.9416, lon: 76.2575, state: 'Kerala' },
+  { id: 'chennai', name: 'Chennai Kasimedu', lat: 13.1256, lon: 80.2974, state: 'Tamil Nadu' },
+  { id: 'visakhapatnam', name: 'Vizag Harbour', lat: 17.6974, lon: 83.2986, state: 'Andhra Pradesh' },
+  { id: 'mumbai', name: 'Sassoon Docks', lat: 18.9172, lon: 72.8228, state: 'Maharashtra' },
+  { id: 'porbandar', name: 'Porbandar Port', lat: 21.6417, lon: 69.6293, state: 'Gujarat' },
+  { id: 'rameswaram', name: 'Rameswaram Jetty', lat: 9.2876, lon: 79.3129, state: 'Tamil Nadu' },
+  { id: 'mangalore', name: 'Mangalore Port', lat: 12.8596, lon: 74.8396, state: 'Karnataka' },
+  { id: 'paradip', name: 'Paradip Port', lat: 20.2644, lon: 86.6698, state: 'Odisha' },
+  { id: 'kanyakumari', name: 'Kanyakumari', lat: 8.0883, lon: 77.5385, state: 'Tamil Nadu' },
+  { id: 'port_blair', name: 'Port Blair', lat: 11.6643, lon: 92.7305, state: 'Andaman & Nicobar' }
+];
 
 export const GisCommandView: React.FC<GisCommandViewProps> = ({
   pfzHotspots,
@@ -54,6 +64,10 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   const [showIMBL, setShowIMBL] = useState(true);
   const [showMPA, setShowMPA] = useState(true);
   const [showCyclone, setShowCyclone] = useState(true);
+  const [showPorts, setShowPorts] = useState(true);
+  const [isLayersExpanded, setIsLayersExpanded] = useState(true);
+
+  // Simulation
   const [isSimulatingVessel, setIsSimulatingVessel] = useState(false);
   const [vesselProgress, setVesselProgress] = useState(0);
 
@@ -71,6 +85,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   const pfzLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const imblLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const mpaLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
+  const portsLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const routeLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const cycloneLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const clickMarkerGroup = useRef<L.LayerGroup>(L.layerGroup());
@@ -101,6 +116,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
     pfzLayerGroup.current.addTo(map);
     imblLayerGroup.current.addTo(map);
     mpaLayerGroup.current.addTo(map);
+    portsLayerGroup.current.addTo(map);
     routeLayerGroup.current.addTo(map);
     cycloneLayerGroup.current.addTo(map);
     clickMarkerGroup.current.addTo(map);
@@ -109,7 +125,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
     map.on('click', (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
       setClickedCoord({ lat, lng });
-      setActiveQueryText(`Investigating coordinates ${lat.toFixed(2)}°N, ${lng.toFixed(2)}°E...`);
+      setActiveQueryText(`Coordinates ${lat.toFixed(2)}°N, ${lng.toFixed(2)}°E`);
 
       // Place visual pulse ripple marker on map
       clickMarkerGroup.current.clearLayers();
@@ -117,23 +133,16 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         className: 'custom-click-pin',
         html: `
           <div class="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
-            <span class="animate-ping absolute inline-flex h-9 w-9 rounded-full bg-blue-500 opacity-80"></span>
-            <span class="relative inline-flex rounded-full h-4 w-4 bg-blue-600 border-2 border-white shadow-lg"></span>
+            <span class="animate-ping absolute inline-flex h-8 w-8 rounded-full bg-blue-500 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-blue-600 border-2 border-white shadow-md"></span>
           </div>
         `,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
       });
 
-      const clickMarker = L.marker([lat, lng], { icon: clickIcon })
-        .bindPopup(`
-          <div class="p-1 font-['Outfit',sans-serif]">
-            <strong class="text-xs text-blue-800">Target Selected</strong>
-            <div class="text-[11px] text-zinc-600">${lat.toFixed(3)}°N, ${lng.toFixed(3)}°E</div>
-          </div>
-        `);
+      const clickMarker = L.marker([lat, lng], { icon: clickIcon });
       clickMarkerGroup.current.addLayer(clickMarker);
-      clickMarker.openPopup();
 
       onMapClickCoord(lat, lng);
     });
@@ -160,6 +169,41 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Render Ports Layer
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+    portsLayerGroup.current.clearLayers();
+
+    if (showPorts) {
+      INDIAN_PORTS.forEach(port => {
+        const portIcon = L.divIcon({
+          className: 'port-marker',
+          html: `
+            <div class="flex items-center justify-center w-5 h-5 rounded-full bg-zinc-900 text-white text-[10px] border border-white shadow-sm hover:scale-125 transition-transform cursor-pointer">
+              ⚓
+            </div>
+          `,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        });
+
+        const marker = L.marker([port.lat, port.lon], { icon: portIcon })
+          .bindPopup(`
+            <div class="p-1 font-['Outfit',sans-serif]">
+              <strong class="text-xs text-zinc-900">${port.name}</strong>
+              <div class="text-[11px] text-zinc-600">${port.state}</div>
+            </div>
+          `);
+
+        marker.on('click', () => {
+          handleSendQuery(`What is the PFZ fishing advisory and sea safety forecast for ${port.name}?`);
+        });
+
+        portsLayerGroup.current.addLayer(marker);
+      });
+    }
+  }, [showPorts]);
 
   // Render Static GIS Layers (IMBL, MPA, Cyclone)
   useEffect(() => {
@@ -277,7 +321,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       pfzHotspots.forEach(pfz => {
         const isSelected = selectedPFZ?.id === pfz.id;
         const marker = L.circleMarker([pfz.latitude, pfz.longitude], {
-          radius: isSelected ? 10 : 7,
+          radius: isSelected ? 9 : 6.5,
           color: isSelected ? '#0284C7' : '#059669',
           fillColor: isSelected ? '#38BDF8' : '#10B981',
           fillOpacity: 0.9,
@@ -305,7 +349,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
     if (!mapInstanceRef.current) return;
     routeLayerGroup.current.clearLayers();
 
-    if (activeRoute && activeRoute.waypoints.length > 1) {
+    if (activeRoute && activeRoute.waypoints && activeRoute.waypoints.length > 1) {
       const latlngs: [number, number][] = activeRoute.waypoints.map(w => [w.latitude, w.longitude]);
       const poly = L.polyline(latlngs, {
         color: '#0284C7',
@@ -320,25 +364,29 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       const boatIcon = L.divIcon({
         className: 'vessel-icon',
         html: `
-          <div class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-600 text-white border-2 border-white shadow-md">
+          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs border border-white shadow-md">
             🚢
           </div>
         `,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14]
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
       });
 
-      const vesselMarker = L.marker(currentPos, { icon: boatIcon })
-        .bindPopup(`<div class="text-xs font-medium text-slate-900">🛥️ Trawler IND-KL-04-M</div>`);
+      const vesselMarker = L.marker(currentPos, { icon: boatIcon });
       routeLayerGroup.current.addLayer(vesselMarker);
     }
   }, [activeRoute, vesselProgress]);
 
   // Trawler animation ticker
   useEffect(() => {
-    if (!isSimulatingVessel || !activeRoute) return;
+    if (!isSimulatingVessel) return;
+    const waypoints = activeRoute?.waypoints || [
+      { latitude: 9.94, longitude: 76.25 },
+      { latitude: 9.85, longitude: 75.95 },
+      { latitude: 9.75, longitude: 75.65 }
+    ];
     const interval = setInterval(() => {
-      setVesselProgress(prev => (prev >= activeRoute.waypoints.length - 1 ? 0 : prev + 1));
+      setVesselProgress(prev => (prev >= waypoints.length - 1 ? 0 : prev + 1));
     }, 1200);
     return () => clearInterval(interval);
   }, [isSimulatingVessel, activeRoute]);
@@ -379,95 +427,122 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       {/* 1. Fullscreen Map Canvas */}
       <div 
         ref={mapContainerRef} 
-        className="absolute inset-0 w-full h-full z-0" 
+        className="absolute inset-0 w-full h-full z-0 cursor-crosshair" 
       />
 
-      {/* 2. Top-Left Minimalist Layer Controls Island */}
-      <div className="absolute top-24 left-6 z-20 pointer-events-auto w-64 p-3.5 rounded-2xl bg-white/90 backdrop-blur-xl border border-zinc-200/80 shadow-md text-zinc-900 space-y-2.5">
-        <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
+      {/* 2. Top-Left Sleek Apple-Style Layer Controls */}
+      <div className="absolute top-24 left-6 z-20 pointer-events-auto w-56 rounded-2xl bg-white/95 backdrop-blur-xl border border-zinc-200/80 shadow-lg text-zinc-900 overflow-hidden transition-all">
+        {/* Card Header with Collapse Button */}
+        <div 
+          onClick={() => setIsLayersExpanded(!isLayersExpanded)}
+          className="px-3.5 py-2.5 flex items-center justify-between cursor-pointer hover:bg-zinc-50 border-b border-zinc-100"
+        >
           <div className="flex items-center space-x-1.5 text-xs font-bold text-zinc-900">
             <Layers className="w-3.5 h-3.5 text-blue-600" />
             <span>Map Layers</span>
           </div>
-          <span className="text-[10px] font-medium text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full">
-            ISRO L3
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-1.5 text-xs">
-          <button
-            onClick={() => setShowPFZ(!showPFZ)}
-            className={`px-2.5 py-1.5 rounded-xl font-medium transition-all flex items-center justify-between cursor-pointer ${
-              showPFZ 
-                ? 'bg-zinc-900 text-white' 
-                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-            }`}
-          >
-            <span>PFZ Zones</span>
-            {showPFZ ? <Eye className="w-3 h-3 text-emerald-400" /> : <EyeOff className="w-3 h-3 text-zinc-400" />}
-          </button>
-
-          <button
-            onClick={() => setShowIMBL(!showIMBL)}
-            className={`px-2.5 py-1.5 rounded-xl font-medium transition-all flex items-center justify-between cursor-pointer ${
-              showIMBL 
-                ? 'bg-zinc-900 text-white' 
-                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-            }`}
-          >
-            <span>IMBL Border</span>
-            {showIMBL ? <Eye className="w-3 h-3 text-red-400" /> : <EyeOff className="w-3 h-3 text-zinc-400" />}
-          </button>
-
-          <button
-            onClick={() => setShowMPA(!showMPA)}
-            className={`px-2.5 py-1.5 rounded-xl font-medium transition-all flex items-center justify-between cursor-pointer ${
-              showMPA 
-                ? 'bg-zinc-900 text-white' 
-                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-            }`}
-          >
-            <span>MPA Reserves</span>
-            {showMPA ? <Eye className="w-3 h-3 text-amber-400" /> : <EyeOff className="w-3 h-3 text-zinc-400" />}
-          </button>
-
-          <button
-            onClick={() => setShowCyclone(!showCyclone)}
-            className={`px-2.5 py-1.5 rounded-xl font-medium transition-all flex items-center justify-between cursor-pointer ${
-              showCyclone 
-                ? 'bg-zinc-900 text-white' 
-                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-            }`}
-          >
-            <span>Cyclone</span>
-            {showCyclone ? <Eye className="w-3 h-3 text-rose-400" /> : <EyeOff className="w-3 h-3 text-zinc-400" />}
-          </button>
-        </div>
-
-        {/* Trawler Simulation */}
-        <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-xs">
-          <span className="text-zinc-600 text-[11px]">Trawler Route</span>
           <div className="flex items-center space-x-1">
-            <button
-              onClick={() => setIsSimulatingVessel(!isSimulatingVessel)}
-              className="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-medium flex items-center space-x-1 transition-all cursor-pointer"
-            >
-              <Play className="w-2.5 h-2.5 fill-current" />
-              <span>{isSimulatingVessel ? 'Pause' : 'Start'}</span>
-            </button>
-            <button
-              onClick={() => { setIsSimulatingVessel(false); setVesselProgress(0); }}
-              className="p-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition-colors cursor-pointer"
-              title="Reset"
-            >
-              <RotateCcw className="w-3 h-3" />
-            </button>
+            <span className="text-[9px] font-semibold text-zinc-400">ISRO</span>
+            {isLayersExpanded ? <ChevronUp className="w-3.5 h-3.5 text-zinc-400" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />}
           </div>
         </div>
+
+        {isLayersExpanded && (
+          <div className="p-3 space-y-2 text-xs">
+            {/* Toggle Rows */}
+            <div className="space-y-1.5">
+              <div 
+                onClick={() => setShowPFZ(!showPFZ)}
+                className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors"
+              >
+                <span className="flex items-center space-x-2 text-zinc-700">
+                  <span className={`w-2 h-2 rounded-full ${showPFZ ? 'bg-emerald-500' : 'bg-zinc-300'}`} />
+                  <span className="text-[11px] font-medium">PFZ Fishing Zones</span>
+                </span>
+                <span className={`text-[10px] font-mono font-semibold ${showPFZ ? 'text-emerald-700' : 'text-zinc-400'}`}>
+                  {showPFZ ? 'ON' : 'OFF'}
+                </span>
+              </div>
+
+              <div 
+                onClick={() => setShowIMBL(!showIMBL)}
+                className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors"
+              >
+                <span className="flex items-center space-x-2 text-zinc-700">
+                  <span className={`w-2 h-2 rounded-full ${showIMBL ? 'bg-red-500' : 'bg-zinc-300'}`} />
+                  <span className="text-[11px] font-medium">IMBL Border Buffer</span>
+                </span>
+                <span className={`text-[10px] font-mono font-semibold ${showIMBL ? 'text-red-700' : 'text-zinc-400'}`}>
+                  {showIMBL ? 'ON' : 'OFF'}
+                </span>
+              </div>
+
+              <div 
+                onClick={() => setShowMPA(!showMPA)}
+                className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors"
+              >
+                <span className="flex items-center space-x-2 text-zinc-700">
+                  <span className={`w-2 h-2 rounded-full ${showMPA ? 'bg-amber-500' : 'bg-zinc-300'}`} />
+                  <span className="text-[11px] font-medium">MPA Eco Reserves</span>
+                </span>
+                <span className={`text-[10px] font-mono font-semibold ${showMPA ? 'text-amber-700' : 'text-zinc-400'}`}>
+                  {showMPA ? 'ON' : 'OFF'}
+                </span>
+              </div>
+
+              <div 
+                onClick={() => setShowCyclone(!showCyclone)}
+                className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors"
+              >
+                <span className="flex items-center space-x-2 text-zinc-700">
+                  <span className={`w-2 h-2 rounded-full ${showCyclone ? 'bg-rose-500' : 'bg-zinc-300'}`} />
+                  <span className="text-[11px] font-medium">Cyclone Alert</span>
+                </span>
+                <span className={`text-[10px] font-mono font-semibold ${showCyclone ? 'text-rose-700' : 'text-zinc-400'}`}>
+                  {showCyclone ? 'ON' : 'OFF'}
+                </span>
+              </div>
+
+              <div 
+                onClick={() => setShowPorts(!showPorts)}
+                className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors"
+              >
+                <span className="flex items-center space-x-2 text-zinc-700">
+                  <span className={`w-2 h-2 rounded-full ${showPorts ? 'bg-blue-500' : 'bg-zinc-300'}`} />
+                  <span className="text-[11px] font-medium">Major Harbours</span>
+                </span>
+                <span className={`text-[10px] font-mono font-semibold ${showPorts ? 'text-blue-700' : 'text-zinc-400'}`}>
+                  {showPorts ? 'ON' : 'OFF'}
+                </span>
+              </div>
+            </div>
+
+            {/* Trawler Simulation Row */}
+            <div className="pt-2 border-t border-zinc-100 flex items-center justify-between">
+              <span className="text-zinc-500 text-[11px]">Trawler Route</span>
+              <div className="flex items-center space-x-1">
+                <button
+                  onClick={() => setIsSimulatingVessel(!isSimulatingVessel)}
+                  className="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-semibold flex items-center space-x-1 transition-all cursor-pointer"
+                >
+                  <Play className="w-2.5 h-2.5 fill-current" />
+                  <span>{isSimulatingVessel ? 'Pause' : 'Simulate'}</span>
+                </button>
+                <button
+                  onClick={() => { setIsSimulatingVessel(false); setVesselProgress(0); }}
+                  className="p-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition-colors cursor-pointer"
+                  title="Reset"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 3. Bottom-Left Minimal Ocean State Pill */}
-      <div className="absolute bottom-6 left-16 z-20 pointer-events-auto hidden sm:flex items-center space-x-4 px-4 py-2 rounded-xl bg-white/90 backdrop-blur-xl border border-zinc-200/80 shadow-sm text-xs text-zinc-700 font-mono">
+      <div className="absolute bottom-6 left-16 z-20 pointer-events-auto hidden sm:flex items-center space-x-4 px-4 py-2 rounded-xl bg-white/95 backdrop-blur-xl border border-zinc-200/80 shadow-sm text-xs text-zinc-700 font-mono">
         <div>Wave: <strong className="text-zinc-900 font-bold">{weather?.significant_wave_height_m || "1.03"}m</strong></div>
         <div className="w-px h-3 bg-zinc-200" />
         <div>Wind: <strong className="text-zinc-900 font-bold">{weather?.wind_speed_knots || "14.9"} kts</strong></div>
@@ -481,13 +556,11 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         {/* Minimal Header */}
         <div className="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-2">
-            <span className={`w-2 h-2 rounded-full ${isLoading ? 'bg-amber-500 animate-ping' : 'bg-emerald-500 animate-pulse'}`} />
-            <h3 className="text-xs font-bold text-zinc-900 tracking-tight">
-              {isLoading ? 'Analyzing Telemetry...' : 'ORCA Assistant'}
-            </h3>
+            <span className={`w-2 h-2 rounded-full ${isLoading ? 'bg-blue-600 animate-ping' : 'bg-emerald-500 animate-pulse'}`} />
+            <h3 className="text-xs font-bold text-zinc-900 tracking-tight">ORCA Assistant</h3>
           </div>
           <span className="text-[10px] font-medium text-zinc-500 bg-zinc-100 px-2.5 py-0.5 rounded-full">
-            {isLoading ? '6 Agents Active' : 'ISRO AI'}
+            ISRO AI
           </span>
         </div>
 
@@ -516,52 +589,23 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         {/* Chat / Advisory Scroll Area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
           {isLoading ? (
-            /* Instant Interactive Loading State */
-            <div className="space-y-3.5 animate-in fade-in duration-300">
-              {/* User Tap / Query Bubble */}
+            /* Ultra-Clean Minimal Streaming / Thinking State */
+            <div className="space-y-3 animate-in fade-in duration-200">
+              {/* User Tap Query Bubble */}
               <div className="flex justify-end">
-                <div className="max-w-[85%] px-3.5 py-2 rounded-2xl bg-zinc-900 text-white font-medium flex items-center space-x-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                  <span>
-                    {activeQueryText || (clickedCoord ? `Inspecting ${clickedCoord.lat.toFixed(2)}°N, ${clickedCoord.lng.toFixed(2)}°E` : 'Executing query...')}
-                  </span>
+                <div className="max-w-[85%] px-3.5 py-2 rounded-2xl bg-zinc-900 text-white font-medium">
+                  {activeQueryText || (clickedCoord ? `📍 Coordinates ${clickedCoord.lat.toFixed(2)}°N, ${clickedCoord.lng.toFixed(2)}°E` : 'Evaluating query...')}
                 </div>
               </div>
 
-              {/* Multi-Agent Reasoning Card */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50/90 to-cyan-50/70 border border-blue-200/80 space-y-3 shadow-xs">
-                <div className="flex items-center space-x-2.5">
-                  <Loader2 className="w-4 h-4 text-blue-600 animate-spin shrink-0" />
-                  <div>
-                    <strong className="block text-xs text-blue-950 font-bold">Multi-Agent DAG Reasoning</strong>
-                    <span className="text-[10px] text-blue-700 font-medium">Cross-analyzing Oceansat-3 & INCOIS models...</span>
-                  </div>
+              {/* Minimalist 3-Dot Thinking Bubble */}
+              <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200/60 flex items-center space-x-3 text-xs text-zinc-600">
+                <div className="flex space-x-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
-
-                {/* Progress Steps */}
-                <div className="space-y-1.5 pt-1 border-t border-blue-200/60 text-[11px]">
-                  <div className="flex items-center justify-between text-blue-900 font-medium">
-                    <span className="flex items-center space-x-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-                      <span>Ingesting satellite oceanography</span>
-                    </span>
-                    <span className="text-[9px] font-mono text-blue-600">Oceansat-3</span>
-                  </div>
-                  <div className="flex items-center justify-between text-blue-900 font-medium">
-                    <span className="flex items-center space-x-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-                      <span>Evaluating SST & Chlorophyll fronts</span>
-                    </span>
-                    <span className="text-[9px] font-mono text-blue-600">INCOIS</span>
-                  </div>
-                  <div className="flex items-center justify-between text-blue-900 font-medium">
-                    <span className="flex items-center space-x-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-                      <span>Computing border geofence & safety</span>
-                    </span>
-                    <span className="text-[9px] font-mono text-blue-600">UNCLOS</span>
-                  </div>
-                </div>
+                <span className="text-zinc-500 font-medium">Reasoning over Oceansat-3 & INCOIS...</span>
               </div>
             </div>
           ) : latestResponse ? (

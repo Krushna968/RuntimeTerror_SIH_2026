@@ -128,15 +128,16 @@ export function App() {
 
   // Map Click coordinate investigation
   const handleMapClickCoord = async (lat: number, lon: number) => {
+    setIsLoading(true);
     try {
-      const weatherRes = await fetch(`${API_BASE}/api/weather?lat=${lat}&lon=${lon}`);
-      if (weatherRes.ok) {
-        const w = await weatherRes.json();
-        setWeather(w);
-      }
-      handleSendMessage(`What are the sea conditions, PFZ suitability, and IMBL border proximity at coordinates ${lat.toFixed(2)}N, ${lon.toFixed(2)}E?`);
+      fetch(`${API_BASE}/api/weather?lat=${lat}&lon=${lon}`)
+        .then(res => res.ok ? res.json() : null)
+        .then(w => { if (w) setWeather(w); })
+        .catch(() => {});
+      await handleSendMessage(`What are the sea conditions, PFZ suitability, and IMBL border proximity at coordinates ${lat.toFixed(2)}N, ${lon.toFixed(2)}E?`);
     } catch (e) {
       console.error(e);
+      setIsLoading(false);
     }
   };
 
