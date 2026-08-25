@@ -1,5 +1,5 @@
 import React from 'react';
-import { Satellite, Activity, Radio, CheckCircle, ShieldCheck } from 'lucide-react';
+import { Satellite, Activity, Radio, CheckCircle, ShieldCheck, Zap } from 'lucide-react';
 import { SatelliteTelemetry } from '../types';
 
 interface SatelliteTelemetryBarProps {
@@ -10,37 +10,43 @@ export const SatelliteTelemetryBar: React.FC<SatelliteTelemetryBarProps> = ({
   satellites
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
       {satellites.map((sat) => (
         <div 
           key={sat.id}
-          className="glass-panel p-3.5 rounded-xl border border-slate-800 hover:border-ocean-cyan/40 transition-all space-y-2"
+          className="glass-card-bright p-4 rounded-2xl border border-cyan-400/30 hover:border-cyan-400/60 hover:shadow-[0_0_25px_rgba(6,182,212,0.25)] transition-all space-y-2.5 group"
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="p-1.5 rounded-lg bg-ocean-cyan/10 text-ocean-cyan">
-                <Satellite className="w-4 h-4" />
+            <div className="flex items-center space-x-2.5">
+              <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 group-hover:scale-110 transition-transform shadow-[0_0_10px_rgba(6,182,212,0.3)]">
+                <Satellite className="w-4 h-4 animate-pulse" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-white">{sat.name}</h4>
-                <p className="text-[10px] text-slate-400 font-mono">{sat.orbit}</p>
+                <h4 className="text-sm font-black text-white tracking-wide">{sat.name}</h4>
+                <p className="text-[11px] text-cyan-200/80 font-mono">{sat.orbit}</p>
               </div>
             </div>
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-500/40">
+            <span className="text-xs font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/60 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
               {sat.health_score}% Health
             </span>
           </div>
 
-          <div className="text-[11px] text-slate-300 space-y-0.5">
-            <div><strong>Sensors:</strong> {sat.sensors.join(", ")}</div>
-            <div><strong>Latency:</strong> {sat.data_latency}</div>
+          <div className="text-xs text-slate-200 space-y-1 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+            <div className="flex items-center space-x-1.5">
+              <span className="text-cyan-400 font-semibold">Sensors:</span>
+              <span className="text-slate-100 font-medium">{sat.sensors.join(", ")}</span>
+            </div>
+            <div className="flex items-center space-x-1.5">
+              <span className="text-cyan-400 font-semibold">Latency:</span>
+              <span className="text-slate-100 font-mono">{sat.data_latency}</span>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-800/80 pt-1.5">
-            <span>Last Pass: {sat.last_pass.split("T")[1]?.substring(0, 5) || "Active"}</span>
-            <span className="flex items-center space-x-1 text-emerald-400">
-              <CheckCircle className="w-3 h-3" />
-              <span>NRSC Synced</span>
+          <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1">
+            <span className="font-mono text-cyan-200">Last Pass: {sat.last_pass.split("T")[1]?.substring(0, 5) || "Continuous"}</span>
+            <span className="flex items-center space-x-1.5 font-bold text-emerald-400">
+              <CheckCircle className="w-3.5 h-3.5" />
+              <span>NRSC Ground Synced</span>
             </span>
           </div>
         </div>

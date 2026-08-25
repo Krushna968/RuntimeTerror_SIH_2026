@@ -9,77 +9,102 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #030712;
-  color: #f1f5f9;
+  background: radial-gradient(circle at 50% 0%, #172554 0%, #0f172a 45%, #020617 100%);
+  background-attachment: fixed;
+  color: #f8fafc;
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  min-height: 100vh;
 }
 
-/* Glassmorphism utilities */
+/* Luminous Glassmorphism utilities */
 .glass-panel {
-  background: rgba(8, 22, 46, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 240, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(6, 182, 212, 0.08);
 }
 
 .glass-panel-glow {
-  background: rgba(8, 22, 46, 0.85);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 240, 255, 0.35);
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.05);
+  background: rgba(15, 28, 56, 0.85);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(6, 182, 212, 0.45);
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.25), inset 0 0 20px rgba(6, 182, 212, 0.1);
+}
+
+.glass-card-bright {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(56, 189, 248, 0.1);
 }
 
 .glass-pill {
-  background: rgba(15, 33, 64, 0.6);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #050e1f;
+  background: #0b1329;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #142e5c;
-  border-radius: 3px;
+  background: #0284c7;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00f0ff;
+  background: #38bdf8;
 }
 
-/* Leaflet Map Custom Overrides for Dark Ocean Theme */
+/* Leaflet Map Custom Overrides for Bright High-Contrast Ocean Theme */
 .leaflet-container {
-  background: #030712 !important;
+  background: #081229 !important;
   font-family: 'Outfit', sans-serif !important;
 }
 
 .leaflet-popup-content-wrapper {
-  background: rgba(8, 22, 46, 0.95) !important;
-  backdrop-filter: blur(12px) !important;
-  color: #f1f5f9 !important;
-  border: 1px solid rgba(0, 240, 255, 0.3) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
-  border-radius: 12px !important;
+  background: rgba(15, 23, 42, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(56, 189, 248, 0.5) !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(6, 182, 212, 0.3) !important;
+  border-radius: 14px !important;
 }
 
 .leaflet-popup-tip {
-  background: rgba(8, 22, 46, 0.95) !important;
-  border: 1px solid rgba(0, 240, 255, 0.3) !important;
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(56, 189, 248, 0.5) !important;
 }
 
-/* Radar Animation */
-.radar-grid {
-  background-image: 
-    radial-gradient(circle at center, rgba(0, 240, 255, 0.08) 0, rgba(0, 240, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(to right, rgba(0, 240, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
-  background-size: 100% 100%, 30px 30px, 30px 30px;
+/* Atmospheric Spotlight Beams */
+.ambient-glow-top {
+  position: fixed;
+  top: -100px;
+  left: 20%;
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, rgba(30, 58, 138, 0) 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-right {
+  position: fixed;
+  top: 30%;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(16, 185, 129, 0) 70%);
+  filter: blur(70px);
+  pointer-events: none;
+  z-index: 0;
 }
