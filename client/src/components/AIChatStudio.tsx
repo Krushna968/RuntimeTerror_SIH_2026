@@ -170,7 +170,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             transition={{ duration: 0.5 }}
             className="text-4xl sm:text-5xl font-normal text-zinc-100 tracking-tight mb-8 select-none"
           >
-            What can I help with, Aryan?
+            Where shall we navigate today?
           </motion.h1>
 
           {/* Centered Gemini-Style Search Capsule */}
