@@ -1,17 +1,13 @@
 import React from 'react';
 import { 
-  ChevronDown, 
   ArrowRight, 
-  Sparkles, 
-  Map, 
-  Cpu, 
-  ShieldCheck, 
   Satellite, 
   Fish, 
-  Waves, 
-  Languages, 
+  ShieldCheck, 
   Compass,
-  AlertTriangle
+  AlertTriangle,
+  Languages,
+  Cpu
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -70,12 +66,12 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
         }}
       />
 
-      {/* 2. Top Unified Navigation Bar */}
+      {/* 2. Top Sleek Navigation Bar (Clickable Texts) */}
       <nav className="relative z-50 w-full max-w-7xl mx-auto h-20 px-6 sm:px-10 flex items-center justify-between">
         {/* Brand Logo */}
         <div 
           onClick={() => onExplorePlatform('map')}
-          className="flex items-center space-x-3 cursor-pointer group"
+          className="flex items-center space-x-3 cursor-pointer group shrink-0"
         >
           {/* 3D Oceanic Compass Emblem */}
           <div className="relative w-8 h-8 flex items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-1.5 shadow-[0_0_20px_rgba(6,182,212,0.6)] group-hover:scale-105 transition-transform">
@@ -90,47 +86,45 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
             <span className="text-2xl font-black tracking-wider text-white group-hover:text-cyan-200 transition-colors">
               ORCA
             </span>
-            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-400/50 uppercase tracking-wider">
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-400/50 uppercase tracking-wider hidden sm:inline-block">
               ISRO · SIH 26176
             </span>
           </div>
         </div>
 
-        {/* Center Menu Links */}
-        <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-zinc-300">
+        {/* Center Menu: Just Clean Clickable Texts */}
+        <div className="hidden lg:flex items-center space-x-9 text-sm font-medium text-zinc-300">
           <button 
             onClick={() => onExplorePlatform('map')}
-            className="flex items-center space-x-1 hover:text-cyan-300 cursor-pointer transition-colors bg-transparent border-none p-0"
+            className="hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap"
           >
-            <span>GIS Command</span>
-            <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+            GIS Command
           </button>
 
           <button 
             onClick={() => onExplorePlatform('agent-lab')}
-            className="flex items-center space-x-1 hover:text-cyan-300 cursor-pointer transition-colors bg-transparent border-none p-0"
+            className="hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap"
           >
-            <span>Agent DAG Lab</span>
-            <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+            Agent DAG
           </button>
 
           <button 
             onClick={() => onExplorePlatform('safety')}
-            className="hover:text-cyan-300 cursor-pointer transition-colors bg-transparent border-none p-0"
+            className="hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap"
           >
             Safety Barometer
           </button>
 
           <button 
             onClick={() => onExplorePlatform('bulletin')}
-            className="hover:text-cyan-300 cursor-pointer transition-colors bg-transparent border-none p-0"
+            className="hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap"
           >
             Marine Advisory
           </button>
         </div>
 
         {/* Right Action Group */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 shrink-0">
           {/* Regional Language Switcher */}
           <div className="relative flex items-center bg-zinc-900/90 border border-zinc-700/80 px-3 py-1.5 rounded-full shadow-sm">
             <Languages className="w-3.5 h-3.5 text-cyan-400 mr-2" />
@@ -158,7 +152,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
           {/* Get Started Button */}
           <button 
             onClick={() => onExplorePlatform('map')}
-            className="px-4 py-2 rounded-full text-sm font-bold text-slate-950 bg-white hover:bg-zinc-100 transition-all shadow-md active:scale-95 cursor-pointer hidden sm:block"
+            className="px-4 py-2 rounded-full text-sm font-bold text-slate-950 bg-white hover:bg-zinc-100 transition-all shadow-md active:scale-95 cursor-pointer hidden sm:block whitespace-nowrap"
           >
             Open Command Map
           </button>
@@ -205,7 +199,6 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
               onClick={() => onExplorePlatform('map')}
             >
               <defs>
-                {/* 3D Prism Gradient */}
                 <linearGradient id="orca-prism-front" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
                   <stop offset="0%" stopColor="#00F0FF" />
                   <stop offset="45%" stopColor="#3B82F6" />
@@ -222,20 +215,17 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
                 </linearGradient>
               </defs>
 
-              {/* Main Arrow / Prism Body */}
               <path 
                 d="M22 28C22 23.5787 26.5816 20.8037 30.4199 23.0118L102.42 64.4118C106.258 66.6199 106.258 72.1558 102.42 74.3639L30.4199 115.764C26.5816 117.972 22 115.197 22 110.776V28Z" 
                 fill="url(#orca-prism-front)"
               />
 
-              {/* Top Facet for 3D Volume */}
               <path 
                 d="M22 28C22 23.5787 26.5816 20.8037 30.4199 23.0118L102.42 64.4118C95 62 65 52 22 55V28Z" 
                 fill="url(#orca-prism-top)"
                 opacity="0.85"
               />
 
-              {/* Glossy Glass Highlight Overlay */}
               <path 
                 d="M24 30L95 68L30 80L24 30Z" 
                 fill="url(#orca-prism-glass)"
@@ -329,10 +319,10 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
             className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 hover:border-pink-400/40 hover:bg-zinc-900/90 transition-all cursor-pointer text-left space-y-1 group"
           >
             <div className="flex items-center space-x-2 text-pink-400">
-              <Languages className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-white">8 Indic Languages</span>
+              <Cpu className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-bold text-white">NVIDIA LLM Engine</span>
             </div>
-            <p className="text-[11px] text-zinc-400">Multi-Turn Voice & Text Assistant</p>
+            <p className="text-[11px] text-zinc-400">Meta Llama-3.1-8B Vernacular</p>
           </div>
         </motion.div>
       </main>
