@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSOSClick
 }) => {
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#07090e]/95 backdrop-blur-xl border-b border-zinc-800/80 px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-2xl text-white font-['Outfit',sans-serif]">
+    <header className="sticky top-0 z-50 w-full bg-[#07090e]/80 backdrop-blur-xl px-6 sm:px-10 py-3.5 flex items-center justify-between text-white font-['Outfit',sans-serif]">
       {/* Brand Logo */}
       <div 
         onClick={() => setActiveTab('home')}
@@ -54,13 +54,13 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Center Navigation: Just Clean Clickable Texts */}
+      {/* Center Navigation: Pure Clean Clickable Texts (Zero Lines) */}
       <nav className="hidden md:flex items-center space-x-7 lg:space-x-9 text-sm font-medium">
         <button
           onClick={() => setActiveTab('home')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'home'
-              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              ? 'text-white font-bold'
               : 'text-zinc-400 hover:text-white'
           }`}
         >
@@ -71,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('chat')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'chat'
-              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              ? 'text-white font-bold'
               : 'text-zinc-400 hover:text-white'
           }`}
         >
@@ -82,7 +82,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('map')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'map'
-              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              ? 'text-white font-bold'
               : 'text-zinc-400 hover:text-white'
           }`}
         >
@@ -93,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('agent-lab')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'agent-lab'
-              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              ? 'text-white font-bold'
               : 'text-zinc-400 hover:text-white'
           }`}
         >
@@ -104,7 +104,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('safety')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'safety'
-              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              ? 'text-white font-bold'
               : 'text-zinc-400 hover:text-white'
           }`}
         >
@@ -115,7 +115,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('bulletin')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'bulletin'
-              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              ? 'text-white font-bold'
               : 'text-zinc-400 hover:text-white'
           }`}
         >
