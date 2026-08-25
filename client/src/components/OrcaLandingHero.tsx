@@ -1,21 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { 
   ArrowRight, 
   Satellite, 
   Fish, 
   ShieldCheck, 
   AlertTriangle,
-  Cpu,
-  Sparkles,
-  Compass,
-  Waves,
-  Wind,
-  Languages,
-  Activity,
-  Anchor,
-  Radio,
-  ExternalLink,
-  ChevronRight
+  Sparkles, 
+  Compass, 
+  ChevronRight 
 } from 'lucide-react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
@@ -23,20 +15,11 @@ interface OrcaLandingHeroProps {
   onExplorePlatform: (tab: 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin') => void;
 }
 
-const LIVE_PORTS = [
-  { name: "Kochi Harbour", state: "Kerala", seaStatus: "SAFE", wave: "1.0m", wind: "14 kts", temp: "27.8°C", safetyScore: 88 },
-  { name: "Chennai Port", state: "Tamil Nadu", seaStatus: "SAFE", wave: "1.2m", wind: "12 kts", temp: "28.4°C", safetyScore: 85 },
-  { name: "Mumbai Sassoon", state: "Maharashtra", seaStatus: "SAFE", wave: "0.9m", wind: "10 kts", temp: "26.9°C", safetyScore: 92 },
-  { name: "Visakhapatnam", state: "Andhra Pradesh", seaStatus: "SAFE", wave: "1.3m", wind: "15 kts", temp: "28.1°C", safetyScore: 82 },
-  { name: "Porbandar Harbour", state: "Gujarat", seaStatus: "CAUTION", wave: "1.8m", wind: "19 kts", temp: "26.2°C", safetyScore: 68 },
-];
-
 export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
   onExplorePlatform
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [selectedPort, setSelectedPort] = useState(LIVE_PORTS[0]);
 
   // Interactive mouse tracker for dynamic 3D tilt and fluid spotlight
   const mouseX = useMotionValue(0);
@@ -199,8 +182,8 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
         className="absolute inset-0 pointer-events-none z-0 opacity-80" 
       />
 
-      {/* 6. Main Hero Section */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-32 pb-20 max-w-6xl mx-auto w-full">
+      {/* 6. Main Clean Focused Hero Section */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-32 pb-24 max-w-5xl mx-auto w-full my-auto">
         {/* Live Telemetry Ticker Pill with Glow */}
         <motion.div 
           initial={{ opacity: 0, y: -15 }}
@@ -295,137 +278,9 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
             <span>GIS Command Map</span>
           </button>
         </motion.div>
-
-        {/* 7. Live Coastal Port Safety Telemetry Strip */}
-        <motion.div 
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.45 }}
-          className="mt-16 w-full max-w-5xl bg-zinc-900/80 border border-cyan-500/30 rounded-3xl p-5 md:p-6 backdrop-blur-xl shadow-[0_0_30px_rgba(6,182,212,0.15)] text-left space-y-4"
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3">
-            <div className="flex items-center space-x-2.5">
-              <Anchor className="w-4 h-4 text-cyan-400" />
-              <h3 className="text-sm font-bold text-white">
-                Live Indian Coastal Ports Ocean State
-              </h3>
-            </div>
-            <span className="text-xs text-zinc-300 font-medium">
-              Click any port to inspect real-time satellite metrics
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            {LIVE_PORTS.map((port, idx) => (
-              <div
-                key={idx}
-                onClick={() => {
-                  setSelectedPort(port);
-                  onExplorePlatform('map');
-                }}
-                className={`p-3.5 rounded-2xl border transition-all cursor-pointer space-y-2 ${
-                  selectedPort.name === port.name 
-                    ? 'bg-zinc-800/90 border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.35)]' 
-                    : 'bg-zinc-950/70 hover:bg-zinc-850 border-zinc-800 hover:border-cyan-500/40'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white truncate">{port.name}</span>
-                  <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${
-                    port.seaStatus === 'SAFE' 
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
-                      : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                  }`}>
-                    {port.seaStatus}
-                  </span>
-                </div>
-
-                <div className="text-[11px] text-zinc-300 font-mono space-y-0.5">
-                  <div className="flex justify-between">
-                    <span>Wave:</span>
-                    <strong className="text-white">{port.wave}</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Wind:</span>
-                    <strong className="text-white">{port.wind}</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>SST:</span>
-                    <strong className="text-cyan-300">{port.temp}</strong>
-                  </div>
-                </div>
-
-                <div className="pt-1 flex items-center justify-between text-[10px] text-zinc-400 border-t border-zinc-800">
-                  <span>Safety Score</span>
-                  <strong className="text-emerald-400 font-mono font-bold">{port.safetyScore}/100</strong>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* 8. Four Specialized AI Domain Engine Cards */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 w-full max-w-5xl text-left"
-        >
-          <div 
-            onClick={() => onExplorePlatform('map')}
-            className="p-5 rounded-3xl bg-zinc-900/80 hover:bg-zinc-850 border border-cyan-500/30 hover:border-cyan-400 hover:shadow-[0_0_25px_rgba(6,182,212,0.25)] transition-all cursor-pointer space-y-2 group backdrop-blur-md"
-          >
-            <div className="flex items-center space-x-2 text-cyan-400">
-              <Fish className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">PFZ Analytics</h4>
-            </div>
-            <p className="text-xs text-zinc-300 leading-relaxed">
-              Mathematical gradient correlation (|∇SST| × |∇Chl-a|) from Oceansat-3 identifying 4.5x catch enhancement fronts.
-            </p>
-          </div>
-
-          <div 
-            onClick={() => onExplorePlatform('safety')}
-            className="p-5 rounded-3xl bg-zinc-900/80 hover:bg-zinc-850 border border-emerald-500/30 hover:border-emerald-400 hover:shadow-[0_0_25px_rgba(16,185,129,0.25)] transition-all cursor-pointer space-y-2 group backdrop-blur-md"
-          >
-            <div className="flex items-center space-x-2 text-emerald-400">
-              <ShieldCheck className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">0-100 Sea Barometer</h4>
-            </div>
-            <p className="text-xs text-zinc-300 leading-relaxed">
-              Real-time wave hazard index, Beaufort wind scale, and Cyclone ASNA radar for decisive safe-venture verdicts.
-            </p>
-          </div>
-
-          <div 
-            onClick={() => onExplorePlatform('map')}
-            className="p-5 rounded-3xl bg-zinc-900/80 hover:bg-zinc-850 border border-red-500/30 hover:border-red-400 hover:shadow-[0_0_25px_rgba(239,68,68,0.25)] transition-all cursor-pointer space-y-2 group backdrop-blur-md"
-          >
-            <div className="flex items-center space-x-2 text-red-400">
-              <AlertTriangle className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">IMBL Geofence</h4>
-            </div>
-            <p className="text-xs text-zinc-300 leading-relaxed">
-              Automated 3 NM buffer warning for Sri Lanka & Pakistan maritime boundaries preventing unintentional border crossing.
-            </p>
-          </div>
-
-          <div 
-            onClick={() => onExplorePlatform('agent-lab')}
-            className="p-5 rounded-3xl bg-zinc-900/80 hover:bg-zinc-850 border border-indigo-500/30 hover:border-indigo-400 hover:shadow-[0_0_25px_rgba(99,102,241,0.25)] transition-all cursor-pointer space-y-2 group backdrop-blur-md"
-          >
-            <div className="flex items-center space-x-2 text-indigo-400">
-              <Cpu className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">NVIDIA NIM DAG</h4>
-            </div>
-            <p className="text-xs text-zinc-300 leading-relaxed">
-              Meta Llama-3.1-8B cognitive synthesis with 8 Indian regional language translations and voice speech support.
-            </p>
-          </div>
-        </motion.div>
       </main>
 
-      {/* 9. Bottom Footer Strip */}
+      {/* 7. Bottom Footer Strip */}
       <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 border-t border-zinc-800/60 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-400 gap-3">
         <div>
           Created by <strong className="text-zinc-200">Team Runtime Terror</strong> for ISRO · Smart India Hackathon 2026
