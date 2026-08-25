@@ -80,9 +80,6 @@ export function App() {
         const satData = await satRes.json();
         setSatellites(satData.constellation || []);
       }
-
-      // 4. Run baseline initial query to populate multi-agent state
-      handleSendMessage("Where is the nearest Potential Fishing Zone for Tuna from Kochi today?", "en");
     } catch (err) {
       console.warn("Backend initializing:", err);
     }
