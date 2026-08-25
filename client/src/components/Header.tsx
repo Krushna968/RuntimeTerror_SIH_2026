@@ -6,8 +6,8 @@ import {
 } from 'lucide-react';
 
 interface HeaderProps {
-  activeTab: 'home' | 'map' | 'agent-lab' | 'safety' | 'bulletin';
-  setActiveTab: (tab: 'home' | 'map' | 'agent-lab' | 'safety' | 'bulletin') => void;
+  activeTab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin';
+  setActiveTab: (tab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin') => void;
   currentLang: string;
   setCurrentLang: (lang: string) => void;
   onSOSClick: () => void;
@@ -55,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Center Navigation: Just Clean Clickable Texts */}
-      <nav className="hidden md:flex items-center space-x-8 lg:space-x-10 text-sm font-medium">
+      <nav className="hidden md:flex items-center space-x-7 lg:space-x-9 text-sm font-medium">
         <button
           onClick={() => setActiveTab('home')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
@@ -65,6 +65,17 @@ export const Header: React.FC<HeaderProps> = ({
           }`}
         >
           Home
+        </button>
+
+        <button
+          onClick={() => setActiveTab('chat')}
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
+            activeTab === 'chat'
+              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              : 'text-zinc-400 hover:text-white'
+          }`}
+        >
+          AI Chatbot
         </button>
 
         <button

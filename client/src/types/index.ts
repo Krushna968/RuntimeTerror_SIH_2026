@@ -160,6 +160,7 @@ export interface ChatResponsePayload {
   response: {
     markdown: string;
     tts_speech_text: string;
+    model_engine?: string;
   };
   top_pfz: PFZHotspot;
   all_pfz_hotspots: PFZHotspot[];
@@ -186,6 +187,7 @@ export interface ChatResponsePayload {
   execution_metadata: {
     total_agents_involved: number;
     total_latency_ms: number;
+    llm_engine?: string;
     timestamp: string;
   };
 }
