@@ -15,7 +15,9 @@ import {
   ArrowUp,
   Compass, 
   Copy, 
-  Check 
+  Check,
+  Loader2,
+  MapPin
 } from 'lucide-react';
 import { PFZHotspot, NavigationRoute, WeatherObservation, SatelliteTelemetry, ChatResponsePayload } from '../types';
 
@@ -39,11 +41,9 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   onSelectPFZ,
   activeRoute,
   weather,
-  satellites,
   onSendMessage,
   isLoading,
   latestResponse,
-  currentLang,
   onMapClickCoord
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -57,6 +57,10 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   const [isSimulatingVessel, setIsSimulatingVessel] = useState(false);
   const [vesselProgress, setVesselProgress] = useState(0);
 
+  // Clicked Location Feedback
+  const [clickedCoord, setClickedCoord] = useState<{ lat: number; lng: number } | null>(null);
+  const [activeQueryText, setActiveQueryText] = useState<string>('');
+
   // Chat Drawer States
   const [chatInput, setChatInput] = useState('');
   const [isListening, setIsListening] = useState(false);
@@ -69,6 +73,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   const mpaLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const routeLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const cycloneLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
+  const clickMarkerGroup = useRef<L.LayerGroup>(L.layerGroup());
 
   // Initialize Fullscreen Leaflet Map
   useEffect(() => {
@@ -98,10 +103,39 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
     mpaLayerGroup.current.addTo(map);
     routeLayerGroup.current.addTo(map);
     cycloneLayerGroup.current.addTo(map);
+    clickMarkerGroup.current.addTo(map);
 
-    // Map click handler
+    // Map click handler with instant visual feedback
     map.on('click', (e: L.LeafletMouseEvent) => {
-      onMapClickCoord(e.latlng.lat, e.latlng.lng);
+      const { lat, lng } = e.latlng;
+      setClickedCoord({ lat, lng });
+      setActiveQueryText(`Investigating coordinates ${lat.toFixed(2)}°N, ${lng.toFixed(2)}°E...`);
+
+      // Place visual pulse ripple marker on map
+      clickMarkerGroup.current.clearLayers();
+      const clickIcon = L.divIcon({
+        className: 'custom-click-pin',
+        html: `
+          <div class="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
+            <span class="animate-ping absolute inline-flex h-9 w-9 rounded-full bg-blue-500 opacity-80"></span>
+            <span class="relative inline-flex rounded-full h-4 w-4 bg-blue-600 border-2 border-white shadow-lg"></span>
+          </div>
+        `,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+
+      const clickMarker = L.marker([lat, lng], { icon: clickIcon })
+        .bindPopup(`
+          <div class="p-1 font-['Outfit',sans-serif]">
+            <strong class="text-xs text-blue-800">Target Selected</strong>
+            <div class="text-[11px] text-zinc-600">${lat.toFixed(3)}°N, ${lng.toFixed(3)}°E</div>
+          </div>
+        `);
+      clickMarkerGroup.current.addLayer(clickMarker);
+      clickMarker.openPopup();
+
+      onMapClickCoord(lat, lng);
     });
 
     mapInstanceRef.current = map;
@@ -312,6 +346,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   const handleSendQuery = (text?: string) => {
     const q = text || chatInput;
     if (!q.trim() || isLoading) return;
+    setActiveQueryText(q);
     onSendMessage(q);
     setChatInput('');
   };
@@ -446,11 +481,13 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         {/* Minimal Header */}
         <div className="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <h3 className="text-xs font-bold text-zinc-900 tracking-tight">ORCA Assistant</h3>
+            <span className={`w-2 h-2 rounded-full ${isLoading ? 'bg-amber-500 animate-ping' : 'bg-emerald-500 animate-pulse'}`} />
+            <h3 className="text-xs font-bold text-zinc-900 tracking-tight">
+              {isLoading ? 'Analyzing Telemetry...' : 'ORCA Assistant'}
+            </h3>
           </div>
           <span className="text-[10px] font-medium text-zinc-500 bg-zinc-100 px-2.5 py-0.5 rounded-full">
-            ISRO AI
+            {isLoading ? '6 Agents Active' : 'ISRO AI'}
           </span>
         </div>
 
@@ -478,7 +515,56 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
 
         {/* Chat / Advisory Scroll Area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
-          {latestResponse ? (
+          {isLoading ? (
+            /* Instant Interactive Loading State */
+            <div className="space-y-3.5 animate-in fade-in duration-300">
+              {/* User Tap / Query Bubble */}
+              <div className="flex justify-end">
+                <div className="max-w-[85%] px-3.5 py-2 rounded-2xl bg-zinc-900 text-white font-medium flex items-center space-x-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <span>
+                    {activeQueryText || (clickedCoord ? `Inspecting ${clickedCoord.lat.toFixed(2)}°N, ${clickedCoord.lng.toFixed(2)}°E` : 'Executing query...')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Multi-Agent Reasoning Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50/90 to-cyan-50/70 border border-blue-200/80 space-y-3 shadow-xs">
+                <div className="flex items-center space-x-2.5">
+                  <Loader2 className="w-4 h-4 text-blue-600 animate-spin shrink-0" />
+                  <div>
+                    <strong className="block text-xs text-blue-950 font-bold">Multi-Agent DAG Reasoning</strong>
+                    <span className="text-[10px] text-blue-700 font-medium">Cross-analyzing Oceansat-3 & INCOIS models...</span>
+                  </div>
+                </div>
+
+                {/* Progress Steps */}
+                <div className="space-y-1.5 pt-1 border-t border-blue-200/60 text-[11px]">
+                  <div className="flex items-center justify-between text-blue-900 font-medium">
+                    <span className="flex items-center space-x-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                      <span>Ingesting satellite oceanography</span>
+                    </span>
+                    <span className="text-[9px] font-mono text-blue-600">Oceansat-3</span>
+                  </div>
+                  <div className="flex items-center justify-between text-blue-900 font-medium">
+                    <span className="flex items-center space-x-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                      <span>Evaluating SST & Chlorophyll fronts</span>
+                    </span>
+                    <span className="text-[9px] font-mono text-blue-600">INCOIS</span>
+                  </div>
+                  <div className="flex items-center justify-between text-blue-900 font-medium">
+                    <span className="flex items-center space-x-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                      <span>Computing border geofence & safety</span>
+                    </span>
+                    <span className="text-[9px] font-mono text-blue-600">UNCLOS</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : latestResponse ? (
             <div className="space-y-3">
               {/* User Query Bubble */}
               <div className="flex justify-end">
@@ -535,14 +621,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-center p-6 text-zinc-400 space-y-2">
               <Compass className="w-7 h-7 text-zinc-400 opacity-60" />
-              <p className="text-xs text-zinc-500">Ask a question or click anywhere on the map.</p>
-            </div>
-          )}
-
-          {isLoading && (
-            <div className="flex items-center space-x-2 text-xs text-zinc-600 animate-pulse pl-1">
-              <Sparkles className="w-3.5 h-3.5 animate-spin text-blue-600" />
-              <span>Analyzing telemetry...</span>
+              <p className="text-xs text-zinc-500">Click anywhere on the map or ask a query.</p>
             </div>
           )}
         </div>
