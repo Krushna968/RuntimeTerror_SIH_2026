@@ -28,14 +28,35 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   onSOSClick
 }) => {
-  const isLightPage = activeTab === 'chat' || activeTab === 'map';
+  const isMap = activeTab === 'map';
+  const isChat = activeTab === 'chat';
+
+  // Dynamic header container classes
+  const headerBgClass = isMap 
+    ? 'bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-lg text-white' 
+    : isChat
+      ? 'bg-transparent text-zinc-900'
+      : 'bg-transparent text-white';
+
+  const getNavLinkClass = (tabKey: HeaderProps['activeTab']) => {
+    const isActive = activeTab === tabKey;
+    if (isMap) {
+      return isActive 
+        ? 'text-cyan-300 font-black' 
+        : 'text-zinc-200 hover:text-white font-semibold';
+    }
+    if (isChat) {
+      return isActive 
+        ? 'text-zinc-950 font-black' 
+        : 'text-zinc-500 hover:text-zinc-950 font-semibold';
+    }
+    return isActive 
+      ? 'text-white font-black' 
+      : 'text-zinc-400 hover:text-white font-semibold';
+  };
 
   return (
-    <header className={`absolute top-0 left-0 right-0 z-50 w-full px-6 sm:px-12 lg:px-20 py-4 flex items-center justify-between font-['Outfit',sans-serif] pointer-events-auto transition-all ${
-      isLightPage 
-        ? 'text-zinc-900 bg-white/40 backdrop-blur-md border-b border-zinc-200/40 shadow-xs' 
-        : 'text-white bg-transparent'
-    }`}>
+    <header className={`absolute top-0 left-0 right-0 z-50 w-full px-6 sm:px-12 lg:px-20 py-4 flex items-center justify-between font-['Outfit',sans-serif] pointer-events-auto transition-all ${headerBgClass}`}>
       {/* Brand Logo */}
       <div 
         onClick={() => setActiveTab('home')}
@@ -52,7 +73,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         <div className="flex items-center space-x-2">
           <span className={`text-2xl font-black tracking-wider transition-colors ${
-            isLightPage ? 'text-zinc-950 group-hover:text-blue-600' : 'text-white group-hover:text-cyan-200'
+            isChat ? 'text-zinc-950 group-hover:text-blue-600' : 'text-white group-hover:text-cyan-200'
           }`}>
             ORCA
           </span>
@@ -60,69 +81,45 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Center Navigation: Pure Clean Clickable Texts */}
-      <nav className="hidden md:flex items-center space-x-7 lg:space-x-9 text-sm font-semibold">
+      <nav className="hidden md:flex items-center space-x-7 lg:space-x-9 text-sm">
         <button
           onClick={() => setActiveTab('home')}
-          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
-            activeTab === 'home'
-              ? (isLightPage ? 'text-zinc-950 font-black' : 'text-white font-black')
-              : (isLightPage ? 'text-zinc-600 hover:text-zinc-950 font-semibold' : 'text-zinc-400 hover:text-white font-semibold')
-          }`}
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('home')}`}
         >
           Home
         </button>
 
         <button
           onClick={() => setActiveTab('chat')}
-          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
-            activeTab === 'chat'
-              ? (isLightPage ? 'text-zinc-950 font-black' : 'text-white font-black')
-              : (isLightPage ? 'text-zinc-600 hover:text-zinc-950 font-semibold' : 'text-zinc-400 hover:text-white font-semibold')
-          }`}
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('chat')}`}
         >
           AI Chatbot
         </button>
 
         <button
           onClick={() => setActiveTab('map')}
-          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
-            activeTab === 'map'
-              ? (isLightPage ? 'text-zinc-950 font-black' : 'text-white font-black')
-              : (isLightPage ? 'text-zinc-600 hover:text-zinc-950 font-semibold' : 'text-zinc-400 hover:text-white font-semibold')
-          }`}
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('map')}`}
         >
           GIS Command
         </button>
 
         <button
           onClick={() => setActiveTab('agent-lab')}
-          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
-            activeTab === 'agent-lab'
-              ? (isLightPage ? 'text-zinc-950 font-black' : 'text-white font-black')
-              : (isLightPage ? 'text-zinc-600 hover:text-zinc-950 font-semibold' : 'text-zinc-400 hover:text-white font-semibold')
-          }`}
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('agent-lab')}`}
         >
           Agent DAG
         </button>
 
         <button
           onClick={() => setActiveTab('safety')}
-          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
-            activeTab === 'safety'
-              ? (isLightPage ? 'text-zinc-950 font-black' : 'text-white font-black')
-              : (isLightPage ? 'text-zinc-600 hover:text-zinc-950 font-semibold' : 'text-zinc-400 hover:text-white font-semibold')
-          }`}
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('safety')}`}
         >
           Safety Barometer
         </button>
 
         <button
           onClick={() => setActiveTab('bulletin')}
-          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
-            activeTab === 'bulletin'
-              ? (isLightPage ? 'text-zinc-950 font-black' : 'text-white font-black')
-              : (isLightPage ? 'text-zinc-600 hover:text-zinc-950 font-semibold' : 'text-zinc-400 hover:text-white font-semibold')
-          }`}
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('bulletin')}`}
         >
           Advisory Bulletin
         </button>
