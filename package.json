@@ -4,6 +4,7 @@
   "description": "ORCA — Marine EcOsystem Reasoning with Collaborative Agents (ISRO SIH 26176)",
   "scripts": {
     "build": "cd client && npm install && npm run build",
+    "dev": "cd client && npm run dev",
     "start": "python3 run_system.py",
     "test": "python3 verify_system.py",
     "dev:backend": "python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload",
