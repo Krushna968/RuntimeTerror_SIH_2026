@@ -15,33 +15,33 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
   onExplorePlatform
 }) => {
   return (
-    <KineticGrid globalColor="default" className="h-screen max-h-screen flex flex-col justify-between select-none">
+    <KineticGrid globalColor="default" className="min-h-screen h-screen flex flex-col justify-between select-none">
       
       {/* Subtle Ambient Depth Glow */}
       <div 
-        className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[450px] pointer-events-none z-0"
+        className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[450px] pointer-events-none z-0"
         style={{
-          background: 'radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(6, 182, 212, 0.06) 45%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, rgba(6, 182, 212, 0.05) 45%, transparent 70%)',
           filter: 'blur(100px)'
         }}
       />
 
       {/* Main Left-Aligned Calibrated Hero Section */}
-      <main className="relative z-10 flex-1 flex flex-col items-start justify-center text-left px-6 sm:px-12 lg:px-20 max-w-7xl mx-auto w-full my-auto pointer-events-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-start justify-center text-left px-6 sm:px-12 lg:px-20 pt-32 sm:pt-40 pb-16 max-w-7xl mx-auto w-full pointer-events-auto">
         
         {/* Calibrated Display Headline & Subtitle */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="space-y-5 max-w-3xl"
+          className="space-y-4 max-w-3xl"
         >
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.06] select-none text-white">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.12] select-none text-white drop-shadow-sm">
             The Agentic Brain<br />
             for the <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">Indian Ocean</span>
           </h1>
 
-          <p className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-2xl font-normal leading-relaxed">
+          <p className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-2xl font-normal leading-relaxed pt-1">
             Autonomous multi-agent platform reasoning over ISRO satellite oceanography, SST-chlorophyll thermal fronts, and IMBL geofencing to empower 4 million+ coastal fishermen.
           </p>
         </motion.div>
@@ -73,7 +73,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
       </main>
 
       {/* Bottom Footer Strip */}
-      <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-2">
+      <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-2 shrink-0">
         <div>
           Created by <strong className="text-zinc-300">Team Runtime Terror</strong> for ISRO · Smart India Hackathon 2026
         </div>
