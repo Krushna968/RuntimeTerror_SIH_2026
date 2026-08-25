@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSOSClick
 }) => {
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#07090e]/80 backdrop-blur-xl px-6 sm:px-10 py-3.5 flex items-center justify-between text-white font-['Outfit',sans-serif]">
+    <header className="sticky top-0 z-50 w-full bg-transparent px-6 sm:px-10 py-4 flex items-center justify-between text-white font-['Outfit',sans-serif]">
       {/* Brand Logo */}
       <div 
         onClick={() => setActiveTab('home')}
