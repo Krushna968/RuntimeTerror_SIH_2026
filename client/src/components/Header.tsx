@@ -1,16 +1,8 @@
 import React from 'react';
 import { 
   Compass, 
-  Radio, 
   Languages, 
-  AlertTriangle, 
-  Map, 
-  Cpu, 
-  FileText, 
-  ShieldAlert, 
-  Satellite,
-  Sparkles,
-  Home
+  AlertTriangle 
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -40,14 +32,14 @@ export const Header: React.FC<HeaderProps> = ({
   onSOSClick
 }) => {
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#07090e]/95 backdrop-blur-xl border-b border-zinc-800/80 px-4 lg:px-8 py-3 flex items-center justify-between shadow-2xl text-white">
+    <header className="sticky top-0 z-50 w-full bg-[#07090e]/95 backdrop-blur-xl border-b border-zinc-800/80 px-6 lg:px-10 py-3.5 flex items-center justify-between shadow-2xl text-white font-['Outfit',sans-serif]">
       {/* Brand & ISRO Identity */}
       <div 
         onClick={() => setActiveTab('home')}
-        className="flex items-center space-x-3 cursor-pointer group"
+        className="flex items-center space-x-3 cursor-pointer group shrink-0"
       >
         {/* 3D Oceanic Compass Emblem */}
-        <div className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-1.5 shadow-[0_0_15px_rgba(6,182,212,0.5)] group-hover:scale-105 transition-transform">
+        <div className="relative w-8 h-8 flex items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-1.5 shadow-[0_0_15px_rgba(6,182,212,0.5)] group-hover:scale-105 transition-transform">
           <Compass className="w-full h-full text-white animate-spin-slow" />
           <span className="absolute -top-1 -right-1 flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-90"></span>
@@ -55,83 +47,76 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </div>
 
-        <div>
-          <div className="flex items-center space-x-2">
-            <h1 className="text-xl font-black tracking-wider text-white group-hover:text-cyan-200 transition-colors">
-              ORCA
-            </h1>
-            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-400/50 uppercase tracking-wider">
-              ISRO · SIH 26176
-            </span>
-          </div>
+        <div className="flex items-center space-x-2">
+          <h1 className="text-xl font-black tracking-wider text-white group-hover:text-cyan-200 transition-colors">
+            ORCA
+          </h1>
+          <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-400/50 uppercase tracking-wider hidden sm:inline-block">
+            ISRO · SIH 26176
+          </span>
         </div>
       </div>
 
-      {/* Center Navigation Tabs */}
-      <nav className="hidden md:flex items-center space-x-1.5 bg-zinc-900/90 p-1.5 rounded-full border border-zinc-800 shadow-inner">
+      {/* Center Navigation: Just Clean Clickable Texts */}
+      <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-zinc-300">
         <button
           onClick={() => setActiveTab('home')}
-          className={`flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'home'
-              ? 'bg-white text-zinc-950 shadow-md'
-              : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
-          <Home className="w-3.5 h-3.5" />
-          <span>Home</span>
+          Home
         </button>
 
         <button
           onClick={() => setActiveTab('map')}
-          className={`flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'map'
-              ? 'bg-white text-zinc-950 shadow-md'
-              : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
-          <Map className="w-3.5 h-3.5" />
-          <span>GIS Command</span>
+          GIS Command
         </button>
 
         <button
           onClick={() => setActiveTab('agent-lab')}
-          className={`flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'agent-lab'
-              ? 'bg-white text-zinc-950 shadow-md'
-              : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
-          <Cpu className="w-3.5 h-3.5" />
-          <span>Agent DAG</span>
+          Agent DAG
         </button>
 
         <button
           onClick={() => setActiveTab('safety')}
-          className={`flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'safety'
-              ? 'bg-white text-zinc-950 shadow-md'
-              : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
-          <ShieldAlert className="w-3.5 h-3.5" />
-          <span>Safety</span>
+          Safety Barometer
         </button>
 
         <button
           onClick={() => setActiveTab('bulletin')}
-          className={`flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'bulletin'
-              ? 'bg-white text-zinc-950 shadow-md'
-              : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+              ? 'text-white font-bold border-b-2 border-cyan-400 pb-0.5'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
-          <FileText className="w-3.5 h-3.5" />
-          <span>Advisory</span>
+          Advisory Bulletin
         </button>
       </nav>
 
       {/* Right Controls: Language + SOS */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-3 shrink-0">
         {/* Regional Language Switcher */}
         <div className="relative flex items-center bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-full shadow-sm">
           <Languages className="w-3.5 h-3.5 text-cyan-400 mr-2" />
@@ -151,7 +136,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Emergency SOS Button */}
         <button
           onClick={onSOSClick}
-          className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-red-600 hover:bg-red-500 text-white font-black text-xs shadow-[0_0_15px_rgba(239,68,68,0.5)] border border-red-400/40 active:scale-95 transition-all cursor-pointer animate-pulse"
+          className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-red-600 hover:bg-red-500 text-white font-black text-xs shadow-[0_0_15px_rgba(239,68,68,0.5)] border border-red-400/40 active:scale-95 transition-all cursor-pointer animate-pulse whitespace-nowrap"
         >
           <AlertTriangle className="w-3.5 h-3.5" />
           <span>SOS 1554</span>
