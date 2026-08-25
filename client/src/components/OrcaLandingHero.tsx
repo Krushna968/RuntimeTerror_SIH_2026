@@ -17,54 +17,54 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
   return (
     <KineticGrid globalColor="default" className="h-screen max-h-screen flex flex-col justify-between select-none">
       
-      {/* Dynamic Ambient Background Glow Highlights */}
+      {/* Subtle Ambient Depth Glow */}
       <div 
-        className="absolute top-0 left-1/3 -translate-x-1/2 w-[900px] h-[550px] pointer-events-none z-0"
+        className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[450px] pointer-events-none z-0"
         style={{
-          background: 'radial-gradient(ellipse at top center, rgba(6, 182, 212, 0.25) 0%, rgba(59, 130, 246, 0.15) 45%, transparent 75%)',
-          filter: 'blur(90px)'
+          background: 'radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(6, 182, 212, 0.06) 45%, transparent 70%)',
+          filter: 'blur(100px)'
         }}
       />
 
       {/* Main Left-Aligned Calibrated Hero Section */}
-      <main className="relative z-10 flex-1 flex flex-col items-start justify-center text-left px-6 sm:px-12 lg:px-20 pt-28 pb-8 max-w-7xl mx-auto w-full my-auto pointer-events-auto">
-
-        {/* Calibrated Display Headline */}
+      <main className="relative z-10 flex-1 flex flex-col items-start justify-center text-left px-6 sm:px-12 lg:px-20 max-w-7xl mx-auto w-full my-auto pointer-events-auto">
+        
+        {/* Calibrated Display Headline & Subtitle */}
         <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.7 }}
-          className="space-y-4 max-w-3xl"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="space-y-5 max-w-3xl"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] select-none text-white drop-shadow-md">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.06] select-none text-white">
             The Agentic Brain<br />
-            for the <span className="bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(0,240,255,0.5)]">Indian Ocean</span>
+            for the <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">Indian Ocean</span>
           </h1>
 
-          <p className="text-zinc-300 text-sm sm:text-base md:text-lg max-w-2xl font-normal leading-relaxed pt-1">
+          <p className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-2xl font-normal leading-relaxed">
             Autonomous multi-agent platform reasoning over ISRO satellite oceanography, SST-chlorophyll thermal fronts, and IMBL geofencing to empower 4 million+ coastal fishermen.
           </p>
         </motion.div>
 
-        {/* Primary CTA Action Buttons */}
+        {/* Calibrated Action Buttons */}
         <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
           className="mt-8 flex flex-col sm:flex-row items-center gap-3.5"
         >
           <button 
             onClick={() => onExplorePlatform('chat')}
-            className="px-7 py-3.5 rounded-full text-sm font-bold text-zinc-950 bg-white hover:bg-zinc-100 transition-all shadow-[0_0_30px_rgba(0,240,255,0.4)] active:scale-95 cursor-pointer flex items-center space-x-2.5 group"
+            className="px-6 py-3 rounded-full text-sm font-semibold text-zinc-950 bg-white hover:bg-zinc-100 transition-all shadow-md active:scale-95 cursor-pointer flex items-center space-x-2 group"
           >
-            <Sparkles className="w-4 h-4 text-cyan-600 group-hover:rotate-45 transition-transform" />
+            <Sparkles className="w-4 h-4 text-cyan-600 group-hover:rotate-12 transition-transform" />
             <span>Launch AI Decision Studio</span>
-            <ArrowRight className="w-4 h-4 text-blue-600 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 text-zinc-700 group-hover:translate-x-0.5 transition-transform" />
           </button>
 
           <button 
             onClick={() => onExplorePlatform('map')}
-            className="px-7 py-3.5 rounded-full text-sm font-semibold text-white bg-zinc-900/80 hover:bg-zinc-800 border border-white/20 hover:border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all flex items-center space-x-2 active:scale-95 cursor-pointer backdrop-blur-md"
+            className="px-6 py-3 rounded-full text-sm font-medium text-zinc-300 bg-zinc-900/90 hover:text-white hover:bg-zinc-800 border border-zinc-700/80 transition-all flex items-center space-x-2 active:scale-95 cursor-pointer backdrop-blur-md"
           >
             <Compass className="w-4 h-4 text-cyan-400" />
             <span>GIS Command Map</span>
@@ -73,13 +73,13 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
       </main>
 
       {/* Bottom Footer Strip */}
-      <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-400 gap-2">
+      <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-2">
         <div>
-          Created by <strong className="text-zinc-200">Team Runtime Terror</strong> for ISRO · Smart India Hackathon 2026
+          Created by <strong className="text-zinc-300">Team Runtime Terror</strong> for ISRO · Smart India Hackathon 2026
         </div>
-        <div className="flex items-center space-x-6 text-zinc-300">
-          <span onClick={() => onExplorePlatform('chat')} className="hover:text-white cursor-pointer transition-colors">AI Chatbot</span>
-          <span onClick={() => onExplorePlatform('map')} className="hover:text-white cursor-pointer transition-colors">GIS Command</span>
+        <div className="flex items-center space-x-6 text-zinc-400">
+          <span onClick={() => onExplorePlatform('chat')} className="hover:text-zinc-200 cursor-pointer transition-colors">AI Chatbot</span>
+          <span onClick={() => onExplorePlatform('map')} className="hover:text-zinc-200 cursor-pointer transition-colors">GIS Command</span>
         </div>
       </footer>
     </KineticGrid>
