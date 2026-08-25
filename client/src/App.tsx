@@ -53,6 +53,7 @@ export function App() {
 
   // Initial load
   useEffect(() => {
+    document.title = "ORCA — ISRO Marine EcOsystem Reasoning with Collaborative Agents";
     fetchInitialData();
   }, []);
 
