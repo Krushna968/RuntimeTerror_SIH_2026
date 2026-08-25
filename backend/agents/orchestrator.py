@@ -15,6 +15,7 @@ from backend.agents.ocean_analytics_agent import OceanAnalyticsAgent
 from backend.agents.geospatial_agent import GeospatialAgent
 from backend.agents.multilingual_agent import MultilingualAgent
 from backend.agents.explainability_agent import ExplainabilityAgent
+from backend.agents.llm_engine import generate_llm_advisory
 from backend.data.geodata import INDIAN_PORTS
 
 class MasterOrchestrator:
@@ -88,8 +89,8 @@ class MasterOrchestrator:
             "agent": "ORCA Master Supervisor & DAG Planner",
             "status": "COMPLETED",
             "duration_ms": round((time.time() - step1_start) * 1000, 2),
-            "thought": f"Parsed query intent: '{intent}'. Reference port: '{port_info['name']}'. Language detected: '{detected_lang}'. Formulated 5-stage collaborative execution graph.",
-            "output_summary": f"Decomposed into 4 parallel agent subtasks."
+            "thought": f"Parsed query intent: '{intent}'. Reference port: '{port_info['name']}'. Language detected: '{detected_lang}'. Formulated 6-stage collaborative execution graph.",
+            "output_summary": f"Decomposed into 5 parallel agent subtasks."
         })
 
         # 2. Marine Data Discovery Agent Execution
@@ -150,7 +151,7 @@ class MasterOrchestrator:
             "output_summary": geofence["nearest_imbl"]["alert_message"]
         })
 
-        # 6. Multilingual & Explainability Synthesis
+        # 6. NVIDIA NIM LLM Cognitive Synthesis & Vernacular Translation
         step6_start = time.time()
         context_bundle = {
             "top_pfz": top_pfz,
@@ -160,17 +161,36 @@ class MasterOrchestrator:
             "port": port_info
         }
         
-        localized_result = self.lang_agent.synthesize_localized_response(intent, context_bundle, lang_code=detected_lang)
+        lang_info = self.lang_agent.supported_languages.get(detected_lang, self.lang_agent.supported_languages["en"])
+        
+        # Call NVIDIA NIM LLM
+        llm_response_text = await generate_llm_advisory(
+            user_query=query,
+            context_data=context_bundle,
+            language_name=lang_info["name"],
+            language_code=detected_lang
+        )
+
+        if llm_response_text:
+            tts_clean = re.sub(r'[*#•🛰️🛡️🛑\n]+', ' ', llm_response_text).strip()
+            final_markdown = llm_response_text
+            model_used_name = "NVIDIA NIM (Meta Llama-3.1-8B)"
+        else:
+            localized_result = self.lang_agent.synthesize_localized_response(intent, context_bundle, lang_code=detected_lang)
+            final_markdown = localized_result["formatted_markdown"]
+            tts_clean = localized_result["tts_speech_text"]
+            model_used_name = "ORCA Deterministic Rule Engine"
+
         evidence_pkg = self.explain_agent.generate_evidence_package(query, execution_trace, context_bundle)
         bulletin = self.explain_agent.generate_official_marine_bulletin(port_info["name"], pfz_list, weather, geofence)
         
         execution_trace.append({
-            "step_id": "STEP_06_EXPLAINABILITY_VERNACULAR_SYNTHESIS",
-            "agent": "Explainability & Multilingual Synthesis Agent",
+            "step_id": "STEP_06_NVIDIA_LLM_COGNITIVE_SYNTHESIS",
+            "agent": f"Neural Cognitive Agent ({model_used_name})",
             "status": "COMPLETED",
             "duration_ms": round((time.time() - step6_start) * 1000, 2),
-            "thought": f"Synthesized final response in '{localized_result['language_name']}' with speech synthesis audio payload and generated official bulletin #{bulletin['bulletin_id']}.",
-            "output_summary": "All reasoning artifacts signed and verified."
+            "thought": f"Synthesized grounded natural language advisory using {model_used_name} in '{lang_info['name']}'. Generated official bulletin #{bulletin['bulletin_id']}.",
+            "output_summary": f"Grounded response generated with data provenance."
         })
 
         total_latency_ms = round((time.time() - start_time) * 1000, 2)
@@ -180,14 +200,15 @@ class MasterOrchestrator:
             "detected_intent": intent,
             "language": {
                 "code": detected_lang,
-                "name": localized_result["language_name"],
-                "native": localized_result["native_name"],
-                "voice_code": localized_result["voice_code"]
+                "name": lang_info["name"],
+                "native": lang_info["native"],
+                "voice_code": lang_info["voice_code"]
             },
             "reference_port": port_info,
             "response": {
-                "markdown": localized_result["formatted_markdown"],
-                "tts_speech_text": localized_result["tts_speech_text"]
+                "markdown": final_markdown,
+                "tts_speech_text": tts_clean,
+                "model_engine": model_used_name
             },
             "top_pfz": top_pfz,
             "all_pfz_hotspots": pfz_list,
@@ -199,6 +220,7 @@ class MasterOrchestrator:
             "evidence_and_provenance": evidence_pkg,
             "execution_metadata": {
                 "total_agents_involved": 6,
+                "llm_engine": model_used_name,
                 "total_latency_ms": total_latency_ms,
                 "timestamp": datetime.utcnow().isoformat() + "Z"
             }
