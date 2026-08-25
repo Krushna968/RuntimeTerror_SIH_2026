@@ -28,16 +28,6 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
 
       {/* Main Left-Aligned Calibrated Hero Section */}
       <main className="relative z-10 flex-1 flex flex-col items-start justify-center text-left px-6 sm:px-12 lg:px-20 pt-28 pb-8 max-w-7xl mx-auto w-full my-auto pointer-events-auto">
-        {/* Badge Pill */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-4 inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-xs text-cyan-300 font-medium tracking-wide shadow-sm"
-        >
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-          <span>ISRO Oceansat-3 & INCOIS Intelligence</span>
-        </motion.div>
 
         {/* Calibrated Display Headline */}
         <motion.div 
