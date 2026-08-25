@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSOSClick
 }) => {
   return (
-    <header className="sticky top-0 z-50 w-full bg-transparent px-6 sm:px-10 py-4 flex items-center justify-between text-white font-['Outfit',sans-serif]">
+    <header className="absolute top-0 left-0 right-0 z-50 w-full bg-transparent px-6 sm:px-10 py-5 flex items-center justify-between text-white font-['Outfit',sans-serif] pointer-events-auto">
       {/* Brand Logo */}
       <div 
         onClick={() => setActiveTab('home')}
@@ -126,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Right Action Group */}
       <div className="flex items-center space-x-3 shrink-0">
         {/* Regional Language Switcher */}
-        <div className="relative flex items-center bg-zinc-900/90 border border-zinc-700/80 px-3 py-1.5 rounded-full shadow-sm">
+        <div className="relative flex items-center bg-zinc-900/60 border border-zinc-700/60 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm">
           <Languages className="w-3.5 h-3.5 text-cyan-400 mr-2" />
           <select
             value={currentLang}

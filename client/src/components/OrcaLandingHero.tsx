@@ -116,7 +116,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
     <div 
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative min-h-[calc(100vh-75px)] w-full bg-[#07090e] text-white flex flex-col justify-between overflow-hidden font-['Outfit',sans-serif] selection:bg-cyan-500 selection:text-slate-950"
+      className="relative min-h-screen w-full bg-[#07090e] text-white flex flex-col justify-between overflow-hidden font-['Outfit',sans-serif] selection:bg-cyan-500 selection:text-slate-950"
     >
       {/* 1. Interactive Dynamic Cursor Follower Spotlight */}
       <motion.div
@@ -196,7 +196,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
       />
 
       {/* 4. Hero Centerpiece Content */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-12 pb-16 max-w-5xl mx-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-32 pb-16 max-w-5xl mx-auto">
         {/* Eyebrow Badge with Pulse */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }}
