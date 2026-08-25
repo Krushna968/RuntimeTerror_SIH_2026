@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
-import { LovableLandingHero } from './components/LovableLandingHero';
+import { OrcaLandingHero } from './components/OrcaLandingHero';
 import { MapViewport } from './components/MapViewport';
 import { AgentChatDrawer } from './components/AgentChatDrawer';
 import { SeaSafetyBarometer } from './components/SeaSafetyBarometer';
@@ -48,7 +48,6 @@ export function App() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isBulletinModalOpen, setIsBulletinModalOpen] = useState<boolean>(false);
   const [isSOSModalOpen, setIsSOSModalOpen] = useState<boolean>(false);
-  const [isDemoModalOpen, setIsDemoModalOpen] = useState<boolean>(false);
 
   // Initial load
   useEffect(() => {
@@ -165,342 +164,302 @@ export function App() {
   };
 
   return (
-    <div className="relative flex flex-col min-h-screen bg-[#08090d] text-white overflow-x-hidden font-['Outfit',sans-serif]">
-      {/* Top Header Navigation */}
-      <Header
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        currentLang={currentLang}
-        setCurrentLang={(lang) => {
-          setCurrentLang(lang);
-          if (latestResponse) {
-            handleSendMessage(latestResponse.query, lang);
-          }
-        }}
-        onSOSClick={() => setIsSOSModalOpen(true)}
-      />
-
-      {/* Main Tab Content */}
-      {activeTab === 'home' && (
-        <LovableLandingHero
-          onExplorePlatform={() => setActiveTab('map')}
-          onGetDemo={() => setIsDemoModalOpen(true)}
+    <div className="relative flex flex-col min-h-screen bg-[#07090e] text-white overflow-x-hidden font-['Outfit',sans-serif]">
+      {/* If on Home Tab, render the unified Hero Landing Page */}
+      {activeTab === 'home' ? (
+        <OrcaLandingHero
+          onExplorePlatform={(tab) => setActiveTab(tab)}
+          currentLang={currentLang}
+          setCurrentLang={(lang) => {
+            setCurrentLang(lang);
+            if (latestResponse) {
+              handleSendMessage(latestResponse.query, lang);
+            }
+          }}
+          onSOSClick={() => setIsSOSModalOpen(true)}
         />
-      )}
+      ) : (
+        <>
+          {/* Top Header Navigation for Workspace Tabs */}
+          <Header
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            currentLang={currentLang}
+            setCurrentLang={(lang) => {
+              setCurrentLang(lang);
+              if (latestResponse) {
+                handleSendMessage(latestResponse.query, lang);
+              }
+            }}
+            onSOSClick={() => setIsSOSModalOpen(true)}
+          />
 
-      {activeTab !== 'home' && (
-        <main className="relative z-10 flex-1 p-3 lg:p-6 max-w-[1920px] w-full mx-auto space-y-5">
-          {/* Top Constellation Bar */}
-          <SatelliteTelemetryBar satellites={satellites} />
+          <main className="relative z-10 flex-1 p-3 lg:p-6 max-w-[1920px] w-full mx-auto space-y-5">
+            {/* Top Constellation Bar */}
+            <SatelliteTelemetryBar satellites={satellites} />
 
-          {/* Tab 1: GIS Command Viewport + Agent Drawer */}
-          {activeTab === 'map' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 h-[calc(100vh-220px)] min-h-[640px]">
-              {/* GIS Map Viewport (Left/Center 7 cols) */}
-              <div className="lg:col-span-7 h-full flex flex-col">
-                <MapViewport
-                  pfzHotspots={pfzHotspots}
-                  selectedPFZ={selectedPFZ}
-                  onSelectPFZ={handleSelectPFZ}
-                  activeRoute={activeRoute}
-                  weather={weather}
-                  onMapClickCoord={handleMapClickCoord}
-                />
+            {/* Tab 1: GIS Command Viewport + Agent Drawer */}
+            {activeTab === 'map' && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 h-[calc(100vh-220px)] min-h-[640px]">
+                {/* GIS Map Viewport (Left/Center 7 cols) */}
+                <div className="lg:col-span-7 h-full flex flex-col">
+                  <MapViewport
+                    pfzHotspots={pfzHotspots}
+                    selectedPFZ={selectedPFZ}
+                    onSelectPFZ={handleSelectPFZ}
+                    activeRoute={activeRoute}
+                    weather={weather}
+                    onMapClickCoord={handleMapClickCoord}
+                  />
+                </div>
+
+                {/* Agent Conversational & DAG Drawer (Right 5 cols) */}
+                <div className="lg:col-span-5 h-full flex flex-col">
+                  <AgentChatDrawer
+                    onSendMessage={handleSendMessage}
+                    isLoading={isLoading}
+                    latestResponse={latestResponse}
+                    currentLang={currentLang}
+                  />
+                </div>
               </div>
+            )}
 
-              {/* Agent Conversational & DAG Drawer (Right 5 cols) */}
-              <div className="lg:col-span-5 h-full flex flex-col">
-                <AgentChatDrawer
-                  onSendMessage={handleSendMessage}
-                  isLoading={isLoading}
-                  latestResponse={latestResponse}
-                  currentLang={currentLang}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Tab 2: Agent Reasoning DAG Lab */}
-          {activeTab === 'agent-lab' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              <div className="lg:col-span-8 space-y-4">
-                <div className="bg-zinc-900/90 p-6 md:p-8 rounded-3xl border border-zinc-800 shadow-2xl space-y-5">
-                  <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2.5 rounded-2xl bg-pink-500/20 text-pink-400 border border-pink-500/40">
-                        <Cpu className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-bold text-white tracking-tight">
-                          Autonomous Multi-Agent DAG Execution Graph
-                        </h2>
-                        <p className="text-xs text-zinc-400 font-medium">
-                          Real-time collaborative task decomposition & telemetry
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-zinc-950 bg-white px-3.5 py-1.5 rounded-full shadow-md">
-                      6 Active Domain Agents
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-zinc-300 leading-relaxed">
-                    ORCA breaks down complex oceanographic questions into an asynchronous Directed Acyclic Graph (DAG). Domain agents for satellite discovery, thermal-chlorophyll front correlation, IMBL boundary compliance, and Indic vernacular synthesis execute in parallel with cryptographic provenance signatures.
-                  </p>
-
-                  {latestResponse && (
-                    <div className="space-y-3.5 pt-2">
-                      {latestResponse.evidence_and_provenance.execution_trace.map((step, idx) => (
-                        <div key={idx} className="bg-zinc-950/80 p-4 rounded-2xl border border-zinc-800 space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-bold text-pink-400 flex items-center space-x-2">
-                              <span className="w-6 h-6 rounded-full bg-pink-500/20 text-pink-300 flex items-center justify-center text-xs font-bold">
-                                {idx + 1}
-                              </span>
-                              <span>{step.agent}</span>
-                            </span>
-                            <span className="text-xs font-mono font-bold text-zinc-400 bg-zinc-900 px-2.5 py-0.5 rounded-md border border-zinc-800">
-                              {step.duration_ms} ms
-                            </span>
-                          </div>
-                          <p className="text-xs text-zinc-200 font-medium pl-8">{step.thought}</p>
-                          <div className="ml-8 p-2.5 rounded-xl bg-black/60 border border-zinc-800 text-xs font-mono text-emerald-400">
-                            ➔ {step.output_summary}
-                          </div>
+            {/* Tab 2: Agent Reasoning DAG Lab */}
+            {activeTab === 'agent-lab' && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <div className="lg:col-span-8 space-y-4">
+                  <div className="bg-zinc-900/90 p-6 md:p-8 rounded-3xl border border-zinc-800 shadow-2xl space-y-5">
+                    <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2.5 rounded-2xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/40">
+                          <Cpu className="w-6 h-6" />
                         </div>
-                      ))}
+                        <div>
+                          <h2 className="text-lg font-bold text-white tracking-tight">
+                            Autonomous Multi-Agent DAG Execution Graph
+                          </h2>
+                          <p className="text-xs text-zinc-400 font-medium">
+                            Real-time collaborative task decomposition & telemetry
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-bold text-zinc-950 bg-white px-3.5 py-1.5 rounded-full shadow-md">
+                        6 Active Domain Agents
+                      </span>
                     </div>
-                  )}
+
+                    <p className="text-xs text-zinc-300 leading-relaxed">
+                      ORCA breaks down complex oceanographic questions into an asynchronous Directed Acyclic Graph (DAG). Domain agents for satellite discovery, thermal-chlorophyll front correlation, IMBL boundary compliance, and Indic vernacular synthesis execute in parallel with cryptographic provenance signatures.
+                    </p>
+
+                    {latestResponse && (
+                      <div className="space-y-3.5 pt-2">
+                        {latestResponse.evidence_and_provenance.execution_trace.map((step, idx) => (
+                          <div key={idx} className="bg-zinc-950/80 p-4 rounded-2xl border border-zinc-800 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-bold text-cyan-400 flex items-center space-x-2">
+                                <span className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-xs font-bold">
+                                  {idx + 1}
+                                </span>
+                                <span>{step.agent}</span>
+                              </span>
+                              <span className="text-xs font-mono font-bold text-zinc-400 bg-zinc-900 px-2.5 py-0.5 rounded-md border border-zinc-800">
+                                {step.duration_ms} ms
+                              </span>
+                            </div>
+                            <p className="text-xs text-zinc-200 font-medium pl-8">{step.thought}</p>
+                            <div className="ml-8 p-2.5 rounded-xl bg-black/60 border border-zinc-800 text-xs font-mono text-emerald-400">
+                              ➔ {step.output_summary}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="lg:col-span-4">
+                  <AgentChatDrawer
+                    onSendMessage={handleSendMessage}
+                    isLoading={isLoading}
+                    latestResponse={latestResponse}
+                    currentLang={currentLang}
+                  />
                 </div>
               </div>
+            )}
 
-              <div className="lg:col-span-4">
-                <AgentChatDrawer
-                  onSendMessage={handleSendMessage}
-                  isLoading={isLoading}
-                  latestResponse={latestResponse}
-                  currentLang={currentLang}
-                />
+            {/* Tab 3: Fishermen Safety & Disaster Barometer */}
+            {activeTab === 'safety' && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <div className="lg:col-span-7 space-y-4">
+                  <SeaSafetyBarometer 
+                    weather={weather} 
+                    portName={latestResponse?.reference_port.name || "Kochi Fishing Harbour"} 
+                  />
+                </div>
+                <div className="lg:col-span-5 h-[680px]">
+                  <MapViewport
+                    pfzHotspots={pfzHotspots}
+                    selectedPFZ={selectedPFZ}
+                    onSelectPFZ={handleSelectPFZ}
+                    activeRoute={activeRoute}
+                    weather={weather}
+                    onMapClickCoord={handleMapClickCoord}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Tab 3: Fishermen Safety & Disaster Barometer */}
-          {activeTab === 'safety' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              <div className="lg:col-span-7 space-y-4">
-                <SeaSafetyBarometer 
-                  weather={weather} 
-                  portName={latestResponse?.reference_port.name || "Kochi Fishing Harbour"} 
-                />
-              </div>
-              <div className="lg:col-span-5 h-[680px]">
-                <MapViewport
-                  pfzHotspots={pfzHotspots}
-                  selectedPFZ={selectedPFZ}
-                  onSelectPFZ={handleSelectPFZ}
-                  activeRoute={activeRoute}
-                  weather={weather}
-                  onMapClickCoord={handleMapClickCoord}
-                />
-              </div>
-            </div>
-          )}
+            {/* Tab 4: Official Advisory Bulletin */}
+            {activeTab === 'bulletin' && (
+              <div className="max-w-6xl mx-auto space-y-6">
+                {/* Top Action Header */}
+                <div className="bg-zinc-900/90 p-6 md:p-8 rounded-3xl border border-zinc-800 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase tracking-widest">
+                        Official Bulletin Dashboard
+                      </span>
+                      <span className="text-xs font-mono text-cyan-300 font-bold">
+                        {latestResponse?.official_bulletin.bulletin_id || "INCOIS-ISRO-ORCA-2026"}
+                      </span>
+                    </div>
+                    <h2 className="text-xl md:text-2xl font-black text-white">
+                      ISRO — INCOIS Joint Satellite Marine Advisory
+                    </h2>
+                    <p className="text-xs text-zinc-400 font-medium">
+                      Validated Earth Observation products from Oceansat-3 (OCM-3) & INSAT-3DR TIR
+                    </p>
+                  </div>
 
-          {/* Tab 4: Official Advisory Bulletin */}
-          {activeTab === 'bulletin' && (
-            <div className="max-w-6xl mx-auto space-y-6">
-              {/* Top Action Header */}
-              <div className="bg-zinc-900/90 p-6 md:p-8 rounded-3xl border border-zinc-800 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black bg-pink-500/20 text-pink-300 border border-pink-500/40 uppercase tracking-widest">
-                      Official Bulletin Dashboard
+                  <button
+                    onClick={() => setIsBulletinModalOpen(true)}
+                    className="flex items-center justify-center space-x-2 px-6 py-3 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs shadow-lg transition-all active:scale-95 cursor-pointer"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>Print / Export Official PDF</span>
+                  </button>
+                </div>
+
+                {/* 4 Core Executive Metric Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
+                      <span>Sea Venture Verdict</span>
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div className="text-lg font-black text-emerald-300">
+                      {latestResponse?.official_bulletin.sea_venture_verdict.replace(/_/g, ' ') || "SAFE FOR VENTURE"}
+                    </div>
+                    <div className="text-[11px] text-zinc-400">
+                      Sector: <strong>{latestResponse?.official_bulletin.coastal_sector}</strong>
+                    </div>
+                  </div>
+
+                  <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold text-cyan-400">
+                      <span>Safety Index Score</span>
+                      <Compass className="w-4 h-4" />
+                    </div>
+                    <div className="text-2xl font-black font-mono text-white">
+                      {latestResponse?.official_bulletin.safety_index_score || 85}<span className="text-xs text-zinc-500">/100</span>
+                    </div>
+                    <div className="text-[11px] text-zinc-400">
+                      Validity: <strong>{latestResponse?.official_bulletin.validity_period}</strong>
+                    </div>
+                  </div>
+
+                  <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold text-amber-400">
+                      <span>PFZ Hotspots Detected</span>
+                      <Fish className="w-4 h-4" />
+                    </div>
+                    <div className="text-2xl font-black font-mono text-white">
+                      {latestResponse?.official_bulletin.recommended_pfz_count || 15} <span className="text-xs text-amber-400 font-bold">Fronts</span>
+                    </div>
+                    <div className="text-[11px] text-zinc-400">
+                      Top Catch Multiplier: <strong>4.5x Enhance</strong>
+                    </div>
+                  </div>
+
+                  <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold text-blue-400">
+                      <span>Wave & Wind State</span>
+                      <Waves className="w-4 h-4" />
+                    </div>
+                    <div className="text-lg font-black text-white font-mono">
+                      {latestResponse?.official_bulletin.meteorological_summary.wave_height_m || 1.03}m · {latestResponse?.official_bulletin.meteorological_summary.wind_speed_knots || 14.9} kts
+                    </div>
+                    <div className="text-[11px] text-zinc-400 truncate">
+                      {latestResponse?.official_bulletin.meteorological_summary.sea_state || "Smooth Sea"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* High-Resolution PFZ Recommendation Table */}
+                <div className="bg-zinc-900/90 p-6 rounded-3xl border border-zinc-800 space-y-4 shadow-xl">
+                  <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+                      <Fish className="w-4 h-4 text-cyan-400" />
+                      <span>High-Confidence Potential Fishing Zones (PFZ)</span>
+                    </h3>
+                    <span className="text-xs font-mono text-cyan-400 font-bold bg-cyan-950/60 px-3 py-1 rounded-full border border-cyan-500/40">
+                      Oceansat-3 Coincidence Analyzed
                     </span>
-                    <span className="text-xs font-mono text-cyan-300 font-bold">
-                      {latestResponse?.official_bulletin.bulletin_id || "INCOIS-ISRO-ORCA-2026"}
-                    </span>
                   </div>
-                  <h2 className="text-xl md:text-2xl font-black text-white">
-                    ISRO — INCOIS Joint Satellite Marine Advisory
-                  </h2>
-                  <p className="text-xs text-zinc-400 font-medium">
-                    Validated Earth Observation products from Oceansat-3 (OCM-3) & INSAT-3DR TIR
-                  </p>
-                </div>
 
-                <button
-                  onClick={() => setIsBulletinModalOpen(true)}
-                  className="flex items-center justify-center space-x-2 px-6 py-3 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs shadow-lg transition-all active:scale-95 cursor-pointer"
-                >
-                  <Printer className="w-4 h-4" />
-                  <span>Print / Export Official PDF</span>
-                </button>
-              </div>
-
-              {/* 4 Core Executive Metric Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
-                    <span>Sea Venture Verdict</span>
-                    <ShieldCheck className="w-4 h-4" />
-                  </div>
-                  <div className="text-lg font-black text-emerald-300">
-                    {latestResponse?.official_bulletin.sea_venture_verdict.replace(/_/g, ' ') || "SAFE FOR VENTURE"}
-                  </div>
-                  <div className="text-[11px] text-zinc-400">
-                    Sector: <strong>{latestResponse?.official_bulletin.coastal_sector}</strong>
-                  </div>
-                </div>
-
-                <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold text-cyan-400">
-                    <span>Safety Index Score</span>
-                    <Compass className="w-4 h-4" />
-                  </div>
-                  <div className="text-2xl font-black font-mono text-white">
-                    {latestResponse?.official_bulletin.safety_index_score || 85}<span className="text-xs text-zinc-500">/100</span>
-                  </div>
-                  <div className="text-[11px] text-zinc-400">
-                    Validity: <strong>{latestResponse?.official_bulletin.validity_period}</strong>
-                  </div>
-                </div>
-
-                <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold text-amber-400">
-                    <span>PFZ Hotspots Detected</span>
-                    <Fish className="w-4 h-4" />
-                  </div>
-                  <div className="text-2xl font-black font-mono text-white">
-                    {latestResponse?.official_bulletin.recommended_pfz_count || 15} <span className="text-xs text-amber-400 font-bold">Fronts</span>
-                  </div>
-                  <div className="text-[11px] text-zinc-400">
-                    Top Catch Multiplier: <strong>4.5x Enhance</strong>
-                  </div>
-                </div>
-
-                <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold text-blue-400">
-                    <span>Wave & Wind State</span>
-                    <Waves className="w-4 h-4" />
-                  </div>
-                  <div className="text-lg font-black text-white font-mono">
-                    {latestResponse?.official_bulletin.meteorological_summary.wave_height_m || 1.03}m · {latestResponse?.official_bulletin.meteorological_summary.wind_speed_knots || 14.9} kts
-                  </div>
-                  <div className="text-[11px] text-zinc-400 truncate">
-                    {latestResponse?.official_bulletin.meteorological_summary.sea_state || "Smooth Sea"}
-                  </div>
-                </div>
-              </div>
-
-              {/* High-Resolution PFZ Recommendation Table */}
-              <div className="bg-zinc-900/90 p-6 rounded-3xl border border-zinc-800 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-                  <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                    <Fish className="w-4 h-4 text-pink-400" />
-                    <span>High-Confidence Potential Fishing Zones (PFZ)</span>
-                  </h3>
-                  <span className="text-xs font-mono text-pink-400 font-bold bg-pink-950/60 px-3 py-1 rounded-full border border-pink-500/40">
-                    Oceansat-3 Coincidence Analyzed
-                  </span>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-zinc-950 text-zinc-400 font-bold uppercase text-[10px] tracking-wider border-b border-zinc-800">
-                      <tr>
-                        <th className="p-3">Zone & Name</th>
-                        <th className="p-3">Coordinates</th>
-                        <th className="p-3">Target Species</th>
-                        <th className="p-3">Depth</th>
-                        <th className="p-3">SST / Chl-a</th>
-                        <th className="p-3">Confidence</th>
-                        <th className="p-3 text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-zinc-800 text-zinc-200">
-                      {(latestResponse?.all_pfz_hotspots || pfzHotspots).map((pfz, idx) => (
-                        <tr key={idx} className="hover:bg-zinc-800/50 transition-colors">
-                          <td className="p-3 font-bold text-white flex items-center space-x-2">
-                            <span className="w-2 h-2 rounded-full bg-pink-500"></span>
-                            <span>{pfz.name}</span>
-                          </td>
-                          <td className="p-3 font-mono text-zinc-400">{pfz.latitude}°N, {pfz.longitude}°E</td>
-                          <td className="p-3">
-                            <span className="px-2.5 py-1 rounded-full font-bold bg-zinc-800 text-pink-300 border border-pink-500/30">
-                              {pfz.dominant_species}
-                            </span>
-                          </td>
-                          <td className="p-3 font-mono">{pfz.recommended_depth_m} m</td>
-                          <td className="p-3 font-mono text-cyan-300">{pfz.sst_celsius}°C / {pfz.chlorophyll_a_mg_m3} mg/m³</td>
-                          <td className="p-3 font-black text-amber-400">{pfz.confidence_score_percent}%</td>
-                          <td className="p-3 text-right">
-                            <button
-                              onClick={() => {
-                                handleSelectPFZ(pfz);
-                                setActiveTab('map');
-                              }}
-                              className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold border border-zinc-700 text-[11px] transition-all cursor-pointer"
-                            >
-                              View on Map ➔
-                            </button>
-                          </td>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-zinc-950 text-zinc-400 font-bold uppercase text-[10px] tracking-wider border-b border-zinc-800">
+                        <tr>
+                          <th className="p-3">Zone & Name</th>
+                          <th className="p-3">Coordinates</th>
+                          <th className="p-3">Target Species</th>
+                          <th className="p-3">Depth</th>
+                          <th className="p-3">SST / Chl-a</th>
+                          <th className="p-3">Confidence</th>
+                          <th className="p-3 text-right">Action</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-800 text-zinc-200">
+                        {(latestResponse?.all_pfz_hotspots || pfzHotspots).map((pfz, idx) => (
+                          <tr key={idx} className="hover:bg-zinc-800/50 transition-colors">
+                            <td className="p-3 font-bold text-white flex items-center space-x-2">
+                              <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+                              <span>{pfz.name}</span>
+                            </td>
+                            <td className="p-3 font-mono text-zinc-400">{pfz.latitude}°N, {pfz.longitude}°E</td>
+                            <td className="p-3">
+                              <span className="px-2.5 py-1 rounded-full font-bold bg-zinc-800 text-cyan-300 border border-cyan-500/30">
+                                {pfz.dominant_species}
+                              </span>
+                            </td>
+                            <td className="p-3 font-mono">{pfz.recommended_depth_m} m</td>
+                            <td className="p-3 font-mono text-cyan-300">{pfz.sst_celsius}°C / {pfz.chlorophyll_a_mg_m3} mg/m³</td>
+                            <td className="p-3 font-black text-amber-400">{pfz.confidence_score_percent}%</td>
+                            <td className="p-3 text-right">
+                              <button
+                                onClick={() => {
+                                  handleSelectPFZ(pfz);
+                                  setActiveTab('map');
+                                }}
+                                className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold border border-zinc-700 text-[11px] transition-all cursor-pointer"
+                              >
+                                View on Map ➔
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </main>
-      )}
-
-      {/* Demo Modal */}
-      {isDemoModalOpen && (
-        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="w-full max-w-lg bg-zinc-900 p-8 rounded-3xl border border-zinc-700 shadow-2xl space-y-5 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-cyan-500 flex items-center justify-center mx-auto text-white shadow-lg">
-              <Sparkles className="w-6 h-6" />
-            </div>
-
-            <h2 className="text-2xl font-bold text-white tracking-tight">Request an Enterprise Demo</h2>
-            <p className="text-sm text-zinc-300">
-              Experience autonomous agentic intelligence, real-time EO data ingestion, and conversational decision-support for your organization.
-            </p>
-
-            <div className="space-y-3 text-left pt-2">
-              <input 
-                type="text" 
-                placeholder="Your Name / Organization" 
-                className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-pink-500" 
-              />
-              <input 
-                type="email" 
-                placeholder="work@enterprise.com" 
-                className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-pink-500" 
-              />
-            </div>
-
-            <div className="flex items-center space-x-3 pt-3">
-              <button
-                onClick={() => {
-                  setIsDemoModalOpen(false);
-                  setActiveTab('map');
-                }}
-                className="flex-1 py-3 rounded-full bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-sm shadow-md transition-all cursor-pointer"
-              >
-                Schedule & Open Platform
-              </button>
-              <button
-                onClick={() => setIsDemoModalOpen(false)}
-                className="px-5 py-3 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold text-sm cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+            )}
+          </main>
+        </>
       )}
 
       {/* Advisory Export Modal */}
