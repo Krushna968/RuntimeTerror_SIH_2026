@@ -10,7 +10,8 @@ import {
   Copy, 
   Check, 
   ArrowUp,
-  Search
+  Fish,
+  ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatResponsePayload } from '../types';
@@ -43,7 +44,6 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
   const [isListening, setIsListening] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [isChatActive, setIsChatActive] = useState(false);
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -75,8 +75,6 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
   const handleSend = async (queryText?: string) => {
     const textToSend = queryText || inputText;
     if (!textToSend.trim() || isLoading) return;
-
-    setIsChatActive(true);
 
     const userMsg: Message = {
       id: `user-${Date.now()}`,
@@ -150,12 +148,12 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const hasMessages = messages.length > 0 || isChatActive;
+  const hasMessages = messages.length > 0;
 
   return (
     <div className="relative min-h-screen w-full bg-[#fcfbf8] text-[#111113] flex flex-col font-['Outfit',sans-serif] overflow-hidden selection:bg-blue-100 selection:text-blue-950">
       
-      {/* EXACT 1:1 LOVABLE VIBRANT BLUE ANNULAR HALO */}
+      {/* 1. EXACT 1:1 LOVABLE VIBRANT BLUE ANNULAR HALO */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center z-0">
         <div 
           className="w-[880px] sm:w-[1020px] h-[640px] sm:h-[720px] rounded-[100%]"
@@ -166,7 +164,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
         />
       </div>
 
-      {/* STATE 1: EXACT 1:1 LOVABLE HERO (PIXEL-PERFECT CLONE WITH RELEVANT TEXT) */}
+      {/* STATE 1: EXACT 1:1 LOVABLE HERO WITH CENTER CHATBOX */}
       {!hasMessages && (
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-4xl w-full mx-auto px-6 my-auto pt-20 pb-16">
           
@@ -196,7 +194,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex items-center space-x-3"
+            className="flex items-center space-x-3 mb-8"
           >
             <button
               onClick={() => handleSend("Where is the nearest Potential Fishing Zone for Tuna from Kochi today?")}
@@ -211,6 +209,63 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             >
               Sea Safety Clearance
             </button>
+          </motion.div>
+
+          {/* Center Chat Box Capsule */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="w-full max-w-xl"
+          >
+            <form 
+              onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+              className="relative flex items-center bg-white border border-[#e4e4e7] hover:border-zinc-400 focus-within:border-blue-500 rounded-full px-5 py-3 shadow-[0_10px_35px_rgba(0,0,0,0.06)] transition-all"
+            >
+              {/* Plus icon on left */}
+              <button 
+                type="button"
+                className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors mr-2 cursor-pointer"
+                title="New Query"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+
+              {/* Main Input Field */}
+              <input
+                ref={inputRef}
+                type="text"
+                autoFocus
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Ask ORCA AI anything..."
+                className="flex-1 bg-transparent text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none font-normal"
+                disabled={isLoading}
+              />
+
+              {/* Microphone Trigger */}
+              <button
+                type="button"
+                onClick={handleToggleMic}
+                className={`p-2 rounded-full transition-all mr-1 cursor-pointer ${
+                  isListening 
+                    ? 'bg-red-600 text-white animate-ping' 
+                    : 'text-zinc-400 hover:text-zinc-700'
+                }`}
+                title="Speak query"
+              >
+                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </button>
+
+              {/* Send Arrow Button */}
+              <button
+                type="submit"
+                disabled={!inputText.trim() || isLoading}
+                className="w-8 h-8 rounded-full bg-[#111113] hover:bg-zinc-800 text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-sm"
+              >
+                <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </form>
           </motion.div>
         </div>
       )}
@@ -289,9 +344,9 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             >
               <button 
                 type="button"
-                onClick={() => { setMessages([]); setIsChatActive(false); }}
+                onClick={() => setMessages([])}
                 className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors mr-2 cursor-pointer"
-                title="Reset to Landing"
+                title="New Chat"
               >
                 <Plus className="w-4 h-4" />
               </button>
