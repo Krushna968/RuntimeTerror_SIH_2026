@@ -1,11 +1,13 @@
 """
-ORCA Marine AI - NVIDIA NIM Cognitive LLM Engine
-Integrates Meta Llama 3.1 / 3.3 via NVIDIA AI Foundation Endpoints
+ORCA Marine AI - Dynamic Conversational NVIDIA NIM LLM Engine
+Integrates Meta Llama 3.1 via NVIDIA AI Foundation Endpoints
+Supports natural conversational dialogue, intent-specific reasoning, and multilingual synthesis.
 """
 
 import os
 import httpx
 import logging
+import re
 from typing import Dict, Any, Optional
 
 logger = logging.getLogger("orca.llm_engine")
@@ -14,13 +16,21 @@ NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "nvapi-yFaXQuL9LqfCY3-WFuBAVkAiTcUc
 NVIDIA_MODEL = os.getenv("NVIDIA_MODEL", "meta/llama-3.1-8b-instruct")
 NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 
-SYSTEM_PROMPT = """You are ORCA (Marine EcOsystem Reasoning with Collaborative Agents), an advanced AI created for the Indian Space Research Organisation (ISRO) and coastal communities (SIH 2026 Problem ID 26176).
+SYSTEM_PROMPT = """You are ORCA (Marine EcOsystem Reasoning with Collaborative Agents), an advanced AI assistant created for the Indian Space Research Organisation (ISRO) and coastal communities (SIH 2026 Problem ID 26176).
 
-Your role:
-1. Synthesize complex satellite Earth Observation data (ISRO Oceansat-3 OCM-3, INSAT-3DR TIR, Sentinel-3) into clear, concise, actionable advisories.
-2. Formulate grounded answers using factual agent data (Potential Fishing Zones, SST gradients, chlorophyll coincidence, IMBL border proximity, Beaufort wind scale, wave heights, and weather hazards).
-3. Provide respectful, clear communication tailored to fishermen and coastal authorities.
-4. When requested in an Indian regional language (Hindi, Tamil, Telugu, Malayalam, Bengali, Gujarati, Marathi), output fluent, culturally appropriate translations.
+Instructions:
+1. Respond directly, naturally, and conversationally to what the user actually asks.
+2. If the user says a greeting (like 'hello', 'hi', 'namaste', 'hey', 'who are you', 'how are you'):
+   - Greet them warmly and politely.
+   - Introduce yourself briefly as ORCA, ISRO's Marine AI decision-support assistant.
+   - Mention 3 key things you can assist with: (1) finding high-yield fishing zones (PFZ), (2) real-time sea-venture weather & wave safety clearance, and (3) international maritime boundary (IMBL) geofence compliance.
+3. If the user asks a specific question (e.g. about weather, waves, cyclones, fish species, borders, routes, or satellite data):
+   - Answer their specific question directly using the provided factual telemetry.
+   - Do NOT dump unrelated sections unless asked for a complete advisory.
+4. If the user asks for a comprehensive advisory or "Where to fish / Is it safe":
+   - Provide a well-structured summary with fishing hotspots, sea safety clearance, and border distance.
+5. If responding in an Indian regional language (Hindi, Tamil, Telugu, Malayalam, Bengali, Gujarati, Marathi), provide fluent, natural vernacular phrasing.
+6. Keep responses concise, clear, and easy to read for fishermen and coastal officials.
 """
 
 async def generate_llm_advisory(
@@ -30,7 +40,7 @@ async def generate_llm_advisory(
     language_code: str = "en"
 ) -> Optional[str]:
     """
-    Generate an intelligent advisory synthesis via NVIDIA NIM LLM endpoint.
+    Generate an intelligent, context-aware conversational response via NVIDIA NIM LLM endpoint.
     Falls back gracefully if API is unreachable.
     """
     if not NVIDIA_API_KEY:
@@ -42,25 +52,28 @@ async def generate_llm_advisory(
     geofence = context_data.get("geofence", {})
     port = context_data.get("port", {})
 
-    prompt = f"""User Query: "{user_query}"
+    # Check if query is a simple greeting
+    clean_q = user_query.strip().lower()
+    is_greeting = clean_q in ["hello", "hi", "hey", "namaste", "namaskar", "vanakkam", "namaskaram", "hello orca", "who are you", "what can you do", "help"]
+
+    if is_greeting:
+        user_prompt = f"""User Greeting: "{user_query}"
+Respond in {language_name} ({language_code}). Greet the user warmly as ORCA (ISRO Marine AI Assistant) and briefly tell them what you can help with."""
+    else:
+        user_prompt = f"""User Question: "{user_query}"
 Target Language: {language_name} ({language_code})
 
-Ground Truth Data from ORCA Specialized Agents:
+Verified Oceanographic Data from ISRO & Domain Agents:
 - Reference Port: {port.get('name', 'Indian Coastal Port')}
-- Recommended Potential Fishing Zone (PFZ): {top_pfz.get('name', 'Offshore Thermal Front')} (Bearing: {top_pfz.get('bearing_degrees', 0)}°, Distance: {top_pfz.get('distance_from_port_km', 0)} km)
-- Dominant Marine Species: {top_pfz.get('dominant_species', 'Pelagic Finfish')} with {top_pfz.get('catch_enhancement_multiplier', '3.5x')} catch boost
-- Oceanographic Metrics: SST {top_pfz.get('sst_celsius', 28.5)}°C, Chlorophyll-a {top_pfz.get('chlorophyll_a_mg_m3', 2.0)} mg/m³, Depth {top_pfz.get('recommended_depth_m', 45)}m
-- Sea-Venture Clearance: {weather.get('safety_status', 'SAFE_FOR_VENTURE')} (Safety Index: {weather.get('safety_index', 85)}/100, Wave Height: {weather.get('significant_wave_height_m', 1.0)}m, Wind: {weather.get('wind_speed_knots', 12)} kts)
-- IMBL International Border Proximity: {geofence.get('nearest_imbl', {}).get('distance_nautical_miles', 150)} NM ({geofence.get('nearest_imbl', {}).get('status', 'SAFE')})
-- Active Weather Hazards: {weather.get('cyclone_influence', {}).get('active_cyclone') or 'None'}
+- Recommended PFZ Zone: {top_pfz.get('name', 'Offshore Front')} ({top_pfz.get('distance_from_port_km', 0)} km, Bearing: {top_pfz.get('bearing_from_port', '0°')})
+- Target Marine Species: {top_pfz.get('dominant_species', 'Pelagic Fish')} (Catch Boost: {top_pfz.get('catch_enhancement_multiplier', '3.5x')}, Depth: {top_pfz.get('recommended_depth_m', 45)}m)
+- Oceanographic State: SST {top_pfz.get('sst_celsius', 28.0)}°C, Chlorophyll-a {top_pfz.get('chlorophyll_a_mg_m3', 2.0)} mg/m³
+- Sea-Venture Clearance: {weather.get('safety_status', 'SAFE_FOR_VENTURE')} (Safety Score: {weather.get('safety_index', 80)}/100, Wave: {weather.get('significant_wave_height_m', 1.0)}m, Wind: {weather.get('wind_speed_knots', 12)} kts, Sea State: {weather.get('sea_state', 'Moderate')})
+- Weather Hazards / Cyclones: {weather.get('cyclone_influence', {}).get('active_cyclone') or 'No active storm'}
+- IMBL Border Distance: {geofence.get('nearest_imbl', {}).get('distance_nautical_miles', 150)} NM ({geofence.get('nearest_imbl', {}).get('border_name', 'International Border')}, Status: {geofence.get('nearest_imbl', {}).get('status_code', 'SAFE')})
 
 Instruction:
-Generate a crisp, highly structured 3-part advisory in {language_name}:
-1. 🐟 **Optimal Fishing Opportunity & Species Guidance** (Specific coordinates, bearing, target species, and catch enhancement).
-2. 🛡️ **Sea Condition & Navigational Safety** (Wave height, wind advisory, venture clearance score).
-3. 🛑 **Maritime Border Compliance & Geofence Status** (IMBL buffer safety).
-
-Keep tone direct, empowering, and authoritative. Do not hallucinate numbers outside the provided facts."""
+Answer the user's specific question directly, concisely, and conversationally in {language_name}. Only include details relevant to their prompt."""
 
     headers = {
         "Authorization": f"Bearer {NVIDIA_API_KEY}",
@@ -71,10 +84,10 @@ Keep tone direct, empowering, and authoritative. Do not hallucinate numbers outs
         "model": NVIDIA_MODEL,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": user_prompt}
         ],
-        "max_tokens": 450,
-        "temperature": 0.2
+        "max_tokens": 400,
+        "temperature": 0.4 if is_greeting else 0.2
     }
 
     try:
@@ -83,7 +96,7 @@ Keep tone direct, empowering, and authoritative. Do not hallucinate numbers outs
             if response.status_code == 200:
                 data = response.json()
                 content = data["choices"][0]["message"]["content"].strip()
-                logger.info(f"NVIDIA NIM ({NVIDIA_MODEL}) generated response in {language_name}")
+                logger.info(f"NVIDIA NIM ({NVIDIA_MODEL}) generated response for: '{user_query[:30]}...'")
                 return content
             else:
                 logger.warning(f"NVIDIA NIM returned HTTP {response.status_code}: {response.text[:100]}")
