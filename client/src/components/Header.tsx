@@ -60,22 +60,28 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Brand Logo */}
       <div 
         onClick={() => setActiveTab('home')}
-        className="flex items-center space-x-3 cursor-pointer group shrink-0"
+        className="flex items-center space-x-2.5 cursor-pointer group shrink-0"
       >
-        {/* 3D Oceanic Compass Emblem */}
-        <div className="relative w-8 h-8 flex items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-600 p-1.5 shadow-[0_0_20px_rgba(6,182,212,0.5)] group-hover:scale-105 transition-transform">
-          <Compass className="w-full h-full text-white animate-spin-slow" />
-          <span className="absolute -top-1 -right-1 flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-90"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-400"></span>
-          </span>
+        {/* Minimalist Geometric Emblem */}
+        <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105 ${
+          isChat 
+            ? 'bg-zinc-950 text-white shadow-xs' 
+            : 'bg-white text-zinc-950 shadow-sm'
+        }`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+            <path d="M3 13c4.5-6 11-8 18-2-4.5 6-11 8-18 2z" />
+            <circle cx="15" cy="9.5" r="1.25" fill="currentColor" stroke="none" />
+          </svg>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <span className={`text-2xl font-black tracking-wider transition-colors ${
-            isChat ? 'text-zinc-950 group-hover:text-blue-600' : 'text-white group-hover:text-cyan-200'
+        <div className="flex items-baseline space-x-1.5">
+          <span className={`text-lg font-black tracking-widest transition-colors ${
+            isChat ? 'text-zinc-950' : 'text-white'
           }`}>
             ORCA
+          </span>
+          <span className="text-[9px] font-mono font-bold tracking-wider text-cyan-400">
+            ISRO
           </span>
         </div>
       </div>
