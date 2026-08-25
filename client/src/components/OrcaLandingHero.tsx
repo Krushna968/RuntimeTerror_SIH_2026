@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { 
   ArrowRight, 
   Sparkles, 
-  Compass 
+  Compass,
+  Satellite
 } from 'lucide-react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
@@ -48,7 +49,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
     window.addEventListener('resize', handleResize);
 
     // Oceanic particle grid
-    const cols = 30;
+    const cols = 32;
     const rows = 18;
     let stepX = width / cols;
     let stepY = height / rows;
@@ -134,7 +135,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
 
       {/* 2. Top-Center High-Illumination Oceanic Spotlight */}
       <div 
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[700px] pointer-events-none z-0"
+        className="absolute top-0 left-1/3 -translate-x-1/2 w-[1100px] h-[700px] pointer-events-none z-0"
         style={{
           background: 'radial-gradient(ellipse at top center, rgba(6, 182, 212, 0.45) 0%, rgba(59, 130, 246, 0.35) 40%, rgba(99, 102, 241, 0.15) 65%, transparent 80%)',
           filter: 'blur(90px)'
@@ -177,30 +178,31 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
         className="absolute inset-0 pointer-events-none z-0 opacity-80" 
       />
 
-      {/* 6. Main Ultra-Clean, Focused Hero Section */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-36 pb-24 max-w-5xl mx-auto w-full my-auto">
-        {/* Cinematic High-Impact Headline */}
+      {/* 6. Main Left-Aligned Hero Section */}
+      <main className="relative z-10 flex-1 flex flex-col items-start justify-center text-left px-6 sm:px-12 lg:px-20 pt-36 pb-24 max-w-7xl mx-auto w-full my-auto">
+        {/* Cinematic Left-Aligned Display Headline */}
         <motion.div 
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7 }}
-          className="space-y-5 max-w-4xl mx-auto"
+          className="space-y-6 max-w-3xl"
         >
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] select-none text-white drop-shadow-lg">
-            The Agentic Brain for the <span className="bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(0,240,255,0.6)]">Indian Ocean</span>
+            The Agentic Brain<br />
+            for the <span className="bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(0,240,255,0.6)]">Indian Ocean</span>
           </h1>
 
-          <p className="text-zinc-200 text-base sm:text-lg md:text-xl max-w-3xl mx-auto font-normal leading-relaxed pt-2">
+          <p className="text-zinc-200 text-base sm:text-lg md:text-xl max-w-2xl font-normal leading-relaxed pt-1">
             Autonomous multi-agent platform reasoning over ISRO satellite oceanography, SST-chlorophyll thermal fronts, and IMBL geofencing to empower 4 million+ coastal fishermen.
           </p>
         </motion.div>
 
-        {/* Primary CTA Action Buttons */}
+        {/* Primary CTA Action Buttons (Left-Aligned) */}
         <motion.div 
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-12 flex flex-col sm:flex-row items-center gap-4"
+          className="mt-10 flex flex-col sm:flex-row items-center gap-4"
         >
           <button 
             onClick={() => onExplorePlatform('chat')}
@@ -222,7 +224,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
       </main>
 
       {/* 7. Bottom Footer Strip */}
-      <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 border-t border-zinc-800/60 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-400 gap-3">
+      <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-6 border-t border-zinc-800/60 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-400 gap-3">
         <div>
           Created by <strong className="text-zinc-200">Team Runtime Terror</strong> for ISRO · Smart India Hackathon 2026
         </div>
