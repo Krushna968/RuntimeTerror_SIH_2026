@@ -4,39 +4,20 @@ import {
   Satellite, 
   Fish, 
   ShieldCheck, 
-  Compass,
   AlertTriangle,
-  Languages,
   Cpu
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface OrcaLandingHeroProps {
   onExplorePlatform: (tab: 'map' | 'agent-lab' | 'safety' | 'bulletin') => void;
-  currentLang: string;
-  setCurrentLang: (lang: string) => void;
-  onSOSClick: () => void;
 }
 
-export const LANGUAGES = [
-  { code: 'en', name: 'English', native: 'English' },
-  { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
-  { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
-  { code: 'te', name: 'Telugu', native: 'తెలుగు' },
-  { code: 'ml', name: 'Malayalam', native: 'മലയാളം' },
-  { code: 'bn', name: 'Bengali', native: 'বাংলা' },
-  { code: 'gu', name: 'Gujarati', native: 'ગુજરાતી' },
-  { code: 'mr', name: 'Marathi', native: 'मराठी' },
-];
-
 export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
-  onExplorePlatform,
-  currentLang,
-  setCurrentLang,
-  onSOSClick
+  onExplorePlatform
 }) => {
   return (
-    <div className="relative min-h-screen w-full bg-[#07090e] text-white flex flex-col justify-between overflow-hidden font-['Outfit',sans-serif] selection:bg-cyan-500 selection:text-slate-950">
+    <div className="relative min-h-[calc(100vh-80px)] w-full bg-[#07090e] text-white flex flex-col justify-between overflow-hidden font-['Outfit',sans-serif] selection:bg-cyan-500 selection:text-slate-950">
       {/* 1. Atmospheric Gradient Lighting Layers */}
       {/* Bottom-Left Directional Spotlight (Oceanic Cyan / Magenta Beam projecting diagonally) */}
       <div 
@@ -66,101 +47,8 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
         }}
       />
 
-      {/* 2. Top Sleek Navigation Bar (Clickable Texts) */}
-      <nav className="relative z-50 w-full max-w-7xl mx-auto h-20 px-6 sm:px-10 flex items-center justify-between">
-        {/* Brand Logo */}
-        <div 
-          onClick={() => onExplorePlatform('map')}
-          className="flex items-center space-x-3 cursor-pointer group shrink-0"
-        >
-          {/* 3D Oceanic Compass Emblem */}
-          <div className="relative w-8 h-8 flex items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-1.5 shadow-[0_0_20px_rgba(6,182,212,0.6)] group-hover:scale-105 transition-transform">
-            <Compass className="w-full h-full text-white animate-spin-slow" />
-            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-90"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-400"></span>
-            </span>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <span className="text-2xl font-black tracking-wider text-white group-hover:text-cyan-200 transition-colors">
-              ORCA
-            </span>
-            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-400/50 uppercase tracking-wider hidden sm:inline-block">
-              ISRO · SIH 26176
-            </span>
-          </div>
-        </div>
-
-        {/* Center Menu: Just Clean Clickable Texts */}
-        <div className="hidden lg:flex items-center space-x-9 text-sm font-medium text-zinc-300">
-          <button 
-            onClick={() => onExplorePlatform('map')}
-            className="hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap"
-          >
-            GIS Command
-          </button>
-
-          <button 
-            onClick={() => onExplorePlatform('agent-lab')}
-            className="hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap"
-          >
-            Agent DAG
-          </button>
-
-          <button 
-            onClick={() => onExplorePlatform('safety')}
-            className="hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap"
-          >
-            Safety Barometer
-          </button>
-
-          <button 
-            onClick={() => onExplorePlatform('bulletin')}
-            className="hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap"
-          >
-            Marine Advisory
-          </button>
-        </div>
-
-        {/* Right Action Group */}
-        <div className="flex items-center space-x-3 shrink-0">
-          {/* Regional Language Switcher */}
-          <div className="relative flex items-center bg-zinc-900/90 border border-zinc-700/80 px-3 py-1.5 rounded-full shadow-sm">
-            <Languages className="w-3.5 h-3.5 text-cyan-400 mr-2" />
-            <select
-              value={currentLang}
-              onChange={(e) => setCurrentLang(e.target.value)}
-              className="bg-transparent text-xs font-semibold text-zinc-200 focus:outline-none cursor-pointer"
-            >
-              {LANGUAGES.map((lang) => (
-                <option key={lang.code} value={lang.code} className="bg-zinc-900 text-white">
-                  {lang.native} ({lang.name})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* SOS Button */}
-          <button 
-            onClick={onSOSClick}
-            className="px-3.5 py-1.5 rounded-full text-xs font-black text-white bg-red-600 hover:bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] border border-red-400/40 transition-all active:scale-95 cursor-pointer animate-pulse"
-          >
-            SOS 1554
-          </button>
-
-          {/* Get Started Button */}
-          <button 
-            onClick={() => onExplorePlatform('map')}
-            className="px-4 py-2 rounded-full text-sm font-bold text-slate-950 bg-white hover:bg-zinc-100 transition-all shadow-md active:scale-95 cursor-pointer hidden sm:block whitespace-nowrap"
-          >
-            Open Command Map
-          </button>
-        </div>
-      </nav>
-
-      {/* 3. Hero Centerpiece Content */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-8 pb-20 max-w-5xl mx-auto">
+      {/* 2. Hero Centerpiece Content */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-12 pb-16 max-w-5xl mx-auto">
         {/* Eyebrow Badge */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }}
@@ -279,7 +167,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.45 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3.5 mt-16 w-full max-w-4xl"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3.5 mt-14 w-full max-w-4xl"
         >
           <div 
             onClick={() => onExplorePlatform('map')}
@@ -327,7 +215,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
         </motion.div>
       </main>
 
-      {/* 4. Bottom Footer Strip */}
+      {/* 3. Bottom Footer Strip */}
       <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 border-t border-zinc-800/40 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-3">
         <div>
           © 2026 <strong>ORCA</strong> · Indian Space Research Organisation (ISRO) · SIH 26176

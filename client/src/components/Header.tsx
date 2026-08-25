@@ -32,14 +32,14 @@ export const Header: React.FC<HeaderProps> = ({
   onSOSClick
 }) => {
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#07090e]/95 backdrop-blur-xl border-b border-zinc-800/80 px-6 lg:px-10 py-3.5 flex items-center justify-between shadow-2xl text-white font-['Outfit',sans-serif]">
-      {/* Brand & ISRO Identity */}
+    <header className="sticky top-0 z-50 w-full bg-[#07090e]/95 backdrop-blur-xl border-b border-zinc-800/80 px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-2xl text-white font-['Outfit',sans-serif]">
+      {/* Brand Logo */}
       <div 
         onClick={() => setActiveTab('home')}
         className="flex items-center space-x-3 cursor-pointer group shrink-0"
       >
         {/* 3D Oceanic Compass Emblem */}
-        <div className="relative w-8 h-8 flex items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-1.5 shadow-[0_0_15px_rgba(6,182,212,0.5)] group-hover:scale-105 transition-transform">
+        <div className="relative w-8 h-8 flex items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 p-1.5 shadow-[0_0_20px_rgba(6,182,212,0.6)] group-hover:scale-105 transition-transform">
           <Compass className="w-full h-full text-white animate-spin-slow" />
           <span className="absolute -top-1 -right-1 flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-90"></span>
@@ -48,17 +48,14 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         <div className="flex items-center space-x-2">
-          <h1 className="text-xl font-black tracking-wider text-white group-hover:text-cyan-200 transition-colors">
+          <span className="text-2xl font-black tracking-wider text-white group-hover:text-cyan-200 transition-colors">
             ORCA
-          </h1>
-          <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-400/50 uppercase tracking-wider hidden sm:inline-block">
-            ISRO · SIH 26176
           </span>
         </div>
       </div>
 
       {/* Center Navigation: Just Clean Clickable Texts */}
-      <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-zinc-300">
+      <nav className="hidden md:flex items-center space-x-8 lg:space-x-10 text-sm font-medium">
         <button
           onClick={() => setActiveTab('home')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
@@ -115,10 +112,10 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       </nav>
 
-      {/* Right Controls: Language + SOS */}
+      {/* Right Action Group */}
       <div className="flex items-center space-x-3 shrink-0">
         {/* Regional Language Switcher */}
-        <div className="relative flex items-center bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-full shadow-sm">
+        <div className="relative flex items-center bg-zinc-900/90 border border-zinc-700/80 px-3 py-1.5 rounded-full shadow-sm">
           <Languages className="w-3.5 h-3.5 text-cyan-400 mr-2" />
           <select
             value={currentLang}
@@ -133,12 +130,12 @@ export const Header: React.FC<HeaderProps> = ({
           </select>
         </div>
 
-        {/* Emergency SOS Button */}
+        {/* SOS Button */}
         <button
           onClick={onSOSClick}
-          className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-red-600 hover:bg-red-500 text-white font-black text-xs shadow-[0_0_15px_rgba(239,68,68,0.5)] border border-red-400/40 active:scale-95 transition-all cursor-pointer animate-pulse whitespace-nowrap"
+          className="px-3.5 py-1.5 rounded-full text-xs font-black text-white bg-red-600 hover:bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] border border-red-400/40 active:scale-95 transition-all cursor-pointer animate-pulse whitespace-nowrap"
         >
-          <AlertTriangle className="w-3.5 h-3.5" />
+          <AlertTriangle className="w-3.5 h-3.5 inline-block mr-1" />
           <span>SOS 1554</span>
         </button>
       </div>
