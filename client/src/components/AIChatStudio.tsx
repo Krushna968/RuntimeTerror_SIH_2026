@@ -205,12 +205,6 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
                 disabled={isLoading}
               />
 
-              {/* Model Pill */}
-              <div className="flex items-center space-x-1 text-xs text-zinc-400 px-2.5 py-1 rounded-full bg-zinc-800/80 mr-2 border border-zinc-700/50 select-none">
-                <span>Llama 3.1</span>
-                <ChevronDown className="w-3 h-3 opacity-60" />
-              </div>
-
               {/* Microphone Trigger */}
               <button
                 type="button"
@@ -327,11 +321,6 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
                 className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none font-normal"
                 disabled={isLoading}
               />
-
-              <div className="flex items-center space-x-1 text-xs text-zinc-400 px-2.5 py-1 rounded-full bg-zinc-800/80 mr-2 border border-zinc-700/50 select-none">
-                <span>Llama 3.1</span>
-                <ChevronDown className="w-3 h-3 opacity-60" />
-              </div>
 
               <button
                 type="button"
