@@ -31,8 +31,12 @@ export const Header: React.FC<HeaderProps> = ({
   setCurrentLang,
   onSOSClick
 }) => {
+  const isLightPage = activeTab === 'chat';
+
   return (
-    <header className="absolute top-0 left-0 right-0 z-50 w-full bg-transparent px-6 sm:px-12 lg:px-20 py-5 flex items-center justify-between text-white font-['Outfit',sans-serif] pointer-events-auto">
+    <header className={`absolute top-0 left-0 right-0 z-50 w-full bg-transparent px-6 sm:px-12 lg:px-20 py-5 flex items-center justify-between font-['Outfit',sans-serif] pointer-events-auto transition-colors ${
+      isLightPage ? 'text-zinc-900' : 'text-white'
+    }`}>
       {/* Brand Logo */}
       <div 
         onClick={() => setActiveTab('home')}
@@ -48,7 +52,9 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-2xl font-black tracking-wider text-white group-hover:text-cyan-200 transition-colors">
+          <span className={`text-2xl font-black tracking-wider transition-colors ${
+            isLightPage ? 'text-zinc-950 group-hover:text-blue-600' : 'text-white group-hover:text-cyan-200'
+          }`}>
             ORCA
           </span>
         </div>
@@ -60,8 +66,8 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('home')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'home'
-              ? 'text-white font-bold'
-              : 'text-zinc-400 hover:text-white'
+              ? (isLightPage ? 'text-zinc-950 font-bold' : 'text-white font-bold')
+              : (isLightPage ? 'text-zinc-500 hover:text-zinc-950' : 'text-zinc-400 hover:text-white')
           }`}
         >
           Home
@@ -71,8 +77,8 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('chat')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'chat'
-              ? 'text-white font-bold'
-              : 'text-zinc-400 hover:text-white'
+              ? (isLightPage ? 'text-zinc-950 font-bold' : 'text-white font-bold')
+              : (isLightPage ? 'text-zinc-500 hover:text-zinc-950' : 'text-zinc-400 hover:text-white')
           }`}
         >
           AI Chatbot
@@ -82,8 +88,8 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('map')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'map'
-              ? 'text-white font-bold'
-              : 'text-zinc-400 hover:text-white'
+              ? (isLightPage ? 'text-zinc-950 font-bold' : 'text-white font-bold')
+              : (isLightPage ? 'text-zinc-500 hover:text-zinc-950' : 'text-zinc-400 hover:text-white')
           }`}
         >
           GIS Command
@@ -93,8 +99,8 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('agent-lab')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'agent-lab'
-              ? 'text-white font-bold'
-              : 'text-zinc-400 hover:text-white'
+              ? (isLightPage ? 'text-zinc-950 font-bold' : 'text-white font-bold')
+              : (isLightPage ? 'text-zinc-500 hover:text-zinc-950' : 'text-zinc-400 hover:text-white')
           }`}
         >
           Agent DAG
@@ -104,8 +110,8 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('safety')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'safety'
-              ? 'text-white font-bold'
-              : 'text-zinc-400 hover:text-white'
+              ? (isLightPage ? 'text-zinc-950 font-bold' : 'text-white font-bold')
+              : (isLightPage ? 'text-zinc-500 hover:text-zinc-950' : 'text-zinc-400 hover:text-white')
           }`}
         >
           Safety Barometer
@@ -115,8 +121,8 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('bulletin')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${
             activeTab === 'bulletin'
-              ? 'text-white font-bold'
-              : 'text-zinc-400 hover:text-white'
+              ? (isLightPage ? 'text-zinc-950 font-bold' : 'text-white font-bold')
+              : (isLightPage ? 'text-zinc-500 hover:text-zinc-950' : 'text-zinc-400 hover:text-white')
           }`}
         >
           Advisory Bulletin
@@ -126,12 +132,16 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Right Action Group */}
       <div className="flex items-center space-x-3 shrink-0">
         {/* Regional Language Switcher */}
-        <div className="relative flex items-center bg-zinc-900/60 border border-zinc-700/60 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm">
-          <Languages className="w-3.5 h-3.5 text-cyan-400 mr-2" />
+        <div className={`relative flex items-center backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm transition-all border ${
+          isLightPage 
+            ? 'bg-white/80 border-zinc-200 text-zinc-900' 
+            : 'bg-zinc-900/60 border-zinc-700/60 text-zinc-200'
+        }`}>
+          <Languages className={`w-3.5 h-3.5 mr-2 ${isLightPage ? 'text-blue-600' : 'text-cyan-400'}`} />
           <select
             value={currentLang}
             onChange={(e) => setCurrentLang(e.target.value)}
-            className="bg-transparent text-xs font-semibold text-zinc-200 focus:outline-none cursor-pointer"
+            className="bg-transparent text-xs font-semibold focus:outline-none cursor-pointer"
           >
             {LANGUAGES.map((lang) => (
               <option key={lang.code} value={lang.code} className="bg-zinc-900 text-white">
