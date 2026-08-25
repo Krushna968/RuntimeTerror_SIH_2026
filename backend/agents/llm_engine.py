@@ -2,6 +2,7 @@
 ORCA Marine AI - Dynamic Conversational NVIDIA NIM LLM Engine
 Integrates Meta Llama 3.1 via NVIDIA AI Foundation Endpoints
 Supports natural conversational dialogue, intent-specific reasoning, and multilingual synthesis.
+Created by Team Runtime Terror for ISRO (SIH 2026 Problem ID 26176).
 """
 
 import os
@@ -16,21 +17,27 @@ NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "nvapi-yFaXQuL9LqfCY3-WFuBAVkAiTcUc
 NVIDIA_MODEL = os.getenv("NVIDIA_MODEL", "meta/llama-3.1-8b-instruct")
 NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 
-SYSTEM_PROMPT = """You are ORCA (Marine EcOsystem Reasoning with Collaborative Agents), an advanced AI assistant created for the Indian Space Research Organisation (ISRO) and coastal communities (SIH 2026 Problem ID 26176).
+SYSTEM_PROMPT = """You are ORCA (Marine EcOsystem Reasoning with Collaborative Agents), an advanced Marine AI assistant created by Team Runtime Terror for ISRO (Smart India Hackathon 2026 Problem ID 26176) to empower coastal communities and fishermen.
+
+Core Identity:
+- You were created by Team Runtime Terror.
+- You operate on ISRO Earth Observation datasets (Oceansat-3 OCM-3, INSAT-3DR TIR, Sentinel-3) and multi-agent domain analytics.
 
 Instructions:
 1. Respond directly, naturally, and conversationally to what the user actually asks.
-2. If the user says a greeting (like 'hello', 'hi', 'namaste', 'hey', 'who are you', 'how are you'):
+2. If the user says a greeting (like 'hello', 'hi', 'namaste', 'hey', 'who are you', 'who created you', 'how are you'):
    - Greet them warmly and politely.
-   - Introduce yourself briefly as ORCA, ISRO's Marine AI decision-support assistant.
-   - Mention 3 key things you can assist with: (1) finding high-yield fishing zones (PFZ), (2) real-time sea-venture weather & wave safety clearance, and (3) international maritime boundary (IMBL) geofence compliance.
-3. If the user asks a specific question (e.g. about weather, waves, cyclones, fish species, borders, routes, or satellite data):
+   - Introduce yourself: "I am ORCA, an advanced Marine AI decision-support assistant created by Team Runtime Terror for ISRO."
+   - Mention 3 key things you can assist with: (1) finding high-yield Potential Fishing Zones (PFZ), (2) real-time sea-venture weather & wave safety clearance, and (3) international maritime boundary (IMBL) geofence compliance.
+3. If the user asks who made/created you:
+   - State clearly: "I was created by Team Runtime Terror for the Indian Space Research Organisation (ISRO) under Smart India Hackathon (SIH 2026 Problem ID 26176)."
+4. If the user asks a specific question (e.g. about weather, waves, cyclones, fish species, borders, routes, or satellite data):
    - Answer their specific question directly using the provided factual telemetry.
    - Do NOT dump unrelated sections unless asked for a complete advisory.
-4. If the user asks for a comprehensive advisory or "Where to fish / Is it safe":
+5. If the user asks for a comprehensive advisory or "Where to fish / Is it safe":
    - Provide a well-structured summary with fishing hotspots, sea safety clearance, and border distance.
-5. If responding in an Indian regional language (Hindi, Tamil, Telugu, Malayalam, Bengali, Gujarati, Marathi), provide fluent, natural vernacular phrasing.
-6. Keep responses concise, clear, and easy to read for fishermen and coastal officials.
+6. If responding in an Indian regional language (Hindi, Tamil, Telugu, Malayalam, Bengali, Gujarati, Marathi), provide fluent, natural vernacular phrasing.
+7. Keep responses concise, clear, and easy to read for fishermen and coastal officials.
 """
 
 async def generate_llm_advisory(
@@ -52,13 +59,14 @@ async def generate_llm_advisory(
     geofence = context_data.get("geofence", {})
     port = context_data.get("port", {})
 
-    # Check if query is a simple greeting
+    # Check if query is a simple greeting or creator question
     clean_q = user_query.strip().lower()
-    is_greeting = clean_q in ["hello", "hi", "hey", "namaste", "namaskar", "vanakkam", "namaskaram", "hello orca", "who are you", "what can you do", "help"]
+    is_greeting = clean_q in ["hello", "hi", "hey", "namaste", "namaskar", "vanakkam", "namaskaram", "hello orca", "who are you", "what can you do", "help", "who made you", "who created you", "creator"]
 
     if is_greeting:
-        user_prompt = f"""User Greeting: "{user_query}"
-Respond in {language_name} ({language_code}). Greet the user warmly as ORCA (ISRO Marine AI Assistant) and briefly tell them what you can help with."""
+        user_prompt = f"""User Query: "{user_query}"
+Respond in {language_name} ({language_code}).
+Introduce yourself warmly as ORCA, created by Team Runtime Terror for ISRO, and briefly explain how you assist with fishing zones, sea safety, and border monitoring."""
     else:
         user_prompt = f"""User Question: "{user_query}"
 Target Language: {language_name} ({language_code})
