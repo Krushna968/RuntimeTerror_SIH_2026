@@ -20,7 +20,8 @@ import {
   Anchor, 
   Activity, 
   Copy, 
-  Check 
+  Check,
+  Radio
 } from 'lucide-react';
 import { PFZHotspot, NavigationRoute, WeatherObservation, SatelliteTelemetry, ChatResponsePayload } from '../types';
 
@@ -84,7 +85,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       zoom: 6,
       minZoom: 4,
       maxZoom: 15,
-      zoomControl: false,
+      zoomControl: false, // We place zoom in bottom-left to avoid drawer overlap
     });
 
     // High-Resolution CartoDB Voyager tiles
@@ -94,8 +95,8 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       maxZoom: 19
     }).addTo(map);
 
-    // Zoom control in bottom right
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    // Zoom control at bottomleft (above ocean telemetry strip)
+    L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
     // Add all layers
     pfzLayerGroup.current.addTo(map);
@@ -355,33 +356,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         className="absolute inset-0 w-full h-full z-0" 
       />
 
-      {/* 2. Top Floating Satellite Telemetry HUD (Bright Luminous Glass Capsule) */}
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-auto hidden md:flex items-center space-x-6 px-6 py-2.5 rounded-full bg-white/90 backdrop-blur-2xl border border-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.08)] text-xs text-zinc-900">
-        <div className="flex items-center space-x-2">
-          <span className="flex h-2.5 w-2.5 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-500 opacity-90"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
-          </span>
-          <span className="font-bold text-zinc-900">ISRO Oceansat-3 (EOS-06)</span>
-          <span className="text-[10px] font-mono font-bold bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded-full border border-cyan-200">98.4%</span>
-        </div>
-
-        <div className="w-px h-3.5 bg-zinc-300" />
-
-        <div className="flex items-center space-x-2">
-          <span className="font-bold text-zinc-900">INSAT-3DR TIR</span>
-          <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">99.1%</span>
-        </div>
-
-        <div className="w-px h-3.5 bg-zinc-300" />
-
-        <div className="flex items-center space-x-1.5 text-zinc-700 font-semibold">
-          <Activity className="w-3.5 h-3.5 text-blue-600" />
-          <span>NRSC Ground Synced</span>
-        </div>
-      </div>
-
-      {/* 3. Top-Left Floating GIS Marine Layers & Simulator Island (Bright Frosted Glass) */}
+      {/* 2. Top-Left Floating GIS Marine Layers Island (Bright Frosted Glass) */}
       <div className="absolute top-24 left-6 z-20 pointer-events-auto w-72 p-4 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/90 shadow-[0_12px_40px_rgba(0,0,0,0.12)] text-zinc-900 space-y-3">
         <div className="flex items-center justify-between border-b border-zinc-200/80 pb-2.5">
           <div className="flex items-center space-x-2">
@@ -391,6 +366,18 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
           <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
             ISRO L3
           </span>
+        </div>
+
+        {/* Live Satellite Status Sub-Pill Inside Island */}
+        <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-blue-50/80 border border-blue-100 text-[10px] font-medium text-blue-900">
+          <div className="flex items-center space-x-1.5 truncate">
+            <span className="flex h-2 w-2 relative shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-500 opacity-90"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+            </span>
+            <span className="truncate font-semibold">Oceansat-3 (EOS-06)</span>
+          </div>
+          <span className="font-mono font-bold text-blue-700 shrink-0">98.4%</span>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
@@ -477,26 +464,26 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         </div>
       </div>
 
-      {/* 4. Bottom-Left Floating Live Ocean State Strip (Bright Glass) */}
-      <div className="absolute bottom-6 left-6 z-20 pointer-events-auto hidden sm:flex items-center space-x-5 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur-2xl border border-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.1)] text-xs text-zinc-900 font-mono">
+      {/* 3. Bottom-Left Floating Live Ocean State Strip (Bright Glass) */}
+      <div className="absolute bottom-6 left-16 z-20 pointer-events-auto hidden sm:flex items-center space-x-5 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur-2xl border border-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.1)] text-xs text-zinc-900 font-mono">
         <div className="flex items-center space-x-1.5">
           <span className="text-zinc-500 font-medium">Wave:</span>
-          <strong className="text-blue-700 font-bold">{weather?.significant_wave_height_m || "1.0"}m</strong>
+          <strong className="text-blue-700 font-bold">{weather?.significant_wave_height_m || "1.03"}m</strong>
         </div>
         <div className="w-px h-3.5 bg-zinc-200" />
         <div className="flex items-center space-x-1.5">
           <span className="text-zinc-500 font-medium">Wind:</span>
-          <strong className="text-emerald-700 font-bold">{weather?.wind_speed_knots || "14"} kts</strong>
+          <strong className="text-emerald-700 font-bold">{weather?.wind_speed_knots || "14.9"} kts</strong>
         </div>
         <div className="w-px h-3.5 bg-zinc-200" />
         <div className="flex items-center space-x-1.5">
           <span className="text-zinc-500 font-medium">Safety:</span>
-          <strong className="text-emerald-700 font-bold">{weather?.safety_index || "88"}/100 (SAFE)</strong>
+          <strong className="text-emerald-700 font-bold">{weather?.safety_index || "74.2"}/100 (SAFE)</strong>
         </div>
       </div>
 
-      {/* 5. Right-Side Floating AI Assistant & Advisory Glass Drawer (Bright Frosted Glass) */}
-      <div className="absolute top-20 right-6 bottom-6 z-20 pointer-events-auto w-96 lg:w-[450px] max-w-[92vw] flex flex-col rounded-3xl bg-white/95 backdrop-blur-3xl border border-white/90 shadow-[0_16px_50px_rgba(0,0,0,0.14)] text-zinc-900 overflow-hidden">
+      {/* 4. Right-Side Floating AI Assistant & Advisory Glass Drawer (Calibrated) */}
+      <div className="absolute top-24 right-6 bottom-6 z-20 pointer-events-auto w-96 lg:w-[450px] max-w-[92vw] flex flex-col rounded-3xl bg-white/95 backdrop-blur-3xl border border-white/90 shadow-[0_16px_50px_rgba(0,0,0,0.14)] text-zinc-900 overflow-hidden">
         
         {/* Drawer Header */}
         <div className="p-4 border-b border-zinc-200/80 flex items-center justify-between shrink-0 bg-white/60">
