@@ -166,7 +166,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
         />
       </div>
 
-      {/* STATE 1: EXACT 1:1 LOVABLE HERO (PIXEL-PERFECT CLONE) */}
+      {/* STATE 1: EXACT 1:1 LOVABLE HERO (PIXEL-PERFECT CLONE WITH RELEVANT TEXT) */}
       {!hasMessages && (
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-4xl w-full mx-auto px-6 my-auto pt-20 pb-16">
           
@@ -177,18 +177,18 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             transition={{ duration: 0.6 }}
             className="text-6xl sm:text-7xl md:text-8xl font-black text-[#111113] tracking-[-0.04em] leading-tight select-none whitespace-nowrap mb-6"
           >
-            Secure by design
+            Reasoning by design
           </motion.h1>
 
-          {/* Subtitle Description */}
+          {/* 2-Line Subtitle Description */}
           <motion.p 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-[#52525b] text-base sm:text-[17px] max-w-[620px] font-normal leading-[1.6] mb-8 text-center"
+            className="text-[#52525b] text-base sm:text-[17px] max-w-[640px] font-normal leading-[1.6] mb-8 text-center"
           >
-            Choose where your data lives, enforce SSO and role-based access, control<br className="hidden sm:inline" />
-            publishing with approvals, and keep your code and prompts out of model training.
+            Reason over ISRO satellite oceanography, verify 0–100 ocean safety clearance,<br className="hidden sm:inline" />
+            discover high-yield fishing zones, and maintain strict maritime border compliance.
           </motion.p>
 
           {/* Action Buttons (Exact Lovable Geometry: rounded-lg) */}
@@ -202,14 +202,14 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
               onClick={() => handleSend("Where is the nearest Potential Fishing Zone for Tuna from Kochi today?")}
               className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#111113] hover:bg-zinc-800 shadow-sm transition-all active:scale-98 cursor-pointer"
             >
-              Trust center
+              Tuna PFZ Advisory
             </button>
 
             <button
               onClick={() => handleSend("Is it safe to venture into the sea tomorrow morning?")}
               className="px-4 py-2 rounded-lg text-sm font-medium text-[#18181b] bg-white hover:bg-zinc-50 border border-[#e4e4e7] shadow-sm transition-all active:scale-98 cursor-pointer"
             >
-              Report an issue
+              Sea Safety Clearance
             </button>
           </motion.div>
         </div>
