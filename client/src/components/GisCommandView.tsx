@@ -13,7 +13,6 @@ import {
   Sparkles, 
   Volume2, 
   VolumeX, 
-  Plus, 
   Mic, 
   MicOff, 
   ArrowUp,
@@ -153,7 +152,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       }).bindPopup(`
         <div class="p-1 text-slate-900 font-['Outfit',sans-serif]">
           <div class="text-xs font-black text-red-600">🛑 India-Sri Lanka IMBL (1974/76)</div>
-          <div class="text-[11px] text-slate-600 mt-1">Strict maritime border. 3 NM warning buffer active.</div>
+          <div class="text-[11px] text-slate-700 mt-1">Strict maritime border. 3 NM warning buffer active.</div>
         </div>
       `);
       imblLayerGroup.current.addLayer(slPoly);
@@ -170,7 +169,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       }).bindPopup(`
         <div class="p-1 text-slate-900 font-['Outfit',sans-serif]">
           <div class="text-xs font-black text-red-600">🛑 India-Pakistan IMBL (Sir Creek)</div>
-          <div class="text-[11px] text-slate-600 mt-1">High-security maritime buffer zone. Zero tolerance.</div>
+          <div class="text-[11px] text-slate-700 mt-1">High-security maritime buffer zone. Zero tolerance.</div>
         </div>
       `);
       imblLayerGroup.current.addLayer(pakPoly);
@@ -183,13 +182,13 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         radius: 25000,
         color: '#D97706',
         fillColor: '#F59E0B',
-        fillOpacity: 0.2,
+        fillOpacity: 0.25,
         weight: 2,
         dashArray: '5, 5'
       }).bindPopup(`
         <div class="p-1 text-slate-900 font-['Outfit',sans-serif]">
           <div class="text-xs font-bold text-amber-700">🛡️ Gulf of Mannar Marine Biosphere</div>
-          <div class="text-[11px] text-slate-600 mt-1">Strict No-Trawling Eco Zone. Coral Reef & Dugong Reserve.</div>
+          <div class="text-[11px] text-slate-700 mt-1">Strict No-Trawling Eco Zone. Coral Reef & Dugong Reserve.</div>
         </div>
       `);
       mpaLayerGroup.current.addLayer(gomCircle);
@@ -198,13 +197,13 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         radius: 20000,
         color: '#D97706',
         fillColor: '#F59E0B',
-        fillOpacity: 0.2,
+        fillOpacity: 0.25,
         weight: 2,
         dashArray: '5, 5'
       }).bindPopup(`
         <div class="p-1 text-slate-900 font-['Outfit',sans-serif]">
           <div class="text-xs font-bold text-amber-700">🐢 Gahirmatha Marine Sanctuary (Odisha)</div>
-          <div class="text-[11px] text-slate-600 mt-1">Seasonal nesting ban in effect (Nov-May).</div>
+          <div class="text-[11px] text-slate-700 mt-1">Seasonal nesting ban in effect (Nov-May).</div>
         </div>
       `);
       mpaLayerGroup.current.addLayer(gmCircle);
@@ -231,7 +230,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       }).bindPopup(`
         <div class="p-1 text-slate-900 font-['Outfit',sans-serif]">
           <div class="text-xs font-black text-red-600">🌪️ Cyclone ASNA-II (VSCS)</div>
-          <div class="text-[11px] text-slate-600 mt-1">Central Pressure: 982 hPa | Max Winds: 65-80 kts</div>
+          <div class="text-[11px] text-slate-700 mt-1">Central Pressure: 982 hPa | Max Winds: 65-80 kts</div>
           <div class="text-[10px] text-red-700 font-semibold mt-1">Danger Radius: 180 km (No Sea Venture)</div>
         </div>
       `);
@@ -250,9 +249,9 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         const isSelected = selectedPFZ?.id === pfz.id;
         const marker = L.circleMarker([pfz.latitude, pfz.longitude], {
           radius: isSelected ? 12 : 8,
-          color: isSelected ? '#06B6D4' : '#059669',
-          fillColor: isSelected ? '#22D3EE' : '#10B981',
-          fillOpacity: isSelected ? 0.9 : 0.75,
+          color: isSelected ? '#0284C7' : '#059669',
+          fillColor: isSelected ? '#38BDF8' : '#10B981',
+          fillOpacity: isSelected ? 0.95 : 0.85,
           weight: isSelected ? 3 : 2
         });
 
@@ -348,7 +347,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 w-screen h-screen overflow-hidden font-['Outfit',sans-serif] select-none bg-slate-950 z-0">
+    <div className="fixed inset-0 w-screen h-screen overflow-hidden font-['Outfit',sans-serif] select-none bg-slate-100 z-0">
       
       {/* 1. Fullscreen Map Canvas */}
       <div 
@@ -356,40 +355,40 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         className="absolute inset-0 w-full h-full z-0" 
       />
 
-      {/* 2. Top Floating Satellite Telemetry HUD (Liquid Glass Capsule) */}
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-auto hidden md:flex items-center space-x-6 px-6 py-2.5 rounded-full bg-zinc-950/50 backdrop-blur-2xl border border-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-xs text-white">
+      {/* 2. Top Floating Satellite Telemetry HUD (Bright Luminous Glass Capsule) */}
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-auto hidden md:flex items-center space-x-6 px-6 py-2.5 rounded-full bg-white/90 backdrop-blur-2xl border border-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.08)] text-xs text-zinc-900">
         <div className="flex items-center space-x-2">
           <span className="flex h-2.5 w-2.5 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-90"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-500 opacity-90"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
           </span>
-          <span className="font-semibold text-zinc-200">ISRO Oceansat-3 (EOS-06)</span>
-          <span className="text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30">98.4%</span>
+          <span className="font-bold text-zinc-900">ISRO Oceansat-3 (EOS-06)</span>
+          <span className="text-[10px] font-mono font-bold bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded-full border border-cyan-200">98.4%</span>
         </div>
 
-        <div className="w-px h-3.5 bg-white/20" />
+        <div className="w-px h-3.5 bg-zinc-300" />
 
         <div className="flex items-center space-x-2">
-          <span className="font-semibold text-zinc-200">INSAT-3DR TIR</span>
-          <span className="text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">99.1%</span>
+          <span className="font-bold text-zinc-900">INSAT-3DR TIR</span>
+          <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">99.1%</span>
         </div>
 
-        <div className="w-px h-3.5 bg-white/20" />
+        <div className="w-px h-3.5 bg-zinc-300" />
 
-        <div className="flex items-center space-x-1.5 text-zinc-300 font-medium">
-          <Activity className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="flex items-center space-x-1.5 text-zinc-700 font-semibold">
+          <Activity className="w-3.5 h-3.5 text-blue-600" />
           <span>NRSC Ground Synced</span>
         </div>
       </div>
 
-      {/* 3. Top-Left Floating GIS Marine Layers & Simulator Island (Liquid Glass) */}
-      <div className="absolute top-24 left-6 z-20 pointer-events-auto w-72 p-4 rounded-3xl bg-zinc-950/55 backdrop-blur-2xl border border-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.5)] text-white space-y-3">
-        <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+      {/* 3. Top-Left Floating GIS Marine Layers & Simulator Island (Bright Frosted Glass) */}
+      <div className="absolute top-24 left-6 z-20 pointer-events-auto w-72 p-4 rounded-3xl bg-white/90 backdrop-blur-2xl border border-white/90 shadow-[0_12px_40px_rgba(0,0,0,0.12)] text-zinc-900 space-y-3">
+        <div className="flex items-center justify-between border-b border-zinc-200/80 pb-2.5">
           <div className="flex items-center space-x-2">
-            <Layers className="w-4 h-4 text-cyan-400" />
-            <span className="text-xs font-bold tracking-wide">GIS Marine Layers</span>
+            <Layers className="w-4 h-4 text-blue-600" />
+            <span className="text-xs font-bold tracking-wide text-zinc-950">GIS Marine Layers</span>
           </div>
-          <span className="text-[9px] font-mono font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">
+          <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
             ISRO L3
           </span>
         </div>
@@ -397,79 +396,79 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() => setShowPFZ(!showPFZ)}
-            className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+            className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
               showPFZ 
-                ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.25)]' 
-                : 'bg-zinc-900/60 border-white/10 text-zinc-400 hover:text-white'
+                ? 'bg-emerald-50 border-emerald-400 text-emerald-900 shadow-xs' 
+                : 'bg-zinc-50/80 border-zinc-200 text-zinc-500 hover:bg-white'
             }`}
           >
             <span className="flex items-center space-x-1.5 truncate">
-              <Fish className="w-3.5 h-3.5" />
+              <Fish className="w-3.5 h-3.5 text-emerald-600" />
               <span>PFZ Zones</span>
             </span>
-            {showPFZ ? <Eye className="w-3 h-3 text-emerald-400 shrink-0" /> : <EyeOff className="w-3 h-3 shrink-0" />}
+            {showPFZ ? <Eye className="w-3 h-3 text-emerald-600 shrink-0" /> : <EyeOff className="w-3 h-3 shrink-0" />}
           </button>
 
           <button
             onClick={() => setShowIMBL(!showIMBL)}
-            className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+            className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
               showIMBL 
-                ? 'bg-red-500/20 border-red-400 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.25)]' 
-                : 'bg-zinc-900/60 border-white/10 text-zinc-400 hover:text-white'
+                ? 'bg-red-50 border-red-400 text-red-900 shadow-xs' 
+                : 'bg-zinc-50/80 border-zinc-200 text-zinc-500 hover:bg-white'
             }`}
           >
             <span className="flex items-center space-x-1.5 truncate">
-              <ShieldAlert className="w-3.5 h-3.5" />
+              <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
               <span>IMBL Border</span>
             </span>
-            {showIMBL ? <Eye className="w-3 h-3 text-red-400 shrink-0" /> : <EyeOff className="w-3 h-3 shrink-0" />}
+            {showIMBL ? <Eye className="w-3 h-3 text-red-600 shrink-0" /> : <EyeOff className="w-3 h-3 shrink-0" />}
           </button>
 
           <button
             onClick={() => setShowMPA(!showMPA)}
-            className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+            className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
               showMPA 
-                ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.25)]' 
-                : 'bg-zinc-900/60 border-white/10 text-zinc-400 hover:text-white'
+                ? 'bg-amber-50 border-amber-400 text-amber-900 shadow-xs' 
+                : 'bg-zinc-50/80 border-zinc-200 text-zinc-500 hover:bg-white'
             }`}
           >
             <span className="flex items-center space-x-1.5 truncate">
-              <Anchor className="w-3.5 h-3.5" />
+              <Anchor className="w-3.5 h-3.5 text-amber-600" />
               <span>MPA Reserves</span>
             </span>
-            {showMPA ? <Eye className="w-3 h-3 text-amber-400 shrink-0" /> : <EyeOff className="w-3 h-3 shrink-0" />}
+            {showMPA ? <Eye className="w-3 h-3 text-amber-600 shrink-0" /> : <EyeOff className="w-3 h-3 shrink-0" />}
           </button>
 
           <button
             onClick={() => setShowCyclone(!showCyclone)}
-            className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+            className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
               showCyclone 
-                ? 'bg-rose-500/20 border-rose-400 text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.25)]' 
-                : 'bg-zinc-900/60 border-white/10 text-zinc-400 hover:text-white'
+                ? 'bg-rose-50 border-rose-400 text-rose-900 shadow-xs' 
+                : 'bg-zinc-50/80 border-zinc-200 text-zinc-500 hover:bg-white'
             }`}
           >
             <span className="flex items-center space-x-1.5 truncate">
-              <Wind className="w-3.5 h-3.5" />
+              <Wind className="w-3.5 h-3.5 text-rose-600" />
               <span>Cyclone Track</span>
             </span>
-            {showCyclone ? <Eye className="w-3 h-3 text-rose-400 shrink-0" /> : <EyeOff className="w-3 h-3 shrink-0" />}
+            {showCyclone ? <Eye className="w-3 h-3 text-rose-600 shrink-0" /> : <EyeOff className="w-3 h-3 shrink-0" />}
           </button>
         </div>
 
         {/* Trawler Simulation Control */}
-        <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
-          <span className="text-zinc-300 font-medium">Simulate Trawler:</span>
+        <div className="pt-2 border-t border-zinc-200/80 flex items-center justify-between text-xs">
+          <span className="text-zinc-700 font-semibold">Simulate Trawler:</span>
           <div className="flex items-center space-x-1.5">
             <button
               onClick={() => setIsSimulatingVessel(!isSimulatingVessel)}
-              className="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold flex items-center space-x-1 shadow-md transition-all active:scale-95 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold flex items-center space-x-1.5 shadow-sm transition-all active:scale-95 cursor-pointer"
             >
               <Play className="w-3 h-3 fill-current" />
               <span>{isSimulatingVessel ? 'Pause' : 'Start'}</span>
             </button>
             <button
               onClick={() => { setIsSimulatingVessel(false); setVesselProgress(0); }}
-              className="p-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors cursor-pointer"
+              className="p-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 transition-colors cursor-pointer border border-zinc-200"
               title="Reset Route"
             >
               <RotateCcw className="w-3 h-3" />
@@ -478,60 +477,60 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         </div>
       </div>
 
-      {/* 4. Bottom-Left Floating Live Ocean State Strip (Liquid Glass) */}
-      <div className="absolute bottom-6 left-6 z-20 pointer-events-auto hidden sm:flex items-center space-x-5 px-5 py-3 rounded-2xl bg-zinc-950/60 backdrop-blur-2xl border border-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.5)] text-xs text-white font-mono">
+      {/* 4. Bottom-Left Floating Live Ocean State Strip (Bright Glass) */}
+      <div className="absolute bottom-6 left-6 z-20 pointer-events-auto hidden sm:flex items-center space-x-5 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur-2xl border border-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.1)] text-xs text-zinc-900 font-mono">
         <div className="flex items-center space-x-1.5">
-          <span className="text-zinc-400">Wave:</span>
-          <strong className="text-cyan-300 font-bold">{weather?.significant_wave_height_m || "1.0"}m</strong>
+          <span className="text-zinc-500 font-medium">Wave:</span>
+          <strong className="text-blue-700 font-bold">{weather?.significant_wave_height_m || "1.0"}m</strong>
         </div>
-        <div className="w-px h-3.5 bg-white/20" />
+        <div className="w-px h-3.5 bg-zinc-200" />
         <div className="flex items-center space-x-1.5">
-          <span className="text-zinc-400">Wind:</span>
-          <strong className="text-emerald-300 font-bold">{weather?.wind_speed_knots || "14"} kts</strong>
+          <span className="text-zinc-500 font-medium">Wind:</span>
+          <strong className="text-emerald-700 font-bold">{weather?.wind_speed_knots || "14"} kts</strong>
         </div>
-        <div className="w-px h-3.5 bg-white/20" />
+        <div className="w-px h-3.5 bg-zinc-200" />
         <div className="flex items-center space-x-1.5">
-          <span className="text-zinc-400">Safety:</span>
-          <strong className="text-emerald-400 font-bold">{weather?.safety_index || "88"}/100 (SAFE)</strong>
+          <span className="text-zinc-500 font-medium">Safety:</span>
+          <strong className="text-emerald-700 font-bold">{weather?.safety_index || "88"}/100 (SAFE)</strong>
         </div>
       </div>
 
-      {/* 5. Right-Side Floating AI Assistant & Advisory Glass Drawer */}
-      <div className="absolute top-20 right-6 bottom-6 z-20 pointer-events-auto w-96 lg:w-[440px] max-w-[92vw] flex flex-col rounded-3xl bg-zinc-950/65 backdrop-blur-3xl border border-white/15 shadow-[0_12px_40px_rgba(0,0,0,0.6)] text-white overflow-hidden">
+      {/* 5. Right-Side Floating AI Assistant & Advisory Glass Drawer (Bright Frosted Glass) */}
+      <div className="absolute top-20 right-6 bottom-6 z-20 pointer-events-auto w-96 lg:w-[450px] max-w-[92vw] flex flex-col rounded-3xl bg-white/95 backdrop-blur-3xl border border-white/90 shadow-[0_16px_50px_rgba(0,0,0,0.14)] text-zinc-900 overflow-hidden">
         
         {/* Drawer Header */}
-        <div className="p-4 border-b border-white/10 flex items-center justify-between shrink-0 bg-white/5">
+        <div className="p-4 border-b border-zinc-200/80 flex items-center justify-between shrink-0 bg-white/60">
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-400/30">
+            <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-200">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-xs font-black tracking-wide text-white">ORCA Agentic Assistant</h3>
-              <p className="text-[10px] text-zinc-400">Autonomous reasoning over Oceansat-3 & INCOIS</p>
+              <h3 className="text-xs font-black tracking-wide text-zinc-950">ORCA Agentic Assistant</h3>
+              <p className="text-[10px] text-zinc-500 font-medium">Autonomous reasoning over Oceansat-3 & INCOIS</p>
             </div>
           </div>
-          <span className="text-[10px] font-bold text-slate-950 bg-cyan-400 px-2.5 py-0.5 rounded-full shadow-sm">
+          <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full shadow-xs">
             Multi-Agent DAG
           </span>
         </div>
 
         {/* Quick Query Pills */}
-        <div className="px-4 py-2.5 border-b border-white/10 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+        <div className="px-4 py-2.5 border-b border-zinc-200/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 bg-zinc-50/50">
           <button
             onClick={() => handleSendQuery("Where is the nearest Potential Fishing Zone for Tuna from Kochi today?")}
-            className="px-3 py-1 rounded-full text-[10px] font-semibold bg-zinc-900/80 hover:bg-zinc-800 border border-cyan-500/40 text-cyan-300 hover:text-white transition-all whitespace-nowrap cursor-pointer"
+            className="px-3 py-1 rounded-full text-[10px] font-semibold bg-white hover:bg-blue-50 border border-blue-200 text-blue-800 transition-all whitespace-nowrap cursor-pointer shadow-2xs"
           >
             🐟 Nearest Tuna PFZ
           </button>
           <button
             onClick={() => handleSendQuery("Is it safe to venture into the sea tomorrow morning?")}
-            className="px-3 py-1 rounded-full text-[10px] font-semibold bg-zinc-900/80 hover:bg-zinc-800 border border-emerald-500/40 text-emerald-300 hover:text-white transition-all whitespace-nowrap cursor-pointer"
+            className="px-3 py-1 rounded-full text-[10px] font-semibold bg-white hover:bg-emerald-50 border border-emerald-200 text-emerald-800 transition-all whitespace-nowrap cursor-pointer shadow-2xs"
           >
             🛡️ Sea Venture Safety
           </button>
           <button
             onClick={() => handleSendQuery("Check Sri Lanka IMBL boundary proximity")}
-            className="px-3 py-1 rounded-full text-[10px] font-semibold bg-zinc-900/80 hover:bg-zinc-800 border border-red-500/40 text-red-300 hover:text-white transition-all whitespace-nowrap cursor-pointer"
+            className="px-3 py-1 rounded-full text-[10px] font-semibold bg-white hover:bg-red-50 border border-red-200 text-red-800 transition-all whitespace-nowrap cursor-pointer shadow-2xs"
           >
             🛑 IMBL Border Check
           </button>
@@ -543,65 +542,65 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
             <div className="space-y-3.5">
               {/* User Query Bubble */}
               <div className="flex justify-end">
-                <div className="max-w-[85%] px-4 py-2.5 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-200 font-medium">
+                <div className="max-w-[85%] px-4 py-2.5 rounded-2xl bg-blue-600 text-white font-medium shadow-xs">
                   {latestResponse.query}
                 </div>
               </div>
 
-              {/* AI Verified Advisory Card (Liquid Glass Box) */}
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3 shadow-inner">
+              {/* AI Verified Advisory Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50/80 via-white to-cyan-50/60 border border-blue-200/70 space-y-3 shadow-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-cyan-400 tracking-wider uppercase">
+                  <span className="text-[10px] font-bold text-blue-700 tracking-wider uppercase">
                     ISRO Verified Advisory · {latestResponse.reference_port.name}
                   </span>
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => handleSpeak(latestResponse.response.tts_speech_text)}
-                      className={`p-1 rounded-md text-zinc-400 hover:text-white cursor-pointer ${speaking ? 'text-cyan-400 animate-pulse' : ''}`}
+                      className={`p-1 rounded-md text-zinc-500 hover:text-zinc-900 cursor-pointer ${speaking ? 'text-blue-600 animate-pulse' : ''}`}
                       title="Listen"
                     >
                       {speaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
                     </button>
                     <button
                       onClick={() => handleCopy(latestResponse.response.markdown)}
-                      className="p-1 rounded-md text-zinc-400 hover:text-white cursor-pointer"
+                      className="p-1 rounded-md text-zinc-500 hover:text-zinc-900 cursor-pointer"
                       title="Copy"
                     >
-                      {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
 
-                <div className="text-xs text-zinc-200 leading-relaxed whitespace-pre-line font-normal">
+                <div className="text-xs text-zinc-800 leading-relaxed whitespace-pre-line font-medium">
                   {latestResponse.response.markdown}
                 </div>
 
                 {/* Key Verdict Metrics Strip */}
-                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/10 text-[10px]">
-                  <div className="p-2 rounded-xl bg-black/40 border border-white/5 space-y-0.5">
-                    <span className="text-zinc-400">Verdict</span>
-                    <strong className="block text-emerald-400 truncate">{latestResponse.weather_and_safety.safety_status}</strong>
+                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-blue-200/60 text-[10px]">
+                  <div className="p-2 rounded-xl bg-white/90 border border-blue-100 space-y-0.5 shadow-2xs">
+                    <span className="text-zinc-500 font-medium">Verdict</span>
+                    <strong className="block text-emerald-700 font-bold truncate">{latestResponse.weather_and_safety.safety_status}</strong>
                   </div>
-                  <div className="p-2 rounded-xl bg-black/40 border border-white/5 space-y-0.5">
-                    <span className="text-zinc-400">Species</span>
-                    <strong className="block text-cyan-300 truncate">{latestResponse.top_pfz.dominant_species}</strong>
+                  <div className="p-2 rounded-xl bg-white/90 border border-blue-100 space-y-0.5 shadow-2xs">
+                    <span className="text-zinc-500 font-medium">Species</span>
+                    <strong className="block text-blue-800 font-bold truncate">{latestResponse.top_pfz.dominant_species}</strong>
                   </div>
-                  <div className="p-2 rounded-xl bg-black/40 border border-white/5 space-y-0.5">
-                    <span className="text-zinc-400">IMBL Distance</span>
-                    <strong className="block text-amber-300 truncate">{latestResponse.geofence_status.nearest_imbl.distance_nautical_miles} NM</strong>
+                  <div className="p-2 rounded-xl bg-white/90 border border-blue-100 space-y-0.5 shadow-2xs">
+                    <span className="text-zinc-500 font-medium">IMBL Distance</span>
+                    <strong className="block text-amber-700 font-bold truncate">{latestResponse.geofence_status.nearest_imbl.distance_nautical_miles} NM</strong>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center p-6 text-zinc-400 space-y-2">
-              <Compass className="w-8 h-8 text-cyan-400 animate-spin-slow opacity-60" />
-              <p className="text-xs">Click anywhere on the map or select a quick query to trigger multi-agent reasoning.</p>
+            <div className="h-full flex flex-col items-center justify-center text-center p-6 text-zinc-500 space-y-2">
+              <Compass className="w-8 h-8 text-blue-600 animate-spin-slow opacity-70" />
+              <p className="text-xs font-medium">Click anywhere on the map or select a quick query to trigger multi-agent reasoning.</p>
             </div>
           )}
 
           {isLoading && (
-            <div className="flex items-center space-x-2 text-xs text-cyan-400 animate-pulse pl-2">
+            <div className="flex items-center space-x-2 text-xs text-blue-600 font-semibold animate-pulse pl-2">
               <Sparkles className="w-4 h-4 animate-spin" />
               <span>Agents collaborating...</span>
             </div>
@@ -609,17 +608,17 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         </div>
 
         {/* Drawer Bottom Input Bar */}
-        <div className="p-3 border-t border-white/10 bg-white/5 shrink-0">
+        <div className="p-3 border-t border-zinc-200/80 bg-white/90 shrink-0">
           <form 
             onSubmit={(e) => { e.preventDefault(); handleSendQuery(); }}
-            className="flex items-center bg-zinc-900/90 border border-white/15 focus-within:border-cyan-400 rounded-full px-4 py-2.5 transition-all"
+            className="flex items-center bg-zinc-100/90 border border-zinc-300 focus-within:border-blue-600 focus-within:bg-white rounded-full px-4 py-2.5 transition-all shadow-2xs"
           >
             <input
               type="text"
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               placeholder="Ask about PFZ zones, weather safety, border..."
-              className="flex-1 bg-transparent text-xs text-white placeholder-zinc-400 focus:outline-none font-normal"
+              className="flex-1 bg-transparent text-xs text-zinc-900 placeholder-zinc-500 focus:outline-none font-medium"
               disabled={isLoading}
             />
 
@@ -642,7 +641,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
                 rec.onerror = () => setIsListening(false);
                 rec.onend = () => setIsListening(false);
               }}
-              className={`p-1.5 rounded-full text-zinc-400 hover:text-white transition-colors mr-1 cursor-pointer ${isListening ? 'text-red-500 animate-ping' : ''}`}
+              className={`p-1.5 rounded-full text-zinc-500 hover:text-zinc-900 transition-colors mr-1 cursor-pointer ${isListening ? 'text-red-500 animate-ping' : ''}`}
             >
               {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </button>
@@ -650,7 +649,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
             <button
               type="submit"
               disabled={!chatInput.trim() || isLoading}
-              className="w-7 h-7 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-sm"
+              className="w-7 h-7 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-sm"
             >
               <ArrowUp className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>
