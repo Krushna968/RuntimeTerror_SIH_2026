@@ -11,8 +11,7 @@ import {
   Check, 
   ArrowUp,
   Fish,
-  ShieldCheck,
-  Compass
+  ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatResponsePayload } from '../types';
@@ -152,25 +151,38 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
   const hasMessages = messages.length > 0;
 
   return (
-    <div className="relative min-h-screen w-full bg-[#fbf9f5] text-zinc-900 flex flex-col font-['Outfit',sans-serif] overflow-hidden selection:bg-blue-200 selection:text-blue-950">
-      {/* 1. Lovable-Style Massive Soft Blue Radial Aura in Center */}
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] sm:w-[1050px] h-[650px] sm:h-[800px] pointer-events-none z-0"
-        style={{
-          background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.45) 0%, rgba(96, 165, 250, 0.3) 35%, rgba(191, 219, 254, 0.15) 55%, transparent 75%)',
-          filter: 'blur(90px)'
-        }}
-      />
+    <div className="relative min-h-screen w-full bg-[#FAF8F5] text-[#09090b] flex flex-col font-['Outfit',sans-serif] overflow-hidden selection:bg-blue-200 selection:text-blue-950">
+      {/* 1. Exact Lovable-Style Ambient Blue Cloud Aura (Layered Multi-Stop Halo) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center z-0">
+        {/* Outer Radiant Azure Halo */}
+        <div 
+          className="w-[1250px] sm:w-[1450px] h-[850px] sm:h-[950px] rounded-full opacity-85"
+          style={{
+            background: 'radial-gradient(ellipse 65% 55% at 50% 50%, rgba(96, 165, 250, 0.65) 0%, rgba(59, 130, 246, 0.45) 45%, rgba(147, 197, 253, 0.3) 70%, transparent 88%)',
+            filter: 'blur(95px)',
+            transform: 'scale(1.15)'
+          }}
+        />
 
-      {/* STATE 1: Lovable-Style Clean Landing Page */}
+        {/* Secondary Sky Blue High-Intensity Core */}
+        <div 
+          className="absolute w-[900px] h-[650px] rounded-full opacity-65"
+          style={{
+            background: 'radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.55) 0%, rgba(99, 102, 241, 0.3) 50%, transparent 75%)',
+            filter: 'blur(105px)'
+          }}
+        />
+      </div>
+
+      {/* STATE 1: Exact Lovable Landing Experience */}
       {!hasMessages && (
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-3xl w-full mx-auto px-6 my-auto pt-24 pb-16">
-          {/* Main Display Headline ("Secure by design" -> "Reasoning by design") */}
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-4xl w-full mx-auto px-6 my-auto pt-28 pb-16">
+          {/* Main Headline in Single Line */}
           <motion.h1 
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-6xl sm:text-7xl md:text-8xl font-black text-zinc-950 tracking-tight leading-[1.05] mb-6 select-none"
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-[#09090b] tracking-[-0.035em] leading-tight select-none whitespace-nowrap"
           >
             Reasoning by design
           </motion.h1>
@@ -180,21 +192,45 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-zinc-600 text-base sm:text-lg md:text-xl max-w-2xl font-normal leading-relaxed mb-10 text-center"
+            className="text-zinc-600 text-sm sm:text-base md:text-lg max-w-xl font-normal leading-relaxed text-center mt-5 mb-8"
           >
             Choose where your vessel sails, discover high-yield fishing zones, verify 0–100 sea safety clearance, and maintain strict international maritime border compliance.
           </motion.p>
+
+          {/* Pill Action Buttons (Lovable Trust Center / Report an Issue style) */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex items-center space-x-3 mb-8"
+          >
+            <button
+              onClick={() => handleSend("Where is the nearest Potential Fishing Zone for Tuna from Kochi today?")}
+              className="px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-[#09090b] hover:bg-zinc-800 shadow-sm transition-all active:scale-95 cursor-pointer flex items-center space-x-2"
+            >
+              <Fish className="w-3.5 h-3.5" />
+              <span>Tuna PFZ Kochi</span>
+            </button>
+
+            <button
+              onClick={() => handleSend("Is it safe to venture into the sea tomorrow morning?")}
+              className="px-6 py-2.5 rounded-full text-xs font-semibold text-zinc-800 bg-white/90 hover:bg-white border border-zinc-200 shadow-sm transition-all active:scale-95 cursor-pointer flex items-center space-x-2"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+              <span>Sea Safety Clearance</span>
+            </button>
+          </motion.div>
 
           {/* Search Input Capsule */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-full max-w-2xl mb-8"
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="w-full max-w-2xl"
           >
             <form 
               onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-              className="relative flex items-center bg-white/95 border border-zinc-200/80 hover:border-zinc-300 focus-within:border-blue-500 rounded-full px-5 py-3.5 shadow-[0_10px_35px_rgba(0,0,0,0.06)] transition-all"
+              className="relative flex items-center bg-white border border-zinc-200/90 hover:border-zinc-300 focus-within:border-blue-500 rounded-full px-5 py-3.5 shadow-[0_10px_35px_rgba(0,0,0,0.06)] transition-all"
             >
               {/* Plus icon on left */}
               <button 
@@ -235,35 +271,11 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
               <button
                 type="submit"
                 disabled={!inputText.trim() || isLoading}
-                className="w-9 h-9 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-md"
+                className="w-9 h-9 rounded-full bg-[#09090b] hover:bg-zinc-800 text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-md"
               >
                 <ArrowUp className="w-4 h-4 stroke-[2.5]" />
               </button>
             </form>
-          </motion.div>
-
-          {/* Lovable-Style Pill Buttons */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex items-center space-x-3"
-          >
-            <button
-              onClick={() => handleSend("Where is the nearest Potential Fishing Zone for Tuna from Kochi today?")}
-              className="px-5 py-2.5 rounded-full text-xs font-semibold text-white bg-zinc-950 hover:bg-zinc-800 shadow-md transition-all active:scale-95 cursor-pointer flex items-center space-x-1.5"
-            >
-              <Fish className="w-3.5 h-3.5" />
-              <span>Tuna PFZ Kochi</span>
-            </button>
-
-            <button
-              onClick={() => handleSend("Is it safe to venture into the sea tomorrow morning?")}
-              className="px-5 py-2.5 rounded-full text-xs font-semibold text-zinc-800 bg-white/90 hover:bg-white border border-zinc-200 shadow-sm transition-all active:scale-95 cursor-pointer flex items-center space-x-1.5"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-              <span>Sea Safety Clearance</span>
-            </button>
           </motion.div>
         </div>
       )}
@@ -281,11 +293,11 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
                   className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} space-y-1`}
                 >
                   {msg.sender === 'user' ? (
-                    <div className="max-w-[85%] sm:max-w-[75%] px-5 py-3 rounded-3xl bg-zinc-950 text-white font-medium text-sm shadow-md">
+                    <div className="max-w-[85%] sm:max-w-[75%] px-5 py-3 rounded-3xl bg-[#09090b] text-white font-medium text-sm shadow-md">
                       {msg.text}
                     </div>
                   ) : (
-                    <div className="w-full bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-zinc-200/80 shadow-sm space-y-3">
+                    <div className="w-full bg-white/95 backdrop-blur-md p-6 rounded-3xl border border-zinc-200/80 shadow-sm space-y-3">
                       <div className="flex items-center space-x-2 text-xs font-bold text-blue-600">
                         <Sparkles className="w-4 h-4" />
                         <span>ORCA AI Advisory</span>
@@ -338,7 +350,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
           <div className="fixed bottom-6 left-0 right-0 z-40 max-w-2xl w-full mx-auto px-4">
             <form 
               onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-              className="relative flex items-center bg-white/95 border border-zinc-200 rounded-full px-5 py-3 shadow-xl focus-within:border-blue-500 transition-all"
+              className="relative flex items-center bg-white border border-zinc-200 rounded-full px-5 py-3 shadow-xl focus-within:border-blue-500 transition-all"
             >
               <button 
                 type="button"
@@ -374,7 +386,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
               <button
                 type="submit"
                 disabled={!inputText.trim() || isLoading}
-                className="w-9 h-9 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-md"
+                className="w-9 h-9 rounded-full bg-[#09090b] hover:bg-zinc-800 text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-md"
               >
                 <ArrowUp className="w-4 h-4 stroke-[2.5]" />
               </button>
