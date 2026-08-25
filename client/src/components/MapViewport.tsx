@@ -69,8 +69,8 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       zoomControl: false,
     });
 
-    // Dark Ocean CartoDB Tiles
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // High-Resolution Crisp Light Ocean CartoDB Voyager Tiles
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://carto.com/">CARTO</a> | ISRO Oceansat-3',
       subdomains: 'abcd',
       maxZoom: 19
@@ -115,14 +115,14 @@ export const MapViewport: React.FC<MapViewportProps> = ({
         [8.4000, 78.8333], [7.8333, 78.6000]
       ];
       const slPoly = L.polyline(srilankaCoords, {
-        color: '#EF4444',
-        weight: 3,
+        color: '#DC2626',
+        weight: 3.5,
         dashArray: '6, 8',
-        opacity: 0.9
+        opacity: 0.95
       }).bindPopup(`
-        <div class="p-1">
-          <div class="text-xs font-bold text-red-400">🛑 India-Sri Lanka IMBL (1974/76)</div>
-          <div class="text-[11px] text-slate-300 mt-1">Strict maritime border. 3 NM warning buffer active.</div>
+        <div class="p-1 text-slate-900">
+          <div class="text-xs font-bold text-red-600">🛑 India-Sri Lanka IMBL (1974/76)</div>
+          <div class="text-[11px] text-slate-700 mt-1">Strict maritime border. 3 NM warning buffer active.</div>
         </div>
       `);
       imblLayerGroup.current.addLayer(slPoly);
@@ -133,14 +133,14 @@ export const MapViewport: React.FC<MapViewportProps> = ({
         [22.8000, 66.8000], [22.3000, 66.2000], [21.5000, 65.5000]
       ];
       const pakPoly = L.polyline(pakCoords, {
-        color: '#EF4444',
-        weight: 3,
+        color: '#DC2626',
+        weight: 3.5,
         dashArray: '6, 8',
-        opacity: 0.9
+        opacity: 0.95
       }).bindPopup(`
-        <div class="p-1">
-          <div class="text-xs font-bold text-red-400">🛑 India-Pakistan IMBL (Sir Creek)</div>
-          <div class="text-[11px] text-slate-300 mt-1">High-security maritime buffer zone. Zero tolerance.</div>
+        <div class="p-1 text-slate-900">
+          <div class="text-xs font-bold text-red-600">🛑 India-Pakistan IMBL (Sir Creek)</div>
+          <div class="text-[11px] text-slate-700 mt-1">High-security maritime buffer zone. Zero tolerance.</div>
         </div>
       `);
       imblLayerGroup.current.addLayer(pakPoly);
@@ -150,15 +150,15 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       // Gulf of Mannar Marine Biosphere
       const gomCircle = L.circle([9.05, 79.15], {
         radius: 25000,
-        color: '#F59E0B',
+        color: '#D97706',
         fillColor: '#F59E0B',
-        fillOpacity: 0.15,
+        fillOpacity: 0.2,
         weight: 2,
-        dashArray: '4, 4'
+        dashArray: '5, 5'
       }).bindPopup(`
-        <div class="p-1">
-          <div class="text-xs font-bold text-amber-400">🛡️ Gulf of Mannar Marine Biosphere</div>
-          <div class="text-[11px] text-slate-300 mt-1">Strict No-Trawling Eco Zone. Coral Reef & Dugong Reserve.</div>
+        <div class="p-1 text-slate-900">
+          <div class="text-xs font-bold text-amber-700">🛡️ Gulf of Mannar Marine Biosphere</div>
+          <div class="text-[11px] text-slate-700 mt-1">Strict No-Trawling Eco Zone. Coral Reef & Dugong Reserve.</div>
         </div>
       `);
       mpaLayerGroup.current.addLayer(gomCircle);
@@ -166,15 +166,15 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       // Gahirmatha Olive Ridley Sanctuary
       const gmCircle = L.circle([20.72, 87.05], {
         radius: 20000,
-        color: '#F59E0B',
+        color: '#D97706',
         fillColor: '#F59E0B',
-        fillOpacity: 0.15,
+        fillOpacity: 0.2,
         weight: 2,
-        dashArray: '4, 4'
+        dashArray: '5, 5'
       }).bindPopup(`
-        <div class="p-1">
-          <div class="text-xs font-bold text-amber-400">🐢 Gahirmatha Marine Sanctuary (Odisha)</div>
-          <div class="text-[11px] text-slate-300 mt-1">Seasonal nesting ban in effect (Nov-May).</div>
+        <div class="p-1 text-slate-900">
+          <div class="text-xs font-bold text-amber-700">🐢 Gahirmatha Marine Sanctuary (Odisha)</div>
+          <div class="text-[11px] text-slate-700 mt-1">Seasonal nesting ban in effect (Nov-May).</div>
         </div>
       `);
       mpaLayerGroup.current.addLayer(gmCircle);
@@ -192,7 +192,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
         radius: 180000,
         color: '#DC2626',
         fillColor: '#EF4444',
-        fillOpacity: 0.12,
+        fillOpacity: 0.18,
         weight: 2,
         dashArray: '5, 5'
       });
@@ -200,14 +200,14 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       const eyeCore = L.circleMarker([15.8, 84.6], {
         radius: 8,
         color: '#FFF',
-        fillColor: '#EF4444',
+        fillColor: '#DC2626',
         fillOpacity: 1,
         weight: 2
       }).bindPopup(`
-        <div class="p-1">
-          <div class="text-xs font-bold text-red-400">🌪️ Cyclone ASNA-II (VSCS)</div>
-          <div class="text-[11px] text-slate-200 mt-1">Central Pressure: 982 hPa | Max Winds: 65-80 kts</div>
-          <div class="text-[10px] text-red-300 font-semibold mt-1">Danger Radius: 180 km (No Sea Venture)</div>
+        <div class="p-1 text-slate-900">
+          <div class="text-xs font-bold text-red-600">🌪️ Cyclone ASNA-II (VSCS)</div>
+          <div class="text-[11px] text-slate-700 mt-1">Central Pressure: 982 hPa | Max Winds: 65-80 kts</div>
+          <div class="text-[10px] text-red-700 font-semibold mt-1">Danger Radius: 180 km (No Sea Venture)</div>
         </div>
       `);
 
@@ -225,38 +225,38 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       pfzHotspots.forEach((pfz) => {
         const isSelected = selectedPFZ?.id === pfz.id;
         
-        // Custom animated HTML icon for PFZ
+        // Custom vibrant pin icon for PFZ
         const customIcon = L.divIcon({
           className: 'custom-pfz-pin',
           html: `
             <div class="relative flex items-center justify-center cursor-pointer">
-              <span class="animate-ping absolute inline-flex h-8 w-8 rounded-full ${isSelected ? 'bg-ocean-cyan opacity-80' : 'bg-ocean-emerald opacity-40'}"></span>
-              <div class="relative flex items-center justify-center w-6 h-6 rounded-full ${isSelected ? 'bg-ocean-cyan text-ocean-950 ring-4 ring-cyan-400/50' : 'bg-ocean-emerald text-white'} shadow-lg font-bold text-[10px] transition-transform hover:scale-125">
+              <span class="animate-ping absolute inline-flex h-8 w-8 rounded-full ${isSelected ? 'bg-blue-500 opacity-80' : 'bg-emerald-500 opacity-50'}"></span>
+              <div class="relative flex items-center justify-center w-7 h-7 rounded-full ${isSelected ? 'bg-blue-600 text-white ring-4 ring-blue-300' : 'bg-emerald-600 text-white ring-2 ring-white'} shadow-lg font-bold text-xs transition-transform hover:scale-125">
                 🐟
               </div>
             </div>
           `,
-          iconSize: [24, 24],
-          iconAnchor: [12, 12]
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
         });
 
         const marker = L.marker([pfz.latitude, pfz.longitude], { icon: customIcon })
           .on('click', () => onSelectPFZ(pfz))
           .bindPopup(`
-            <div class="p-2 space-y-1.5 min-w-[220px]">
-              <div class="flex items-center justify-between border-b border-slate-700/60 pb-1">
-                <span class="text-xs font-bold text-ocean-cyan">${pfz.name}</span>
-                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+            <div class="p-2 space-y-1.5 min-w-[220px] text-slate-900">
+              <div class="flex items-center justify-between border-b border-slate-200 pb-1">
+                <span class="text-xs font-bold text-blue-700">${pfz.name}</span>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
                   ${pfz.confidence_score_percent}% PFZ
                 </span>
               </div>
-              <div class="text-[11px] text-slate-300">
-                <div>🎯 <strong>Target Species:</strong> <span class="text-emerald-400 font-semibold">${pfz.dominant_species}</span></div>
-                <div>⚡ <strong>Catch Multiplier:</strong> <span class="text-yellow-300 font-bold">${pfz.catch_enhancement_multiplier}</span></div>
+              <div class="text-[11px] text-slate-700">
+                <div>🎯 <strong>Species:</strong> <span class="text-emerald-700 font-bold">${pfz.dominant_species}</span></div>
+                <div>⚡ <strong>Catch Boost:</strong> <span class="text-amber-700 font-bold">${pfz.catch_enhancement_multiplier}</span></div>
                 <div>🌊 <strong>SST:</strong> ${pfz.sst_celsius}°C | <strong>Chl-a:</strong> ${pfz.chlorophyll_a_mg_m3} mg/m³</div>
-                <div>⚓ <strong>Depth:</strong> ${pfz.recommended_depth_m}m | <strong>From ${pfz.nearest_port}:</strong> ${pfz.distance_from_port_km} km (${pfz.bearing_from_port})</div>
+                <div>⚓ <strong>Depth:</strong> ${pfz.recommended_depth_m}m | <strong>From ${pfz.nearest_port}:</strong> ${pfz.distance_from_port_km} km</div>
               </div>
-              <button class="w-full mt-2 py-1 text-center text-[10px] font-bold rounded bg-ocean-cyan/20 hover:bg-ocean-cyan/30 text-ocean-cyan border border-ocean-cyan/40">
+              <button class="w-full mt-2 py-1 text-center text-[10px] font-bold rounded bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-300 cursor-pointer">
                 Plan Navigation Route ➔
               </button>
             </div>
@@ -276,9 +276,9 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       const latlngs: [number, number][] = activeRoute.waypoints.map(w => [w.latitude, w.longitude]);
 
       const polyline = L.polyline(latlngs, {
-        color: '#00F0FF',
-        weight: 4,
-        opacity: 0.85,
+        color: '#0284C7',
+        weight: 4.5,
+        opacity: 0.9,
         dashArray: '8, 6'
       });
 
@@ -286,20 +286,20 @@ export const MapViewport: React.FC<MapViewportProps> = ({
 
       // Start & End markers
       const startMarker = L.circleMarker(latlngs[0], {
-        radius: 6,
+        radius: 7,
         color: '#FFF',
-        fillColor: '#10B981',
+        fillColor: '#059669',
         fillOpacity: 1,
         weight: 2
-      }).bindPopup(`<div class="text-xs font-bold text-emerald-400">Departure: ${activeRoute.origin.name}</div>`);
+      }).bindPopup(`<div class="text-xs font-bold text-emerald-800">Departure: ${activeRoute.origin.name}</div>`);
 
       const endMarker = L.circleMarker(latlngs[latlngs.length - 1], {
-        radius: 6,
+        radius: 7,
         color: '#FFF',
-        fillColor: '#00F0FF',
+        fillColor: '#0284C7',
         fillOpacity: 1,
         weight: 2
-      }).bindPopup(`<div class="text-xs font-bold text-ocean-cyan">Destination: ${activeRoute.destination.name}</div>`);
+      }).bindPopup(`<div class="text-xs font-bold text-blue-800">Destination: ${activeRoute.destination.name}</div>`);
 
       routeLayerGroup.current.addLayer(startMarker);
       routeLayerGroup.current.addLayer(endMarker);
@@ -309,7 +309,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       const boatIcon = L.divIcon({
         className: 'vessel-icon',
         html: `
-          <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600/90 text-white border-2 border-white shadow-xl animate-pulse">
+          <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white border-2 border-white shadow-xl animate-pulse">
             🚢
           </div>
         `,
@@ -319,9 +319,9 @@ export const MapViewport: React.FC<MapViewportProps> = ({
 
       const vesselMarker = L.marker(currentPos, { icon: boatIcon })
         .bindPopup(`
-          <div class="p-1">
-            <div class="text-xs font-bold text-blue-300">🛥️ Trawler IND-KL-04-M</div>
-            <div class="text-[11px] text-slate-300">Speed: 9.5 kts | ETA: ${activeRoute.route_metrics.estimated_transit_time_hours} hrs</div>
+          <div class="p-1 text-slate-900">
+            <div class="text-xs font-bold text-blue-700">🛥️ Trawler IND-KL-04-M</div>
+            <div class="text-[11px] text-slate-600">Speed: 9.5 kts | ETA: ${activeRoute.route_metrics.estimated_transit_time_hours} hrs</div>
           </div>
         `);
 
@@ -345,83 +345,85 @@ export const MapViewport: React.FC<MapViewportProps> = ({
   }, [isSimulatingVessel, activeRoute]);
 
   return (
-    <div className="relative w-full h-full min-h-[500px] overflow-hidden rounded-2xl border border-ocean-cyan/20 shadow-2xl">
+    <div className="relative w-full h-full min-h-[520px] overflow-hidden rounded-3xl border border-slate-200 shadow-lg bg-white">
       {/* Map Canvas */}
-      <div ref={mapContainerRef} className="w-full h-full min-h-[500px]" />
+      <div ref={mapContainerRef} className="w-full h-full min-h-[520px]" />
 
-      {/* Floating Layer Control Panel */}
-      <div className="absolute top-4 left-4 z-[400] glass-panel-glow p-3 rounded-xl max-w-xs space-y-2 text-xs">
-        <div className="flex items-center justify-between font-bold text-ocean-cyan border-b border-ocean-cyan/20 pb-1.5">
-          <span className="flex items-center space-x-1.5">
-            <Layers className="w-4 h-4" />
+      {/* Floating Layer Control Panel (Bright Glass) */}
+      <div className="absolute top-4 left-4 z-[400] bg-white/95 backdrop-blur-md p-3.5 rounded-2xl border border-slate-200 shadow-xl max-w-xs space-y-2.5 text-xs text-slate-800">
+        <div className="flex items-center justify-between font-bold text-slate-900 border-b border-slate-200 pb-2">
+          <span className="flex items-center space-x-2">
+            <Layers className="w-4 h-4 text-blue-600" />
             <span>GIS Marine Layers</span>
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">ISRO L3</span>
+          <span className="text-[10px] text-blue-600 font-mono bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+            ISRO L3
+          </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-1.5 pt-1">
+        <div className="grid grid-cols-2 gap-2 pt-1">
           <button
             onClick={() => setShowPFZ(!showPFZ)}
-            className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg border transition-all ${
-              showPFZ ? 'bg-emerald-950/70 border-emerald-500/50 text-emerald-300' : 'bg-slate-900/50 border-slate-700/40 text-slate-400'
+            className={`flex items-center justify-between px-3 py-2 rounded-xl border transition-all cursor-pointer ${
+              showPFZ ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold' : 'bg-slate-50 border-slate-200 text-slate-500'
             }`}
           >
-            <span className="flex items-center space-x-1">
-              <Fish className="w-3.5 h-3.5" />
+            <span className="flex items-center space-x-1.5">
+              <Fish className="w-3.5 h-3.5 text-emerald-600" />
               <span>PFZ Zones</span>
             </span>
-            {showPFZ ? <Eye className="w-3 h-3 text-emerald-400" /> : <EyeOff className="w-3 h-3" />}
+            {showPFZ ? <Eye className="w-3 h-3 text-emerald-600" /> : <EyeOff className="w-3 h-3" />}
           </button>
 
           <button
             onClick={() => setShowIMBL(!showIMBL)}
-            className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg border transition-all ${
-              showIMBL ? 'bg-red-950/70 border-red-500/50 text-red-300' : 'bg-slate-900/50 border-slate-700/40 text-slate-400'
+            className={`flex items-center justify-between px-3 py-2 rounded-xl border transition-all cursor-pointer ${
+              showIMBL ? 'bg-red-50 border-red-300 text-red-800 font-bold' : 'bg-slate-50 border-slate-200 text-slate-500'
             }`}
           >
-            <span className="flex items-center space-x-1">
-              <ShieldAlert className="w-3.5 h-3.5" />
+            <span className="flex items-center space-x-1.5">
+              <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
               <span>IMBL Border</span>
             </span>
-            {showIMBL ? <Eye className="w-3 h-3 text-red-400" /> : <EyeOff className="w-3 h-3" />}
+            {showIMBL ? <Eye className="w-3 h-3 text-red-600" /> : <EyeOff className="w-3 h-3" />}
           </button>
 
           <button
             onClick={() => setShowMPA(!showMPA)}
-            className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg border transition-all ${
-              showMPA ? 'bg-amber-950/70 border-amber-500/50 text-amber-300' : 'bg-slate-900/50 border-slate-700/40 text-slate-400'
+            className={`flex items-center justify-between px-3 py-2 rounded-xl border transition-all cursor-pointer ${
+              showMPA ? 'bg-amber-50 border-amber-300 text-amber-800 font-bold' : 'bg-slate-50 border-slate-200 text-slate-500'
             }`}
           >
-            <span className="flex items-center space-x-1">
-              <ShieldAlert className="w-3.5 h-3.5" />
+            <span className="flex items-center space-x-1.5">
+              <ShieldAlert className="w-3.5 h-3.5 text-amber-600" />
               <span>MPA Reserves</span>
             </span>
-            {showMPA ? <Eye className="w-3 h-3 text-amber-400" /> : <EyeOff className="w-3 h-3" />}
+            {showMPA ? <Eye className="w-3 h-3 text-amber-600" /> : <EyeOff className="w-3 h-3" />}
           </button>
 
           <button
             onClick={() => setShowCyclone(!showCyclone)}
-            className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg border transition-all ${
-              showCyclone ? 'bg-red-950/70 border-red-500/50 text-red-300' : 'bg-slate-900/50 border-slate-700/40 text-slate-400'
+            className={`flex items-center justify-between px-3 py-2 rounded-xl border transition-all cursor-pointer ${
+              showCyclone ? 'bg-red-50 border-red-300 text-red-800 font-bold' : 'bg-slate-50 border-slate-200 text-slate-500'
             }`}
           >
-            <span className="flex items-center space-x-1">
-              <Wind className="w-3.5 h-3.5" />
-              <span>Cyclone ASNA</span>
+            <span className="flex items-center space-x-1.5">
+              <Wind className="w-3.5 h-3.5 text-red-600" />
+              <span>Cyclone Track</span>
             </span>
-            {showCyclone ? <Eye className="w-3 h-3 text-red-400" /> : <EyeOff className="w-3 h-3" />}
+            {showCyclone ? <Eye className="w-3 h-3 text-red-600" /> : <EyeOff className="w-3 h-3" />}
           </button>
         </div>
 
         {/* Route Simulation Trigger */}
         {activeRoute && (
-          <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
-            <span className="text-[11px] text-slate-300">Simulate Trawler:</span>
-            <div className="flex items-center space-x-1">
+          <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+            <span className="text-[11px] text-slate-600 font-medium">Simulate Trawler:</span>
+            <div className="flex items-center space-x-1.5">
               <button
                 onClick={() => setIsSimulatingVessel(!isSimulatingVessel)}
-                className={`flex items-center space-x-1 px-2 py-1 rounded text-[11px] font-bold ${
-                  isSimulatingVessel ? 'bg-red-600 text-white' : 'bg-ocean-cyan text-ocean-950'
+                className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all ${
+                  isSimulatingVessel ? 'bg-red-600 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
                 <Play className="w-3 h-3" />
@@ -429,7 +431,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
               </button>
               <button
                 onClick={() => setVesselProgress(0)}
-                className="p-1 rounded bg-slate-800 text-slate-300 hover:text-white"
+                className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
               >
                 <RotateCcw className="w-3 h-3" />
               </button>
@@ -439,13 +441,13 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       </div>
 
       {/* Floating Bottom Quick Legend */}
-      <div className="absolute bottom-4 left-4 z-[400] glass-panel px-3 py-2 rounded-xl text-[11px] flex items-center space-x-4 text-slate-300 hidden md:flex">
+      <div className="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200 text-xs font-semibold flex items-center space-x-4 text-slate-700 shadow-md hidden md:flex">
         <div className="flex items-center space-x-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-ocean-emerald"></span>
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
           <span>Potential Fishing Zone</span>
         </div>
         <div className="flex items-center space-x-1.5">
-          <span className="w-3 h-0.5 bg-red-500 border border-dashed"></span>
+          <span className="w-3 h-1 bg-red-500 rounded"></span>
           <span>IMBL Border</span>
         </div>
         <div className="flex items-center space-x-1.5">
@@ -453,7 +455,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
           <span>Protected Area</span>
         </div>
         <div className="flex items-center space-x-1.5">
-          <span className="w-3 h-0.5 bg-ocean-cyan"></span>
+          <span className="w-3 h-1 bg-blue-500 rounded"></span>
           <span>Safe Route</span>
         </div>
       </div>

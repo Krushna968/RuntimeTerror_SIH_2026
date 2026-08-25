@@ -112,21 +112,21 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full glass-card-bright rounded-3xl border border-cyan-400/30 shadow-2xl overflow-hidden">
+    <div className="flex flex-col h-full bg-white rounded-3xl border border-slate-200 shadow-lg overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-3.5 border-b border-cyan-400/20 bg-slate-900/80 flex items-center justify-between">
+      <div className="px-5 py-3.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.3)]">
+          <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shadow-sm">
             <Cpu className="w-5 h-5 animate-pulse" />
           </div>
           <div>
-            <h2 className="text-sm font-extrabold text-white flex items-center space-x-2">
+            <h2 className="text-sm font-black text-slate-900 flex items-center space-x-2">
               <span>ORCA Agentic Assistant</span>
-              <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-cyan-950 text-cyan-300 border border-cyan-400/50">
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
                 Multi-Agent DAG
               </span>
             </h2>
-            <p className="text-[11px] text-cyan-200/80 font-medium">
+            <p className="text-[11px] text-slate-500 font-medium">
               Autonomous reasoning over Oceansat-3 & INCOIS feeds
             </p>
           </div>
@@ -135,10 +135,10 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
         {latestResponse && (
           <button
             onClick={() => handleSpeak(latestResponse.response.tts_speech_text, latestResponse.language.voice_code)}
-            className={`p-2 rounded-xl border transition-all ${
+            className={`p-2 rounded-xl border transition-all cursor-pointer ${
               isSpeaking 
-                ? 'bg-cyan-400 text-slate-950 border-cyan-300 shadow-[0_0_15px_#22d3ee] animate-pulse' 
-                : 'bg-slate-800 text-slate-200 hover:text-white hover:bg-slate-700 border-slate-600'
+                ? 'bg-blue-600 text-white border-blue-600 shadow-md animate-pulse' 
+                : 'bg-white text-slate-700 hover:text-blue-600 hover:bg-blue-50 border-slate-200'
             }`}
             title="Read aloud in regional language"
           >
@@ -148,13 +148,13 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
       </div>
 
       {/* Preset Query Chips */}
-      <div className="px-4 py-2.5 border-b border-slate-800 bg-slate-950/60 flex items-center space-x-2 overflow-x-auto no-scrollbar">
+      <div className="px-4 py-2.5 border-b border-slate-100 bg-slate-50/50 flex items-center space-x-2 overflow-x-auto no-scrollbar">
         {PRESET_QUERIES.map((preset, idx) => (
           <button
             key={idx}
             onClick={() => onSendMessage(preset.query)}
             disabled={isLoading}
-            className="whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 hover:bg-cyan-500/20 text-slate-200 hover:text-cyan-300 border border-slate-700/80 hover:border-cyan-400/50 transition-all shadow-sm cursor-pointer"
+            className="whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 transition-all shadow-xs cursor-pointer"
           >
             {preset.label}
           </button>
@@ -162,24 +162,24 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
       </div>
 
       {/* Main Conversation & Reasoning Area */}
-      <div className="flex-1 p-4 md:p-5 overflow-y-auto space-y-4">
+      <div className="flex-1 p-4 md:p-5 overflow-y-auto space-y-4 bg-slate-50/30">
         {isLoading && (
-          <div className="p-5 rounded-2xl glass-panel-glow border border-cyan-400/50 space-y-3.5 animate-pulse shadow-xl">
-            <div className="flex items-center space-x-2 text-cyan-300 text-xs font-extrabold">
-              <Sparkles className="w-4 h-4 animate-spin" />
+          <div className="p-5 rounded-2xl bg-white border border-blue-200 space-y-3.5 animate-pulse shadow-md">
+            <div className="flex items-center space-x-2 text-blue-700 text-xs font-extrabold">
+              <Sparkles className="w-4 h-4 animate-spin text-blue-600" />
               <span>ORCA Multi-Agent Network Collaborating...</span>
             </div>
-            <div className="space-y-2 text-xs text-slate-200">
+            <div className="space-y-2 text-xs text-slate-700">
               <div className="flex items-center space-x-2.5">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
                 <span>Decomposing spatial intent & querying Oceansat-3 OCM-3 products...</span>
               </div>
               <div className="flex items-center space-x-2.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 <span>Computing SST Thermal Front × Chlorophyll-a Coincidence Gradient...</span>
               </div>
               <div className="flex items-center space-x-2.5">
-                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
                 <span>Evaluating IMBL geofence buffer & A* weather routing clearance...</span>
               </div>
             </div>
@@ -190,53 +190,53 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
           <div className="space-y-4">
             {/* User Query Echo */}
             <div className="flex justify-end">
-              <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tr-sm bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-medium text-xs shadow-lg border border-blue-400/40">
+              <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tr-sm bg-blue-600 text-white font-medium text-xs shadow-md">
                 {latestResponse.query}
               </div>
             </div>
 
             {/* Agent Primary Synthesized Response Card */}
-            <div className="glass-panel p-5 rounded-3xl border-l-4 border-l-cyan-400 border-cyan-400/40 space-y-3.5 shadow-2xl">
-              <div className="flex items-center justify-between border-b border-slate-700/80 pb-2.5">
+            <div className="bg-white p-5 rounded-3xl border border-blue-200 space-y-3.5 shadow-md">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 rounded-full bg-cyan-400/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 text-[10px] font-black shadow-[0_0_8px_rgba(6,182,212,0.3)]">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-black flex items-center justify-center text-[10px]">
                     ISRO
                   </div>
-                  <span className="text-xs font-black text-white">
+                  <span className="text-xs font-black text-slate-900">
                     Verified Advisory · {latestResponse.reference_port.name}
                   </span>
                 </div>
-                <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 shadow-sm">
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                   {latestResponse.language.native} ({latestResponse.language.name})
                 </span>
               </div>
 
               {/* Formatted Markdown Content */}
-              <div className="text-xs leading-relaxed text-slate-100 whitespace-pre-line font-medium space-y-1.5">
+              <div className="text-xs leading-relaxed text-slate-800 whitespace-pre-line font-medium space-y-1.5">
                 {latestResponse.response.markdown}
               </div>
 
               {/* Quick Insight Badges */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2.5 border-t border-slate-800">
-                <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80">
-                  <div className="text-[10px] text-slate-400 font-semibold">Sea Venture Verdict</div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2.5 border-t border-slate-100">
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-[10px] text-slate-500 font-semibold">Sea Venture Verdict</div>
                   <div className={`text-xs font-black mt-0.5 ${
-                    latestResponse.weather_and_safety.safety_status === 'SAFE_FOR_VENTURE' ? 'text-emerald-400' : 'text-amber-400'
+                    latestResponse.weather_and_safety.safety_status === 'SAFE_FOR_VENTURE' ? 'text-emerald-700' : 'text-amber-700'
                   }`}>
                     {latestResponse.weather_and_safety.safety_status.replace(/_/g, ' ')}
                   </div>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80">
-                  <div className="text-[10px] text-slate-400 font-semibold">Dominant Species</div>
-                  <div className="text-xs font-black text-cyan-300 mt-0.5">
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-[10px] text-slate-500 font-semibold">Dominant Species</div>
+                  <div className="text-xs font-black text-blue-700 mt-0.5">
                     {latestResponse.top_pfz.dominant_species}
                   </div>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-700/80 col-span-2 sm:col-span-1">
-                  <div className="text-[10px] text-slate-400 font-semibold">Nearest IMBL Distance</div>
-                  <div className="text-xs font-black text-white mt-0.5 font-mono">
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 col-span-2 sm:col-span-1">
+                  <div className="text-[10px] text-slate-500 font-semibold">Nearest IMBL Distance</div>
+                  <div className="text-xs font-black text-slate-900 mt-0.5 font-mono">
                     {latestResponse.geofence_status.nearest_imbl.distance_nautical_miles} NM
                   </div>
                 </div>
@@ -244,17 +244,17 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
             </div>
 
             {/* Collapsible Multi-Agent Reasoning DAG Trace */}
-            <div className="glass-panel rounded-2xl border border-cyan-400/30 overflow-hidden text-xs shadow-lg">
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden text-xs shadow-sm">
               <button
                 onClick={() => setExpandedTrace(!expandedTrace)}
-                className="w-full px-4 py-3 bg-slate-900/90 hover:bg-slate-850 flex items-center justify-between font-extrabold text-slate-200 transition-colors cursor-pointer"
+                className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100 flex items-center justify-between font-extrabold text-slate-800 transition-colors cursor-pointer"
               >
                 <span className="flex items-center space-x-2">
-                  <Cpu className="w-4 h-4 text-cyan-300 animate-pulse" />
+                  <Cpu className="w-4 h-4 text-blue-600" />
                   <span>Agent Execution Chain ({latestResponse.evidence_and_provenance.execution_steps_count} Specialized Agents)</span>
                 </span>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs text-cyan-300 font-mono font-bold">
+                  <span className="text-xs text-blue-700 font-mono font-bold">
                     {latestResponse.execution_metadata.total_latency_ms}ms
                   </span>
                   {expandedTrace ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -262,20 +262,20 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
               </button>
 
               {expandedTrace && (
-                <div className="p-3.5 space-y-3 bg-slate-950/80 border-t border-slate-800">
+                <div className="p-3.5 space-y-3 bg-white border-t border-slate-200">
                   {latestResponse.evidence_and_provenance.execution_trace.map((step, idx) => (
-                    <div key={idx} className="p-3 rounded-xl bg-slate-900/95 border border-slate-700/80 space-y-1.5 shadow-sm">
+                    <div key={idx} className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-extrabold text-cyan-300 flex items-center space-x-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="font-extrabold text-blue-700 flex items-center space-x-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                           <span>{step.agent}</span>
                         </span>
-                        <span className="text-[11px] text-slate-400 font-mono font-semibold">{step.duration_ms}ms</span>
+                        <span className="text-[11px] text-slate-500 font-mono">{step.duration_ms}ms</span>
                       </div>
-                      <p className="text-xs text-slate-200 leading-snug font-medium">
+                      <p className="text-xs text-slate-700 leading-snug font-medium">
                         {step.thought}
                       </p>
-                      <div className="text-[11px] text-emerald-300 font-mono bg-black/60 px-2.5 py-1 rounded-lg border border-slate-800">
+                      <div className="text-[11px] text-emerald-800 font-mono bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                         ➔ {step.output_summary}
                       </div>
                     </div>
@@ -290,8 +290,8 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
       </div>
 
       {/* Input Box & Voice Trigger */}
-      <form onSubmit={handleFormSubmit} className="p-3.5 border-t border-cyan-400/20 bg-slate-900/90">
-        <div className="relative flex items-center bg-slate-950/90 border border-slate-700 rounded-2xl p-1.5 shadow-inner focus-within:border-cyan-400/60 transition-all">
+      <form onSubmit={handleFormSubmit} className="p-3.5 border-t border-slate-200 bg-white">
+        <div className="relative flex items-center bg-slate-50 border border-slate-300 rounded-2xl p-1.5 shadow-inner focus-within:border-blue-500 focus-within:bg-white transition-all">
           <input
             type="text"
             value={inputText}
@@ -301,17 +301,17 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
                 ? "मछली पकड़ने का क्षेत्र, मौसम या सुरक्षा के बारे में पूछें..." 
                 : "Ask about PFZ zones, weather safety, border geofence..."
             }
-            className="flex-1 bg-transparent px-3.5 py-2 text-xs text-white placeholder-slate-400 focus:outline-none font-medium"
+            className="flex-1 bg-transparent px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none font-medium"
             disabled={isLoading}
           />
 
           <button
             type="button"
             onClick={handleToggleMic}
-            className={`p-2.5 rounded-xl transition-all ${
+            className={`p-2.5 rounded-xl transition-all cursor-pointer ${
               isListening 
                 ? 'bg-red-600 text-white animate-ping' 
-                : 'text-slate-300 hover:text-cyan-300 hover:bg-slate-800'
+                : 'text-slate-500 hover:text-blue-600 hover:bg-slate-200'
             }`}
             title="Speak query (Web Speech STT)"
           >
@@ -321,7 +321,7 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
           <button
             type="submit"
             disabled={!inputText.trim() || isLoading}
-            className="ml-1 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-black text-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(6,182,212,0.4)] cursor-pointer"
+            className="ml-1 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-blue-600/30 cursor-pointer"
           >
             <Send className="w-4 h-4" />
           </button>
