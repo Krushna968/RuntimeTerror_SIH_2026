@@ -1,15 +1,14 @@
 import React from 'react';
 import { 
   Compass, 
-  Languages, 
   AlertTriangle 
 } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin';
   setActiveTab: (tab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin') => void;
-  currentLang: string;
-  setCurrentLang: (lang: string) => void;
+  currentLang?: string;
+  setCurrentLang?: (lang: string) => void;
   onSOSClick: () => void;
 }
 
@@ -27,8 +26,6 @@ export const LANGUAGES = [
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
-  currentLang,
-  setCurrentLang,
   onSOSClick
 }) => {
   const isLightPage = activeTab === 'chat';
@@ -131,26 +128,6 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right Action Group */}
       <div className="flex items-center space-x-3 shrink-0">
-        {/* Regional Language Switcher */}
-        <div className={`relative flex items-center backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm transition-all border ${
-          isLightPage 
-            ? 'bg-white/80 border-zinc-200 text-zinc-900' 
-            : 'bg-zinc-900/60 border-zinc-700/60 text-zinc-200'
-        }`}>
-          <Languages className={`w-3.5 h-3.5 mr-2 ${isLightPage ? 'text-blue-600' : 'text-cyan-400'}`} />
-          <select
-            value={currentLang}
-            onChange={(e) => setCurrentLang(e.target.value)}
-            className="bg-transparent text-xs font-semibold focus:outline-none cursor-pointer"
-          >
-            {LANGUAGES.map((lang) => (
-              <option key={lang.code} value={lang.code} className="bg-zinc-900 text-white">
-                {lang.native} ({lang.name})
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* SOS Button */}
         <button
           onClick={onSOSClick}
