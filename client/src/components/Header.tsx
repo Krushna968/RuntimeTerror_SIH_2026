@@ -81,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Center Navigation: Pure Clean Clickable Texts */}
-      <nav className="hidden md:flex items-center space-x-7 lg:space-x-9 text-sm">
+      <nav className="hidden md:flex items-center space-x-8 lg:space-x-10 text-sm">
         <button
           onClick={() => setActiveTab('home')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('home')}`}
@@ -101,27 +101,6 @@ export const Header: React.FC<HeaderProps> = ({
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('map')}`}
         >
           GIS Command
-        </button>
-
-        <button
-          onClick={() => setActiveTab('agent-lab')}
-          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('agent-lab')}`}
-        >
-          Agent DAG
-        </button>
-
-        <button
-          onClick={() => setActiveTab('safety')}
-          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('safety')}`}
-        >
-          Safety Barometer
-        </button>
-
-        <button
-          onClick={() => setActiveTab('bulletin')}
-          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('bulletin')}`}
-        >
-          Advisory Bulletin
         </button>
       </nav>
 
