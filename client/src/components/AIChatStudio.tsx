@@ -150,7 +150,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
   const hasMessages = messages.length > 0;
 
   return (
-    <div className="relative min-h-[calc(100vh-70px)] w-full bg-[#0d0e12] text-white flex flex-col font-['Outfit',sans-serif]">
+    <div className="relative min-h-screen w-full bg-[#0d0e12] text-white flex flex-col font-['Outfit',sans-serif]">
       {/* Subtle Central Ambient Glow */}
       <div 
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] pointer-events-none z-0"

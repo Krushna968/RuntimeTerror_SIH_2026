@@ -197,7 +197,7 @@ export function App() {
 
       {/* Other Workspace Tabs */}
       {activeTab !== 'home' && activeTab !== 'chat' && (
-        <main className="relative z-10 flex-1 p-3 lg:p-6 max-w-[1920px] w-full mx-auto space-y-5">
+        <main className="relative z-10 flex-1 pt-24 pb-6 px-3 lg:px-6 max-w-[1920px] w-full mx-auto space-y-5">
           {/* Top Constellation Bar */}
           <SatelliteTelemetryBar satellites={satellites} />
 
