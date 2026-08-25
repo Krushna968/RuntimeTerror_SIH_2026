@@ -10,9 +10,7 @@ import {
   Copy, 
   Check, 
   ArrowUp,
-  Fish,
-  ShieldCheck,
-  Compass
+  Search
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatResponsePayload } from '../types';
@@ -45,7 +43,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
   const [isListening, setIsListening] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [showInputModal, setShowInputModal] = useState(false);
+  const [isChatActive, setIsChatActive] = useState(false);
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -78,6 +76,8 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
     const textToSend = queryText || inputText;
     if (!textToSend.trim() || isLoading) return;
 
+    setIsChatActive(true);
+
     const userMsg: Message = {
       id: `user-${Date.now()}`,
       sender: 'user',
@@ -87,7 +87,6 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
 
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
-    setShowInputModal(false);
 
     await onSendMessage(textToSend);
   };
@@ -151,78 +150,53 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const hasMessages = messages.length > 0;
+  const hasMessages = messages.length > 0 || isChatActive;
 
   return (
     <div className="relative min-h-screen w-full bg-[#fcfbf8] text-[#111113] flex flex-col font-['Outfit',sans-serif] overflow-hidden selection:bg-blue-100 selection:text-blue-950">
       
-      {/* 1. EXACT LOVABLE ANNULAR BLUE HALO (Aura Ring with Lighter Center & Warm Cream Outer Edges) */}
+      {/* EXACT 1:1 LOVABLE VIBRANT BLUE ANNULAR HALO */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center z-0">
-        <svg 
-          className="w-[1400px] h-[950px] max-w-none opacity-90" 
-          viewBox="0 0 1200 800" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            {/* Annular Ring Gradient */}
-            <radialGradient id="lovableAnnularHalo" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#fcfbf8" stopOpacity="0.1" />
-              <stop offset="30%" stopColor="#93c5fd" stopOpacity="0.45" />
-              <stop offset="55%" stopColor="#3b82f6" stopOpacity="0.75" />
-              <stop offset="72%" stopColor="#60a5fa" stopOpacity="0.55" />
-              <stop offset="88%" stopColor="#bfdbfe" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#fcfbf8" stopOpacity="0" />
-            </radialGradient>
-            
-            <filter id="heavyBlur" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="75" />
-            </filter>
-          </defs>
-
-          {/* Elliptical Glowing Aura */}
-          <ellipse 
-            cx="600" 
-            cy="400" 
-            rx="520" 
-            ry="330" 
-            fill="url(#lovableAnnularHalo)" 
-            filter="url(#heavyBlur)" 
-          />
-        </svg>
+        <div 
+          className="w-[880px] sm:w-[1020px] h-[640px] sm:h-[720px] rounded-[100%]"
+          style={{
+            background: 'radial-gradient(ellipse 55% 48% at 50% 50%, rgba(252, 251, 248, 0) 0%, rgba(252, 251, 248, 0) 26%, rgba(96, 165, 250, 0.85) 54%, rgba(37, 99, 235, 0.95) 68%, rgba(96, 165, 250, 0.7) 78%, rgba(252, 251, 248, 0) 95%)',
+            filter: 'blur(45px)',
+          }}
+        />
       </div>
 
-      {/* STATE 1: EXACT 1:1 LOVABLE HERO DESIGN */}
+      {/* STATE 1: EXACT 1:1 LOVABLE HERO (PIXEL-PERFECT CLONE) */}
       {!hasMessages && (
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-4xl w-full mx-auto px-6 my-auto pt-24 pb-16">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-4xl w-full mx-auto px-6 my-auto pt-20 pb-16">
           
-          {/* Main Headline: Single Line, Extra Bold Black Typography */}
+          {/* Main Headline: Single Line Bold */}
           <motion.h1 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-6xl sm:text-7xl md:text-8xl font-extrabold text-[#111113] tracking-[-0.04em] leading-[1.05] select-none whitespace-nowrap mb-6"
+            className="text-6xl sm:text-7xl md:text-8xl font-black text-[#111113] tracking-[-0.04em] leading-tight select-none whitespace-nowrap mb-6"
           >
             Secure by design
           </motion.h1>
 
-          {/* 2-Line Centered Subtitle */}
+          {/* Subtitle Description */}
           <motion.p 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-[#52525b] text-base sm:text-lg max-w-[620px] font-normal leading-[1.6] mb-8 text-center"
+            className="text-[#52525b] text-base sm:text-[17px] max-w-[620px] font-normal leading-[1.6] mb-8 text-center"
           >
             Choose where your data lives, enforce SSO and role-based access, control<br className="hidden sm:inline" />
             publishing with approvals, and keep your code and prompts out of model training.
           </motion.p>
 
-          {/* Two Rectangular Action Buttons (Exact Lovable Geometry: rounded-lg 8px) */}
+          {/* Action Buttons (Exact Lovable Geometry: rounded-lg) */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex items-center space-x-3 mb-10"
+            className="flex items-center space-x-3"
           >
             <button
               onClick={() => handleSend("Where is the nearest Potential Fishing Zone for Tuna from Kochi today?")}
@@ -237,59 +211,6 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             >
               Report an issue
             </button>
-          </motion.div>
-
-          {/* Interactive AI Search Input Bar */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="w-full max-w-xl"
-          >
-            <form 
-              onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-              className="relative flex items-center bg-white/95 border border-[#e4e4e7] hover:border-zinc-400 focus-within:border-blue-500 rounded-full px-5 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all"
-            >
-              <button 
-                type="button"
-                className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors mr-2 cursor-pointer"
-                title="New Query"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-
-              <input
-                ref={inputRef}
-                type="text"
-                autoFocus
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder="Ask ORCA AI anything..."
-                className="flex-1 bg-transparent text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none font-normal"
-                disabled={isLoading}
-              />
-
-              <button
-                type="button"
-                onClick={handleToggleMic}
-                className={`p-2 rounded-full transition-all mr-1 cursor-pointer ${
-                  isListening 
-                    ? 'bg-red-600 text-white animate-ping' 
-                    : 'text-zinc-400 hover:text-zinc-700'
-                }`}
-                title="Speak query"
-              >
-                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-              </button>
-
-              <button
-                type="submit"
-                disabled={!inputText.trim() || isLoading}
-                className="w-8 h-8 rounded-full bg-[#111113] hover:bg-zinc-800 text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0 shadow-sm"
-              >
-                <ArrowUp className="w-4 h-4 stroke-[2.5]" />
-              </button>
-            </form>
           </motion.div>
         </div>
       )}
@@ -368,15 +289,16 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             >
               <button 
                 type="button"
-                onClick={() => setMessages([])}
+                onClick={() => { setMessages([]); setIsChatActive(false); }}
                 className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors mr-2 cursor-pointer"
-                title="New Chat"
+                title="Reset to Landing"
               >
                 <Plus className="w-4 h-4" />
               </button>
 
               <input
                 type="text"
+                autoFocus
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Ask ORCA AI anything..."
