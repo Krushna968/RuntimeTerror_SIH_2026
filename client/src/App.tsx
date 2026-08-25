@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { OrcaLandingHero } from './components/OrcaLandingHero';
+import { AIChatStudio } from './components/AIChatStudio';
 import { MapViewport } from './components/MapViewport';
 import { AgentChatDrawer } from './components/AgentChatDrawer';
 import { SeaSafetyBarometer } from './components/SeaSafetyBarometer';
@@ -39,7 +40,7 @@ import {
 const API_BASE = 'http://localhost:8000';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'map' | 'agent-lab' | 'safety' | 'bulletin'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin'>('home');
   const [currentLang, setCurrentLang] = useState<string>('en');
   const [pfzHotspots, setPfzHotspots] = useState<PFZHotspot[]>([]);
   const [selectedPFZ, setSelectedPFZ] = useState<PFZHotspot | null>(null);
@@ -168,7 +169,7 @@ export function App() {
 
   return (
     <div className="relative flex flex-col min-h-screen bg-[#07090e] text-white overflow-x-hidden font-['Outfit',sans-serif]">
-      {/* Top Header Navigation — Persistently Carried Across Every Tab */}
+      {/* Top Header Navigation */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -182,22 +183,38 @@ export function App() {
         onSOSClick={() => setIsSOSModalOpen(true)}
       />
 
-      {/* Main Tab Content */}
+      {/* Tab 0: Home Landing Page */}
       {activeTab === 'home' && (
         <OrcaLandingHero
           onExplorePlatform={(tab) => setActiveTab(tab)}
         />
       )}
 
-      {activeTab !== 'home' && (
+      {/* Tab 1: Dedicated AI Chatbot Studio Page */}
+      {activeTab === 'chat' && (
+        <div className="relative z-10 flex-1 p-2 sm:p-4">
+          <AIChatStudio
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading}
+            latestResponse={latestResponse}
+            currentLang={currentLang}
+            setCurrentLang={setCurrentLang}
+            onNavigateToMap={() => setActiveTab('map')}
+            onNavigateToSafety={() => setActiveTab('safety')}
+            onNavigateToBulletin={() => setActiveTab('bulletin')}
+          />
+        </div>
+      )}
+
+      {/* Other Workspace Tabs */}
+      {activeTab !== 'home' && activeTab !== 'chat' && (
         <main className="relative z-10 flex-1 p-3 lg:p-6 max-w-[1920px] w-full mx-auto space-y-5">
           {/* Top Constellation Bar */}
           <SatelliteTelemetryBar satellites={satellites} />
 
-          {/* Tab 1: GIS Command Viewport + Agent Drawer */}
+          {/* GIS Command Viewport + Agent Drawer */}
           {activeTab === 'map' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 h-[calc(100vh-220px)] min-h-[640px]">
-              {/* GIS Map Viewport (Left/Center 7 cols) */}
               <div className="lg:col-span-7 h-full flex flex-col">
                 <MapViewport
                   pfzHotspots={pfzHotspots}
@@ -209,7 +226,6 @@ export function App() {
                 />
               </div>
 
-              {/* Agent Conversational & DAG Drawer (Right 5 cols) */}
               <div className="lg:col-span-5 h-full flex flex-col">
                 <AgentChatDrawer
                   onSendMessage={handleSendMessage}
@@ -221,7 +237,7 @@ export function App() {
             </div>
           )}
 
-          {/* Tab 2: Agent Reasoning DAG Lab */}
+          {/* Agent Reasoning DAG Lab */}
           {activeTab === 'agent-lab' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               <div className="lg:col-span-8 space-y-4">
@@ -286,7 +302,7 @@ export function App() {
             </div>
           )}
 
-          {/* Tab 3: Fishermen Safety & Disaster Barometer */}
+          {/* Fishermen Safety & Disaster Barometer */}
           {activeTab === 'safety' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               <div className="lg:col-span-7 space-y-4">
@@ -308,10 +324,9 @@ export function App() {
             </div>
           )}
 
-          {/* Tab 4: Official Advisory Bulletin */}
+          {/* Official Advisory Bulletin */}
           {activeTab === 'bulletin' && (
             <div className="max-w-6xl mx-auto space-y-6">
-              {/* Top Action Header */}
               <div className="bg-zinc-900/90 p-6 md:p-8 rounded-3xl border border-zinc-800 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
@@ -476,11 +491,11 @@ export function App() {
           </div>
         ) : (
           <button
-            onClick={() => setIsFloatingChatOpen(true)}
+            onClick={() => setActiveTab('chat')}
             className="flex items-center space-x-2.5 px-5 py-3.5 rounded-full bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white font-black text-sm shadow-[0_0_25px_rgba(6,182,212,0.6)] border border-cyan-300/40 hover:scale-105 active:scale-95 transition-all cursor-pointer group"
           >
             <Sparkles className="w-5 h-5 animate-spin-slow group-hover:rotate-45 transition-transform" />
-            <span>Talk to ORCA AI</span>
+            <span>AI Chatbot Studio</span>
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
           </button>
         )}
