@@ -4,6 +4,7 @@ import { OrcaLandingHero } from './components/OrcaLandingHero';
 import { AIChatStudio } from './components/AIChatStudio';
 import { MapViewport } from './components/MapViewport';
 import { AgentChatDrawer } from './components/AgentChatDrawer';
+import { GisCommandView } from './components/GisCommandView';
 import { SeaSafetyBarometer } from './components/SeaSafetyBarometer';
 import { SatelliteTelemetryBar } from './components/SatelliteTelemetryBar';
 import { AdvisoryExportModal } from './components/AdvisoryExportModal';
@@ -195,36 +196,28 @@ export function App() {
         />
       )}
 
-      {/* Other Workspace Tabs */}
-      {activeTab !== 'home' && activeTab !== 'chat' && (
+      {/* Fullscreen Liquid Glass GIS Command Center */}
+      {activeTab === 'map' && (
+        <GisCommandView
+          pfzHotspots={pfzHotspots}
+          selectedPFZ={selectedPFZ}
+          onSelectPFZ={handleSelectPFZ}
+          activeRoute={activeRoute}
+          weather={weather}
+          satellites={satellites}
+          onSendMessage={handleSendMessage}
+          isLoading={isLoading}
+          latestResponse={latestResponse}
+          currentLang={currentLang}
+          onMapClickCoord={handleMapClickCoord}
+        />
+      )}
+
+      {/* Other Workspace Tabs (Agent DAG, Safety, Bulletin) */}
+      {activeTab !== 'home' && activeTab !== 'chat' && activeTab !== 'map' && (
         <main className="relative z-10 flex-1 pt-24 pb-6 px-3 lg:px-6 max-w-[1920px] w-full mx-auto space-y-5">
           {/* Top Constellation Bar */}
           <SatelliteTelemetryBar satellites={satellites} />
-
-          {/* GIS Command Viewport + Agent Drawer */}
-          {activeTab === 'map' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 h-[calc(100vh-220px)] min-h-[640px]">
-              <div className="lg:col-span-7 h-full flex flex-col">
-                <MapViewport
-                  pfzHotspots={pfzHotspots}
-                  selectedPFZ={selectedPFZ}
-                  onSelectPFZ={handleSelectPFZ}
-                  activeRoute={activeRoute}
-                  weather={weather}
-                  onMapClickCoord={handleMapClickCoord}
-                />
-              </div>
-
-              <div className="lg:col-span-5 h-full flex flex-col">
-                <AgentChatDrawer
-                  onSendMessage={handleSendMessage}
-                  isLoading={isLoading}
-                  latestResponse={latestResponse}
-                  currentLang={currentLang}
-                />
-              </div>
-            </div>
-          )}
 
           {/* Agent Reasoning DAG Lab */}
           {activeTab === 'agent-lab' && (
