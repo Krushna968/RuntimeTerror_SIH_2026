@@ -164,10 +164,10 @@ export function App() {
     }
   };
 
-  const isDarkCanvas = activeTab === 'home' || activeTab === 'map';
+  const isDarkCanvas = activeTab === 'map';
 
   return (
-    <div className={`relative flex flex-col min-h-screen ${isDarkCanvas ? 'bg-[#07090e] text-white' : 'bg-[#f8fafc] text-slate-900'} overflow-x-hidden font-['Outfit',sans-serif]`}>
+    <div className={`relative flex flex-col min-h-screen ${isDarkCanvas ? 'bg-[#07090e] text-white' : 'bg-[#fcfbf8] text-slate-900'} overflow-x-hidden font-['Outfit',sans-serif]`}>
       {/* Top Header Navigation */}
       <Header
         activeTab={activeTab}

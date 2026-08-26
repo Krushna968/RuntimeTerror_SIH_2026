@@ -15,14 +15,14 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
   onExplorePlatform
 }) => {
   return (
-    <KineticGrid globalColor="default" className="min-h-screen h-screen flex flex-col justify-between select-none">
+    <KineticGrid globalColor="light" className="min-h-screen h-screen flex flex-col justify-between select-none">
       
       {/* Subtle Ambient Depth Glow */}
       <div 
-        className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[450px] pointer-events-none z-0"
+        className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[520px] pointer-events-none z-0"
         style={{
-          background: 'radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, rgba(6, 182, 212, 0.05) 45%, transparent 70%)',
-          filter: 'blur(100px)'
+          background: 'radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(14, 165, 233, 0.12) 40%, transparent 70%)',
+          filter: 'blur(110px)'
         }}
       />
 
@@ -36,12 +36,12 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="space-y-4 max-w-3xl"
         >
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-[-0.035em] leading-[1.1] select-none text-white drop-shadow-sm">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-[-0.035em] leading-[1.1] select-none text-slate-900 drop-shadow-xs">
             The Agentic Brain<br />
-            for the <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">Indian Ocean</span>
+            for the <span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 bg-clip-text text-transparent">Indian Ocean</span>
           </h1>
 
-          <p className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-2xl font-normal leading-[1.65] pt-1">
+          <p className="text-slate-600 text-sm sm:text-base md:text-lg max-w-2xl font-normal leading-[1.65] pt-1">
             Autonomous multi-agent platform reasoning over ISRO satellite oceanography, SST-chlorophyll thermal fronts, and IMBL geofencing to empower 4 million+ coastal fishermen.
           </p>
         </motion.div>
@@ -55,29 +55,29 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
         >
           <button 
             onClick={() => onExplorePlatform('chat')}
-            className="px-6 py-3 rounded-full text-sm font-semibold text-zinc-950 bg-white hover:bg-zinc-100 transition-all shadow-md active:scale-95 cursor-pointer flex items-center space-x-2 group"
+            className="px-6 py-3 rounded-full text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-all shadow-md active:scale-95 cursor-pointer flex items-center space-x-2 group"
           >
-            <Sparkles className="w-4 h-4 text-cyan-600 group-hover:rotate-12 transition-transform" />
+            <Sparkles className="w-4 h-4 text-cyan-300 group-hover:rotate-12 transition-transform" />
             <span>Launch AI Decision Studio</span>
-            <ArrowRight className="w-4 h-4 text-zinc-700 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight className="w-4 h-4 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
           </button>
 
           <button 
             onClick={() => onExplorePlatform('map')}
-            className="px-6 py-3 rounded-full text-sm font-medium text-zinc-300 bg-zinc-900/90 hover:text-white hover:bg-zinc-800 border border-zinc-700/80 transition-all flex items-center space-x-2 active:scale-95 cursor-pointer backdrop-blur-md"
+            className="px-6 py-3 rounded-full text-sm font-semibold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 transition-all flex items-center space-x-2 active:scale-95 cursor-pointer shadow-xs"
           >
-            <Compass className="w-4 h-4 text-cyan-400" />
+            <Compass className="w-4 h-4 text-blue-600" />
             <span>GIS Command Map</span>
           </button>
         </motion.div>
       </main>
 
       {/* Bottom Footer Strip */}
-      <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-2 shrink-0">
+      <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-4 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2 shrink-0">
         <div>
-          Created by <strong className="text-zinc-300 font-medium">Team Runtime Terror</strong> for ISRO · Smart India Hackathon 2026
+          Created by <strong className="text-slate-700 font-medium">Team Runtime Terror</strong> for ISRO · Smart India Hackathon 2026
         </div>
-        <div className="text-xs text-zinc-500 font-mono">
+        <div className="text-xs text-slate-500 font-mono">
           Oceansat-3 · INSAT-3DR · INCOIS
         </div>
       </footer>
