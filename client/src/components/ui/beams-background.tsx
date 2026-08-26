@@ -3,6 +3,11 @@ import { cn } from "@/lib/utils";
 
 export interface HolographicBeamsProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
+   * Theme mode: 'dark' or 'light'
+   * Default: 'light'
+   */
+  theme?: 'dark' | 'light';
+  /**
    * Density of the light pillars.
    * Default: 30
    */
@@ -26,6 +31,7 @@ export interface HolographicBeamsProps extends React.HTMLAttributes<HTMLDivEleme
 
 export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
   className,
+  theme = 'light',
   density = 30,
   speed = 1,
   aberration = 2.5,
@@ -90,11 +96,13 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
       ctx.fill();
     };
 
+    const isLight = theme === 'light';
+
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       
-      // Enable additive blending for that "Hologram" glowing look
-      ctx.globalCompositeOperation = "screen"; // 'screen' prevents over-exposure compared to 'lighter'
+      // Enable additive blending on dark or smooth overlay on light
+      ctx.globalCompositeOperation = isLight ? "source-over" : "screen";
 
       time += 0.01 * speed;
       const beamWidth = width / density;
@@ -102,34 +110,57 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
       for (let i = 0; i <= density; i++) {
         const x = i * beamWidth;
         
-        // 1. RED CHANNEL (Shifted Left)
-        // We use slightly different time and phase to separate the colors
-        const rAlpha = (opacity / 100) * (0.5 + 0.5 * Math.cos(i * 0.5 + time));
-        drawBeam(
-            x - aberration, 
-            time + i * 0.1, 
-            `rgba(255, 0, 0, ${rAlpha * 0.5})`, 
-            1.5
-        );
+        if (isLight) {
+          // Light Mode Colors (Oceanic Azure, Electric Cyan, Emerald)
+          const cAlpha = (opacity / 100) * (0.35 + 0.35 * Math.cos(i * 0.5 + time));
+          drawBeam(
+              x - aberration, 
+              time + i * 0.1, 
+              `rgba(14, 165, 233, ${cAlpha * 0.35})`, 
+              1.6
+          );
 
-        // 2. BLUE CHANNEL (Shifted Right)
-        const bAlpha = (opacity / 100) * (0.5 + 0.5 * Math.sin(i * 0.6 + time * 1.1));
-        drawBeam(
-            x + aberration, 
-            time + i * 0.12 + 10, 
-            `rgba(0, 50, 255, ${bAlpha * 0.5})`, 
-            1.5
-        );
+          const bAlpha = (opacity / 100) * (0.35 + 0.35 * Math.sin(i * 0.6 + time * 1.1));
+          drawBeam(
+              x + aberration, 
+              time + i * 0.12 + 10, 
+              `rgba(59, 130, 246, ${bAlpha * 0.4})`, 
+              1.6
+          );
 
-        // 3. GREEN/WHITE CHANNEL (Center - Structure)
-        // This is the "Core" of the beam
-        const coreAlpha = (opacity / 100) * (0.6 + 0.4 * Math.sin(i * 0.3 - time));
-        drawBeam(
-            x, 
-            time + i * 0.1 + 5, 
-            `rgba(200, 255, 255, ${coreAlpha * 0.3})`, 
-            0.8 // Thinner core
-        );
+          const coreAlpha = (opacity / 100) * (0.4 + 0.3 * Math.sin(i * 0.3 - time));
+          drawBeam(
+              x, 
+              time + i * 0.1 + 5, 
+              `rgba(20, 184, 166, ${coreAlpha * 0.3})`, 
+              1.0
+          );
+        } else {
+          // Dark Holographic RGB mode
+          const rAlpha = (opacity / 100) * (0.5 + 0.5 * Math.cos(i * 0.5 + time));
+          drawBeam(
+              x - aberration, 
+              time + i * 0.1, 
+              `rgba(255, 0, 0, ${rAlpha * 0.5})`, 
+              1.5
+          );
+
+          const bAlpha = (opacity / 100) * (0.5 + 0.5 * Math.sin(i * 0.6 + time * 1.1));
+          drawBeam(
+              x + aberration, 
+              time + i * 0.12 + 10, 
+              `rgba(0, 50, 255, ${bAlpha * 0.5})`, 
+              1.5
+          );
+
+          const coreAlpha = (opacity / 100) * (0.6 + 0.4 * Math.sin(i * 0.3 - time));
+          drawBeam(
+              x, 
+              time + i * 0.1 + 5, 
+              `rgba(200, 255, 255, ${coreAlpha * 0.3})`, 
+              0.8
+          );
+        }
       }
 
       animationFrameId = requestAnimationFrame(draw);
@@ -143,31 +174,45 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [density, speed, aberration, opacity]);
+  }, [theme, density, speed, aberration, opacity]);
 
   return (
     <div
       ref={containerRef}
-      className={cn("absolute inset-0 z-0 overflow-hidden bg-black", className)}
+      className={cn(
+        "absolute inset-0 z-0 overflow-hidden",
+        theme === 'light' ? "bg-[#fcfbf8]" : "bg-black",
+        className
+      )}
       style={style}
       {...props}
     >
       <canvas 
         ref={canvasRef} 
-        className="block w-full h-full filter blur-[4px]" // Slight blur to merge the RGB channels
+        className="block w-full h-full filter blur-[5px]" // Soft blur to merge the glowing channels
       />
       
       {/* Texture Overlay (Scanlines) for extra Holographic feel */}
       <div 
-        className="absolute inset-0 z-10 pointer-events-none opacity-20"
+        className={cn(
+          "absolute inset-0 z-10 pointer-events-none",
+          theme === 'light' ? "opacity-5" : "opacity-20"
+        )}
         style={{
-            backgroundImage: "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,1) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06))",
+            backgroundImage: theme === 'light'
+              ? "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.04) 50%), linear-gradient(90deg, rgba(14,165,233,0.03), rgba(0,0,0,0), rgba(59,130,246,0.03))"
+              : "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,1) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06))",
             backgroundSize: "100% 4px, 3px 100%"
         }}
       />
       
       {/* Vignette */}
-      <div className="absolute inset-0 z-20 bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)]" />
+      <div className={cn(
+        "absolute inset-0 z-20",
+        theme === 'light'
+          ? "bg-[radial-gradient(circle_at_center,transparent_0%,rgba(245,248,252,0.4)_100%)]"
+          : "bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)]"
+      )} />
     </div>
   );
 };

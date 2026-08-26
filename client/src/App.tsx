@@ -165,7 +165,7 @@ export function App() {
     }
   };
 
-  const isDarkCanvas = activeTab === 'map' || activeTab === 'agent-lab';
+  const isDarkCanvas = activeTab === 'map';
 
   return (
     <div className={`relative flex flex-col min-h-screen ${isDarkCanvas ? 'bg-black text-white' : 'bg-[#fcfbf8] text-slate-900'} overflow-x-hidden font-['Outfit',sans-serif]`}>
