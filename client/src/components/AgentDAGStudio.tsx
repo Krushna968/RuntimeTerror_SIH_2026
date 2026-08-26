@@ -168,7 +168,7 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
   };
 
   return (
-    <div className="relative w-full min-h-screen font-sans bg-[#fcfbf8] text-slate-900 overflow-hidden flex flex-col justify-between select-none">
+    <div className="relative w-full min-h-screen font-['Outfit',sans-serif] bg-[#fcfbf8] text-slate-900 overflow-hidden flex flex-col justify-between select-none">
       
       {/* Holographic Beams with Rich Crimson, Indigo, Cyan Chromatic Colors on Bright Background */}
       <HolographicBeams 
@@ -180,15 +180,15 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
       />
 
       {/* Main Content Area */}
-      <div className="relative z-30 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-8 w-full">
+      <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-8 w-full">
         
-        {/* Centered Heading */}
-        <div className="text-center space-y-2">
+        {/* Centered Heading with Bold Outfit Typography */}
+        <div className="text-center space-y-3">
           <motion.h1 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="px-4 text-center text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold tracking-tight text-slate-900 drop-shadow-sm select-none"
+            className="px-4 text-center text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight text-slate-900 select-none leading-none drop-shadow-xs"
           >
             Autonomous Multi-Agent DAG
           </motion.h1>
@@ -197,7 +197,7 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
-            className="text-slate-600 text-xs sm:text-sm md:text-base max-w-2xl mx-auto text-center font-normal leading-relaxed"
+            className="text-slate-600 text-sm sm:text-base md:text-lg max-w-3xl mx-auto text-center font-medium leading-relaxed"
           >
             Decomposes complex maritime intent into parallel asynchronous subtasks across satellite telemetry, ocean thermal-chlorophyll front correlation, IMBL geofencing, and Indic vernacular synthesis.
           </motion.p>
@@ -211,7 +211,7 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Ask anything about PFZ coordinates, sea safety, border clearance..."
-              className="w-full pl-6 pr-28 py-4 rounded-full bg-white/95 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 backdrop-blur-xl shadow-xl transition-all text-sm"
+              className="w-full pl-6 pr-28 py-4 rounded-full bg-white border border-slate-200 text-slate-900 placeholder-slate-400 font-medium focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 backdrop-blur-xl shadow-xl transition-all text-sm"
               disabled={isLoading}
             />
             <button
