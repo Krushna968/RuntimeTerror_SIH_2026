@@ -187,25 +187,25 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
     >
       <canvas 
         ref={canvasRef} 
-        className="block w-full h-full filter blur-[5px]" // Soft holographic diffusion
+        className="block w-full h-full filter blur-[7px]" // Smooth buttery diffusion
       />
 
       {/* Ambient Blue & Red Dual Atmosphere Glow at the bottom on light theme */}
       {theme === 'light' && (
-        <div className="absolute inset-x-0 bottom-0 h-[65%] pointer-events-none z-10 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/12 via-purple-600/10 to-rose-600/15 [mask-image:linear-gradient(to_top,black,transparent)]" />
+        <div className="absolute inset-x-0 bottom-0 h-[70%] pointer-events-none z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/8 to-rose-600/14 [mask-image:linear-gradient(to_top,black_40%,transparent)]" />
         </div>
       )}
       
-      {/* Texture Overlay (Scanlines) for extra Holographic feel */}
+      {/* Texture Overlay (Soft Holographic Micro-grain) */}
       <div 
         className={cn(
           "absolute inset-0 z-15 pointer-events-none",
-          theme === 'light' ? "opacity-12" : "opacity-20"
+          theme === 'light' ? "opacity-3" : "opacity-20"
         )}
         style={{
             backgroundImage: theme === 'light'
-              ? "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.06) 50%), linear-gradient(90deg, rgba(29,78,216,0.06), rgba(147,51,234,0.04), rgba(225,29,72,0.06))"
+              ? "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.03) 50%), linear-gradient(90deg, rgba(29,78,216,0.04), rgba(147,51,234,0.03), rgba(225,29,72,0.04))"
               : "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,1) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06))",
             backgroundSize: "100% 4px, 3px 100%"
         }}
@@ -215,7 +215,7 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
       <div className={cn(
         "absolute inset-0 z-20",
         theme === 'light'
-          ? "bg-[radial-gradient(circle_at_center,transparent_0%,rgba(252,251,248,0.45)_100%)]"
+          ? "bg-[radial-gradient(circle_at_center,transparent_0%,rgba(252,251,248,0.35)_100%)]"
           : "bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)]"
       )} />
     </div>
