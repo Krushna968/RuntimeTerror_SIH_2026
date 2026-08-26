@@ -126,13 +126,13 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
   return (
     <div className="relative w-full min-h-screen font-sans bg-[#fcfbf8] text-slate-900 overflow-hidden flex flex-col justify-between select-none">
       
-      {/* Holographic Beams with Rich Crimson, Indigo, Cyan Chromatic Colors on Bright Background */}
+      {/* Holographic Beams with Rich Crimson, Ruby & Flame Red Chromatic Colors on Bright Background */}
       <HolographicBeams 
         theme="light"
-        density={16}
-        speed={1.4}
-        aberration={3}
-        opacity={80}
+        density={20}
+        speed={1.5}
+        aberration={3.5}
+        opacity={95}
       />
 
       {/* Main Content Area */}
