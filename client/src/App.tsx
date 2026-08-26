@@ -5,6 +5,7 @@ import { AIChatStudio } from './components/AIChatStudio';
 import { MapViewport } from './components/MapViewport';
 import { AgentChatDrawer } from './components/AgentChatDrawer';
 import { GisCommandView } from './components/GisCommandView';
+import { AgentDAGStudio } from './components/AgentDAGStudio';
 import { SeaSafetyBarometer } from './components/SeaSafetyBarometer';
 import { SatelliteTelemetryBar } from './components/SatelliteTelemetryBar';
 import { AdvisoryExportModal } from './components/AdvisoryExportModal';
@@ -164,10 +165,10 @@ export function App() {
     }
   };
 
-  const isDarkCanvas = activeTab === 'map';
+  const isDarkCanvas = activeTab === 'map' || activeTab === 'agent-lab';
 
   return (
-    <div className={`relative flex flex-col min-h-screen ${isDarkCanvas ? 'bg-[#07090e] text-white' : 'bg-[#fcfbf8] text-slate-900'} overflow-x-hidden font-['Outfit',sans-serif]`}>
+    <div className={`relative flex flex-col min-h-screen ${isDarkCanvas ? 'bg-black text-white' : 'bg-[#fcfbf8] text-slate-900'} overflow-x-hidden font-['Outfit',sans-serif]`}>
       {/* Top Header Navigation */}
       <Header
         activeTab={activeTab}
@@ -217,76 +218,22 @@ export function App() {
         />
       )}
 
-      {/* Other Workspace Tabs (Agent DAG, Safety, Bulletin) */}
-      {activeTab !== 'home' && activeTab !== 'chat' && activeTab !== 'map' && (
+      {/* Dedicated Holographic Agent DAG Studio */}
+      {activeTab === 'agent-lab' && (
+        <AgentDAGStudio
+          satellites={satellites}
+          latestResponse={latestResponse}
+          isLoading={isLoading}
+          onSendMessage={handleSendMessage}
+          currentLang={currentLang}
+        />
+      )}
+
+      {/* Other Workspace Tabs (Safety, Bulletin) */}
+      {activeTab !== 'home' && activeTab !== 'chat' && activeTab !== 'map' && activeTab !== 'agent-lab' && (
         <main className="relative z-10 flex-1 pt-24 pb-10 px-4 sm:px-8 lg:px-12 max-w-[1720px] w-full mx-auto space-y-6">
           {/* Top Constellation Bar */}
           <SatelliteTelemetryBar satellites={satellites} />
-
-          {/* Agent Reasoning DAG Lab */}
-          {activeTab === 'agent-lab' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-8 space-y-5">
-                <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-5 text-slate-900">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2.5 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100">
-                        <Cpu className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-black text-slate-900 tracking-tight">
-                          Autonomous Multi-Agent DAG Execution Graph
-                        </h2>
-                        <p className="text-xs text-slate-500 font-medium">
-                          Powered by NVIDIA NIM (Meta Llama-3.1-8B) & 6 Domain Agents
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-3.5 py-1.5 rounded-full shadow-xs">
-                      6 Active Domain Agents
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                    ORCA breaks down complex oceanographic questions into an asynchronous Directed Acyclic Graph (DAG). Domain agents for satellite discovery, thermal-chlorophyll front correlation, IMBL boundary compliance, and Indic vernacular synthesis execute in parallel with cryptographic provenance signatures.
-                  </p>
-
-                  {latestResponse && (
-                    <div className="space-y-3.5 pt-2">
-                      {latestResponse.evidence_and_provenance.execution_trace.map((step, idx) => (
-                        <div key={idx} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-bold text-blue-700 flex items-center space-x-2">
-                              <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">
-                                {idx + 1}
-                              </span>
-                              <span>{step.agent}</span>
-                            </span>
-                            <span className="text-xs font-mono font-bold text-slate-600 bg-white px-2.5 py-0.5 rounded-md border border-slate-200">
-                              {step.duration_ms} ms
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-700 font-medium pl-8">{step.thought}</p>
-                          <div className="ml-8 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-mono text-emerald-700">
-                            ➔ {step.output_summary}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="lg:col-span-4">
-                <AgentChatDrawer
-                  onSendMessage={handleSendMessage}
-                  isLoading={isLoading}
-                  latestResponse={latestResponse}
-                  currentLang={currentLang}
-                />
-              </div>
-            </div>
-          )}
 
           {/* Fishermen Safety & Disaster Barometer */}
           {activeTab === 'safety' && (
