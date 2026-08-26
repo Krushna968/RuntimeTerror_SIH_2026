@@ -9,12 +9,12 @@ export interface HolographicBeamsProps extends React.HTMLAttributes<HTMLDivEleme
   theme?: 'dark' | 'light';
   /**
    * Density of the light pillars.
-   * Default: 18
+   * Default: 20
    */
   density?: number;
   /**
    * Speed of the animation.
-   * Default: 1.5
+   * Default: 1.4
    */
   speed?: number;
   /**
@@ -24,7 +24,7 @@ export interface HolographicBeamsProps extends React.HTMLAttributes<HTMLDivEleme
   aberration?: number;
   /**
    * Base color weight (mostly influences the center white-hot area).
-   * Default: 90 (opacity percentage)
+   * Default: 95 (opacity percentage)
    */
   opacity?: number;
 }
@@ -32,10 +32,10 @@ export interface HolographicBeamsProps extends React.HTMLAttributes<HTMLDivEleme
 export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
   className,
   theme = 'light',
-  density = 18,
-  speed = 1.5,
+  density = 20,
+  speed = 1.4,
   aberration = 3.5,
-  opacity = 90,
+  opacity = 95,
   style,
   ...props
 }) => {
@@ -102,32 +102,35 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
 
       for (let i = 0; i <= density; i++) {
         const x = i * beamWidth;
+        const pos = i / density; // 0 (left) to 1 (right)
         
         if (isLight) {
-          // 1. PRIMARY CRIMSON & SCARLET RED CHANNEL (Vibrant Red Pillars)
-          const rAlpha = (opacity / 100) * (0.6 + 0.4 * Math.cos(i * 0.45 + time));
+          // 1. ROYAL COBALT BLUE / INDIGO CHANNEL (Left to Center)
+          const bAlpha = (opacity / 100) * (0.6 + 0.4 * Math.sin(i * 0.5 + time * 1.1));
+          const blueWeight = Math.max(0.3, 1.2 - pos * 1.1);
           drawBeam(
-              x - aberration * 1.2, 
+              x - aberration * 1.4, 
               time + i * 0.1, 
-              `rgba(230, 25, 60, ${rAlpha * 0.65})`, 
+              `rgba(29, 78, 216, ${bAlpha * 0.65 * blueWeight})`, 
               1.8
           );
 
-          // 2. SECONDARY DEEP RUBY / MAGENTA / ROSE CHANNEL
-          const bAlpha = (opacity / 100) * (0.55 + 0.45 * Math.sin(i * 0.55 + time * 1.15));
+          // 2. CRIMSON / SCARLET RED CHANNEL (Right to Center)
+          const rAlpha = (opacity / 100) * (0.6 + 0.4 * Math.cos(i * 0.45 + time));
+          const redWeight = Math.max(0.3, pos * 1.1 + 0.1);
           drawBeam(
-              x + aberration * 1.2, 
+              x + aberration * 1.4, 
               time + i * 0.12 + 10, 
-              `rgba(195, 20, 90, ${bAlpha * 0.55})`, 
+              `rgba(225, 29, 72, ${rAlpha * 0.68 * redWeight})`, 
               1.8
           );
 
-          // 3. WARM CORAL / FLAME RED CORE CHANNEL
-          const coreAlpha = (opacity / 100) * (0.6 + 0.4 * Math.sin(i * 0.3 - time));
+          // 3. VIOLET / MAGENTA / PURPLE CORE CHANNEL (Mid transitions)
+          const coreAlpha = (opacity / 100) * (0.55 + 0.35 * Math.sin(i * 0.35 - time));
           drawBeam(
               x, 
               time + i * 0.1 + 5, 
-              `rgba(245, 60, 90, ${coreAlpha * 0.5})`, 
+              `rgba(147, 51, 234, ${coreAlpha * 0.55})`, 
               1.1
           );
         } else {
@@ -187,20 +190,22 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
         className="block w-full h-full filter blur-[5px]" // Soft holographic diffusion
       />
 
-      {/* Ambient Red/Crimson Atmosphere Glow at the bottom on light theme */}
+      {/* Ambient Blue & Red Dual Atmosphere Glow at the bottom on light theme */}
       {theme === 'light' && (
-        <div className="absolute inset-x-0 bottom-0 h-[65%] pointer-events-none bg-gradient-to-t from-rose-500/15 via-rose-500/5 to-transparent z-10" />
+        <div className="absolute inset-x-0 bottom-0 h-[65%] pointer-events-none z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/12 via-purple-600/10 to-rose-600/15 [mask-image:linear-gradient(to_top,black,transparent)]" />
+        </div>
       )}
       
       {/* Texture Overlay (Scanlines) for extra Holographic feel */}
       <div 
         className={cn(
           "absolute inset-0 z-15 pointer-events-none",
-          theme === 'light' ? "opacity-10" : "opacity-20"
+          theme === 'light' ? "opacity-12" : "opacity-20"
         )}
         style={{
             backgroundImage: theme === 'light'
-              ? "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.06) 50%), linear-gradient(90deg, rgba(230,25,60,0.06), rgba(195,20,90,0.03), rgba(245,60,90,0.05))"
+              ? "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.06) 50%), linear-gradient(90deg, rgba(29,78,216,0.06), rgba(147,51,234,0.04), rgba(225,29,72,0.06))"
               : "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,1) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06))",
             backgroundSize: "100% 4px, 3px 100%"
         }}
