@@ -169,7 +169,7 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
   };
 
   return (
-    <div className="relative w-full min-h-screen font-['Outfit',sans-serif] bg-[#fcfbf8] text-slate-900 overflow-hidden flex flex-col justify-between select-none">
+    <div className="relative w-full min-h-screen font-['Outfit',sans-serif] bg-[#fcfbf8] text-slate-900 scroll-smooth flex flex-col justify-between select-none">
       
       {/* Holographic Beams with Rich Crimson, Indigo, Cyan Chromatic Colors on Bright Background */}
       <HolographicBeams 
@@ -190,14 +190,6 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center space-y-2 max-w-4xl mx-auto flex flex-col items-center"
         >
-          {/* Micro-badge */}
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white/90 border border-slate-200 shadow-xs backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-            <span className="text-[11px] font-bold font-mono text-slate-800 tracking-wider uppercase">
-              ISRO Autonomous Multi-Agent DAG
-            </span>
-          </div>
-
           {/* Dynamic Dot Matrix Typography Stage */}
           <div className="w-full h-28 sm:h-36 md:h-44 flex items-center justify-center">
             <DotMatrixText
