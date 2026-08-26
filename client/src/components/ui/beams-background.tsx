@@ -9,7 +9,7 @@ export interface HolographicBeamsProps extends React.HTMLAttributes<HTMLDivEleme
   theme?: 'dark' | 'light';
   /**
    * Density of the light pillars.
-   * Default: 15
+   * Default: 18
    */
   density?: number;
   /**
@@ -19,12 +19,12 @@ export interface HolographicBeamsProps extends React.HTMLAttributes<HTMLDivEleme
   speed?: number;
   /**
    * Intensity of the chromatic aberration (RGB shift).
-   * Default: 3
+   * Default: 3.5
    */
   aberration?: number;
   /**
    * Base color weight (mostly influences the center white-hot area).
-   * Default: 80 (opacity percentage)
+   * Default: 90 (opacity percentage)
    */
   opacity?: number;
 }
@@ -32,10 +32,10 @@ export interface HolographicBeamsProps extends React.HTMLAttributes<HTMLDivEleme
 export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
   className,
   theme = 'light',
-  density = 15,
+  density = 18,
   speed = 1.5,
-  aberration = 3,
-  opacity = 80,
+  aberration = 3.5,
+  opacity = 90,
   style,
   ...props
 }) => {
@@ -75,7 +75,7 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
 
     const drawBeam = (x: number, t: number, color: string, widthMod: number) => {
       const n = noise(x, t * 0.5);
-      const beamHeight = height * (0.65 + n * 0.35); 
+      const beamHeight = height * (0.7 + n * 0.3); 
       const beamWidth = (width / density) * widthMod;
 
       const gradient = ctx.createLinearGradient(x, height, x, height - beamHeight);
@@ -104,31 +104,31 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
         const x = i * beamWidth;
         
         if (isLight) {
-          // 1. CRIMSON / RUBY RED CHANNEL (Shifted Left) - Rich and vivid
-          const rAlpha = (opacity / 100) * (0.45 + 0.45 * Math.cos(i * 0.5 + time));
+          // 1. PRIMARY CRIMSON & SCARLET RED CHANNEL (Vibrant Red Pillars)
+          const rAlpha = (opacity / 100) * (0.6 + 0.4 * Math.cos(i * 0.45 + time));
           drawBeam(
-              x - aberration, 
+              x - aberration * 1.2, 
               time + i * 0.1, 
-              `rgba(225, 29, 72, ${rAlpha * 0.45})`, 
-              1.6
+              `rgba(230, 25, 60, ${rAlpha * 0.65})`, 
+              1.8
           );
 
-          // 2. VIOLET / INDIGO / PURPLE CHANNEL (Shifted Right) - Rich chromatic shift
-          const bAlpha = (opacity / 100) * (0.45 + 0.45 * Math.sin(i * 0.6 + time * 1.1));
+          // 2. SECONDARY DEEP RUBY / MAGENTA / ROSE CHANNEL
+          const bAlpha = (opacity / 100) * (0.55 + 0.45 * Math.sin(i * 0.55 + time * 1.15));
           drawBeam(
-              x + aberration, 
+              x + aberration * 1.2, 
               time + i * 0.12 + 10, 
-              `rgba(99, 102, 241, ${bAlpha * 0.45})`, 
-              1.6
+              `rgba(195, 20, 90, ${bAlpha * 0.55})`, 
+              1.8
           );
 
-          // 3. ELECTRIC CYAN / TURQUOISE CHANNEL (Center Core)
-          const coreAlpha = (opacity / 100) * (0.5 + 0.35 * Math.sin(i * 0.3 - time));
+          // 3. WARM CORAL / FLAME RED CORE CHANNEL
+          const coreAlpha = (opacity / 100) * (0.6 + 0.4 * Math.sin(i * 0.3 - time));
           drawBeam(
               x, 
               time + i * 0.1 + 5, 
-              `rgba(6, 182, 212, ${coreAlpha * 0.38})`, 
-              0.9
+              `rgba(245, 60, 90, ${coreAlpha * 0.5})`, 
+              1.1
           );
         } else {
           // Dark Hologram Mode (Pure RGB)
@@ -184,18 +184,23 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
     >
       <canvas 
         ref={canvasRef} 
-        className="block w-full h-full filter blur-[6px]" // Soft holographic diffusion
+        className="block w-full h-full filter blur-[5px]" // Soft holographic diffusion
       />
+
+      {/* Ambient Red/Crimson Atmosphere Glow at the bottom on light theme */}
+      {theme === 'light' && (
+        <div className="absolute inset-x-0 bottom-0 h-[65%] pointer-events-none bg-gradient-to-t from-rose-500/15 via-rose-500/5 to-transparent z-10" />
+      )}
       
       {/* Texture Overlay (Scanlines) for extra Holographic feel */}
       <div 
         className={cn(
-          "absolute inset-0 z-10 pointer-events-none",
+          "absolute inset-0 z-15 pointer-events-none",
           theme === 'light' ? "opacity-10" : "opacity-20"
         )}
         style={{
             backgroundImage: theme === 'light'
-              ? "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.06) 50%), linear-gradient(90deg, rgba(225,29,72,0.05), rgba(99,102,241,0.03), rgba(6,182,212,0.05))"
+              ? "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.06) 50%), linear-gradient(90deg, rgba(230,25,60,0.06), rgba(195,20,90,0.03), rgba(245,60,90,0.05))"
               : "linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,1) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06))",
             backgroundSize: "100% 4px, 3px 100%"
         }}
@@ -205,7 +210,7 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
       <div className={cn(
         "absolute inset-0 z-20",
         theme === 'light'
-          ? "bg-[radial-gradient(circle_at_center,transparent_0%,rgba(252,251,248,0.5)_100%)]"
+          ? "bg-[radial-gradient(circle_at_center,transparent_0%,rgba(252,251,248,0.45)_100%)]"
           : "bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)]"
       )} />
     </div>
