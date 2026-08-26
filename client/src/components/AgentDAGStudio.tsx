@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import HolographicBeams from './ui/beams-background';
+import DotMatrixText from './ui/dot-text';
 import { SatelliteTelemetry, ChatResponsePayload } from '../types';
 
 interface AgentDAGStudioProps {
@@ -180,51 +181,75 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
       />
 
       {/* Main Content Area */}
-      <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-8 w-full">
+      <div className="relative z-30 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-8 w-full">
         
-        {/* Centered Heading with High Contrast Crisp Typography */}
-        <div className="text-center space-y-3">
-          <motion.h1 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="px-4 text-center text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight text-slate-950 select-none leading-none drop-shadow-xs"
-          >
-            Autonomous Multi-Agent DAG
-          </motion.h1>
+        {/* Ultra-Modern Dot Matrix Hero Stage */}
+        <motion.div 
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="text-center space-y-2 max-w-4xl mx-auto flex flex-col items-center"
+        >
+          {/* Micro-badge */}
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white/90 border border-slate-200 shadow-xs backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+            <span className="text-[11px] font-bold font-mono text-slate-800 tracking-wider uppercase">
+              ISRO Autonomous Multi-Agent DAG
+            </span>
+          </div>
 
-          <motion.p 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
-            className="text-slate-800 text-sm sm:text-base md:text-lg max-w-3xl mx-auto text-center font-semibold leading-relaxed"
-          >
-            Decomposes complex maritime intent into parallel asynchronous subtasks across satellite telemetry, ocean thermal-chlorophyll front correlation, IMBL geofencing, and Indic vernacular synthesis.
-          </motion.p>
-        </div>
+          {/* Dynamic Dot Matrix Typography Stage */}
+          <div className="w-full h-28 sm:h-36 md:h-44 flex items-center justify-center">
+            <DotMatrixText
+              text={[
+                "Multi-Agent DAG",
+                "ISRO Ocean AI",
+                "Autonomous Reasoning",
+                "PFZ & IMBL Geo-DAG"
+              ]}
+              transition="fade"
+              cycleInterval={3200}
+              dotSize={3.5}
+              gap={2.2}
+              activeColor="#090d16"
+              inactiveColor="rgba(15, 23, 42, 0.06)"
+              showInactive={true}
+              fontFamily="'Outfit', 'Inter', sans-serif"
+              className="w-full h-full drop-shadow-[0_0_20px_rgba(0,0,0,0.06)]"
+            />
+          </div>
 
-        {/* Interactive Query Launcher */}
-        <div className="max-w-3xl mx-auto space-y-3">
+          {/* Refined Subtitle */}
+          <p className="text-slate-600 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-normal leading-relaxed -mt-1">
+            Decomposes complex maritime intent into parallel asynchronous subtasks across satellite telemetry, ocean thermal fronts, IMBL geofencing, and Indic synthesis.
+          </p>
+        </motion.div>
+
+        {/* Ultra-Clean Interactive Query Launcher */}
+        <div className="max-w-2xl mx-auto space-y-3">
           <form onSubmit={handleSend} className="relative flex items-center">
+            <div className="absolute left-4 text-blue-600 pointer-events-none">
+              <Sparkles className="w-4 h-4" />
+            </div>
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Ask anything about PFZ coordinates, sea safety, border clearance..."
-              className="w-full pl-6 pr-28 py-4 rounded-full bg-white border border-slate-300 text-slate-950 placeholder-slate-500 font-medium focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 backdrop-blur-xl shadow-xl transition-all text-sm"
+              className="w-full pl-11 pr-28 py-3.5 rounded-full bg-white/95 border border-slate-200 text-slate-950 placeholder-slate-400 font-medium focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 backdrop-blur-xl shadow-lg transition-all text-sm"
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={isLoading || !inputText.trim()}
-              className="absolute right-2 px-5 py-2.5 rounded-full bg-slate-950 text-white font-bold text-xs hover:bg-slate-800 transition-all flex items-center space-x-1.5 shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="absolute right-1.5 px-4.5 py-2 rounded-full bg-slate-950 text-white font-bold text-xs hover:bg-slate-800 transition-all flex items-center space-x-1.5 shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {isLoading ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
               ) : (
                 <>
-                  <span>Execute</span>
-                  <Send className="w-3.5 h-3.5 text-white" />
+                  <span>Run DAG</span>
+                  <Send className="w-3 h-3 text-white" />
                 </>
               )}
             </button>
@@ -237,7 +262,7 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
                 key={idx}
                 onClick={() => onSendMessage(preset.query)}
                 disabled={isLoading}
-                className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white hover:bg-blue-50 border border-slate-300 hover:border-blue-400 text-slate-900 hover:text-blue-700 transition-all backdrop-blur-md shadow-xs cursor-pointer active:scale-95 whitespace-nowrap"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/80 hover:bg-white border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 transition-all backdrop-blur-md shadow-xs cursor-pointer active:scale-95 whitespace-nowrap"
               >
                 {preset.label}
               </button>
