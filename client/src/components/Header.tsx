@@ -1,7 +1,8 @@
 import React from 'react';
 import { 
   Compass, 
-  AlertTriangle 
+  AlertTriangle,
+  Languages 
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -26,17 +27,19 @@ export const LANGUAGES = [
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
+  currentLang = 'en',
+  setCurrentLang,
   onSOSClick
 }) => {
   const isMap = activeTab === 'map';
-  const isChat = activeTab === 'chat';
+  const isDark = activeTab === 'home' || activeTab === 'map';
 
-  // Smooth vertical fade gradient on Map page (darker at top, fading out towards bottom)
+  // Header background styling based on active view
   const headerBgClass = isMap 
     ? 'bg-gradient-to-b from-black/85 via-black/40 to-transparent pb-8 pt-5 text-white border-none shadow-none' 
-    : isChat
-      ? 'bg-transparent text-zinc-900 py-4'
-      : 'bg-transparent text-white py-4';
+    : isDark
+      ? 'bg-transparent text-white py-4'
+      : 'bg-white/90 backdrop-blur-md border-b border-slate-200/80 text-zinc-900 py-3.5 shadow-xs';
 
   const getNavLinkClass = (tabKey: HeaderProps['activeTab']) => {
     const isActive = activeTab === tabKey;
@@ -45,14 +48,14 @@ export const Header: React.FC<HeaderProps> = ({
         ? 'text-cyan-300 font-black drop-shadow-sm' 
         : 'text-zinc-100 hover:text-white font-semibold drop-shadow-sm';
     }
-    if (isChat) {
+    if (isDark) {
       return isActive 
-        ? 'text-zinc-950 font-black' 
-        : 'text-zinc-500 hover:text-zinc-950 font-semibold';
+        ? 'text-white font-black' 
+        : 'text-zinc-400 hover:text-white font-semibold';
     }
     return isActive 
-      ? 'text-white font-black' 
-      : 'text-zinc-400 hover:text-white font-semibold';
+      ? 'text-blue-600 font-black' 
+      : 'text-zinc-600 hover:text-zinc-950 font-semibold';
   };
 
   return (
@@ -64,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
       >
         {/* Minimalist Geometric Emblem */}
         <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105 ${
-          isChat 
+          !isDark 
             ? 'bg-zinc-950 text-white shadow-xs' 
             : 'bg-white text-zinc-950 shadow-sm'
         }`}>
@@ -75,8 +78,8 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         <div className="flex items-baseline space-x-1.5">
-          <span className={`text-lg font-black tracking-widest transition-colors ${
-            isChat ? 'text-zinc-950' : 'text-white'
+          <span className={`text-base sm:text-lg font-black tracking-widest transition-colors ${
+            !isDark ? 'text-zinc-950' : 'text-white'
           }`}>
             ORCA
           </span>
@@ -86,8 +89,8 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Center Navigation: Pure Clean Clickable Texts */}
-      <nav className="hidden md:flex items-center space-x-8 lg:space-x-10 text-sm">
+      {/* Center Navigation: All Module Tabs */}
+      <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 text-sm">
         <button
           onClick={() => setActiveTab('home')}
           className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('home')}`}
@@ -108,16 +111,59 @@ export const Header: React.FC<HeaderProps> = ({
         >
           GIS Command
         </button>
+
+        <button
+          onClick={() => setActiveTab('agent-lab')}
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('agent-lab')}`}
+        >
+          Agent DAG
+        </button>
+
+        <button
+          onClick={() => setActiveTab('safety')}
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('safety')}`}
+        >
+          Safety Barometer
+        </button>
+
+        <button
+          onClick={() => setActiveTab('bulletin')}
+          className={`transition-colors cursor-pointer bg-transparent border-none p-0 whitespace-nowrap ${getNavLinkClass('bulletin')}`}
+        >
+          Advisory Bulletin
+        </button>
       </nav>
 
-      {/* Right Action Group */}
-      <div className="flex items-center space-x-3 shrink-0">
+      {/* Right Action Group: Language Switcher + SOS */}
+      <div className="flex items-center space-x-2.5 sm:space-x-3 shrink-0">
+        {/* Regional Language Switcher */}
+        {setCurrentLang && (
+          <div className={`relative flex items-center backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm transition-all border ${
+            !isDark 
+              ? 'bg-white border-zinc-200 text-zinc-900 shadow-xs' 
+              : 'bg-zinc-900/80 border-zinc-700/80 text-zinc-200'
+          }`}>
+            <Languages className={`w-3.5 h-3.5 mr-1.5 shrink-0 ${!isDark ? 'text-blue-600' : 'text-cyan-400'}`} />
+            <select
+              value={currentLang}
+              onChange={(e) => setCurrentLang(e.target.value)}
+              className="bg-transparent text-xs font-semibold focus:outline-none cursor-pointer pr-1"
+            >
+              {LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code} className="bg-zinc-900 text-white">
+                  {lang.native} ({lang.name})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* SOS Button */}
         <button
           onClick={onSOSClick}
-          className="px-4 py-1.5 rounded-full text-xs font-black text-white bg-red-600 hover:bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)] border border-red-400/40 active:scale-95 transition-all cursor-pointer animate-pulse whitespace-nowrap"
+          className="px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-black text-white bg-red-600 hover:bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)] border border-red-400/40 active:scale-95 transition-all cursor-pointer animate-pulse whitespace-nowrap"
         >
-          <AlertTriangle className="w-3.5 h-3.5 inline-block mr-1.5" />
+          <AlertTriangle className="w-3.5 h-3.5 inline-block mr-1" />
           <span>SOS 1554</span>
         </button>
       </div>

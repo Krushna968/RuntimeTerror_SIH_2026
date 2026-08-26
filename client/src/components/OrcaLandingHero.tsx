@@ -36,12 +36,12 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="space-y-4 max-w-3xl"
         >
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.12] select-none text-white drop-shadow-sm">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-[-0.035em] leading-[1.1] select-none text-white drop-shadow-sm">
             The Agentic Brain<br />
             for the <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">Indian Ocean</span>
           </h1>
 
-          <p className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-2xl font-normal leading-relaxed pt-1">
+          <p className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-2xl font-normal leading-[1.65] pt-1">
             Autonomous multi-agent platform reasoning over ISRO satellite oceanography, SST-chlorophyll thermal fronts, and IMBL geofencing to empower 4 million+ coastal fishermen.
           </p>
         </motion.div>
@@ -75,11 +75,10 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
       {/* Bottom Footer Strip */}
       <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-2 shrink-0">
         <div>
-          Created by <strong className="text-zinc-300">Team Runtime Terror</strong> for ISRO · Smart India Hackathon 2026
+          Created by <strong className="text-zinc-300 font-medium">Team Runtime Terror</strong> for ISRO · Smart India Hackathon 2026
         </div>
-        <div className="flex items-center space-x-6 text-zinc-400">
-          <span onClick={() => onExplorePlatform('chat')} className="hover:text-zinc-200 cursor-pointer transition-colors">AI Chatbot</span>
-          <span onClick={() => onExplorePlatform('map')} className="hover:text-zinc-200 cursor-pointer transition-colors">GIS Command</span>
+        <div className="text-xs text-zinc-500 font-mono">
+          Oceansat-3 · INSAT-3DR · INCOIS
         </div>
       </footer>
     </KineticGrid>

@@ -164,8 +164,10 @@ export function App() {
     }
   };
 
+  const isDarkCanvas = activeTab === 'home' || activeTab === 'map';
+
   return (
-    <div className="relative flex flex-col min-h-screen bg-[#07090e] text-white overflow-x-hidden font-['Outfit',sans-serif]">
+    <div className={`relative flex flex-col min-h-screen ${isDarkCanvas ? 'bg-[#07090e] text-white' : 'bg-[#f8fafc] text-slate-900'} overflow-x-hidden font-['Outfit',sans-serif]`}>
       {/* Top Header Navigation */}
       <Header
         activeTab={activeTab}
@@ -217,55 +219,55 @@ export function App() {
 
       {/* Other Workspace Tabs (Agent DAG, Safety, Bulletin) */}
       {activeTab !== 'home' && activeTab !== 'chat' && activeTab !== 'map' && (
-        <main className="relative z-10 flex-1 pt-24 pb-6 px-3 lg:px-6 max-w-[1920px] w-full mx-auto space-y-5">
+        <main className="relative z-10 flex-1 pt-24 pb-10 px-4 sm:px-8 lg:px-12 max-w-[1720px] w-full mx-auto space-y-6">
           {/* Top Constellation Bar */}
           <SatelliteTelemetryBar satellites={satellites} />
 
           {/* Agent Reasoning DAG Lab */}
           {activeTab === 'agent-lab' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              <div className="lg:col-span-8 space-y-4">
-                <div className="bg-zinc-900/90 p-6 md:p-8 rounded-3xl border border-zinc-800 shadow-2xl space-y-5">
-                  <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-8 space-y-5">
+                <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-5 text-slate-900">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2.5 rounded-2xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/40">
+                      <div className="p-2.5 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100">
                         <Cpu className="w-6 h-6" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-bold text-white tracking-tight">
+                        <h2 className="text-lg font-black text-slate-900 tracking-tight">
                           Autonomous Multi-Agent DAG Execution Graph
                         </h2>
-                        <p className="text-xs text-zinc-400 font-medium">
+                        <p className="text-xs text-slate-500 font-medium">
                           Powered by NVIDIA NIM (Meta Llama-3.1-8B) & 6 Domain Agents
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold text-zinc-950 bg-white px-3.5 py-1.5 rounded-full shadow-md">
+                    <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-3.5 py-1.5 rounded-full shadow-xs">
                       6 Active Domain Agents
                     </span>
                   </div>
 
-                  <p className="text-xs text-zinc-300 leading-relaxed">
+                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
                     ORCA breaks down complex oceanographic questions into an asynchronous Directed Acyclic Graph (DAG). Domain agents for satellite discovery, thermal-chlorophyll front correlation, IMBL boundary compliance, and Indic vernacular synthesis execute in parallel with cryptographic provenance signatures.
                   </p>
 
                   {latestResponse && (
                     <div className="space-y-3.5 pt-2">
                       {latestResponse.evidence_and_provenance.execution_trace.map((step, idx) => (
-                        <div key={idx} className="bg-zinc-950/80 p-4 rounded-2xl border border-zinc-800 space-y-2">
+                        <div key={idx} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm font-bold text-cyan-400 flex items-center space-x-2">
-                              <span className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-xs font-bold">
+                            <span className="text-sm font-bold text-blue-700 flex items-center space-x-2">
+                              <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">
                                 {idx + 1}
                               </span>
                               <span>{step.agent}</span>
                             </span>
-                            <span className="text-xs font-mono font-bold text-zinc-400 bg-zinc-900 px-2.5 py-0.5 rounded-md border border-zinc-800">
+                            <span className="text-xs font-mono font-bold text-slate-600 bg-white px-2.5 py-0.5 rounded-md border border-slate-200">
                               {step.duration_ms} ms
                             </span>
                           </div>
-                          <p className="text-xs text-zinc-200 font-medium pl-8">{step.thought}</p>
-                          <div className="ml-8 p-2.5 rounded-xl bg-black/60 border border-zinc-800 text-xs font-mono text-emerald-400">
+                          <p className="text-xs text-slate-700 font-medium pl-8">{step.thought}</p>
+                          <div className="ml-8 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-mono text-emerald-700">
                             ➔ {step.output_summary}
                           </div>
                         </div>
@@ -288,14 +290,14 @@ export function App() {
 
           {/* Fishermen Safety & Disaster Barometer */}
           {activeTab === 'safety' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              <div className="lg:col-span-7 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-7 space-y-5">
                 <SeaSafetyBarometer 
                   weather={weather} 
                   portName={latestResponse?.reference_port.name || "Kochi Fishing Harbour"} 
                 />
               </div>
-              <div className="lg:col-span-5 h-[680px]">
+              <div className="lg:col-span-5 h-[680px] rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
                 <MapViewport
                   pfzHotspots={pfzHotspots}
                   selectedPFZ={selectedPFZ}
@@ -311,27 +313,27 @@ export function App() {
           {/* Official Advisory Bulletin */}
           {activeTab === 'bulletin' && (
             <div className="max-w-6xl mx-auto space-y-6">
-              <div className="bg-zinc-900/90 p-6 md:p-8 rounded-3xl border border-zinc-800 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-slate-900">
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
-                    <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase tracking-widest">
+                    <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-widest">
                       Official Bulletin Dashboard
                     </span>
-                    <span className="text-xs font-mono text-cyan-300 font-bold">
+                    <span className="text-xs font-mono text-blue-700 font-bold">
                       {latestResponse?.official_bulletin.bulletin_id || "INCOIS-ISRO-ORCA-2026"}
                     </span>
                   </div>
-                  <h2 className="text-xl md:text-2xl font-black text-white">
+                  <h2 className="text-xl md:text-2xl font-black text-slate-900">
                     ISRO — INCOIS Joint Satellite Marine Advisory
                   </h2>
-                  <p className="text-xs text-zinc-400 font-medium">
+                  <p className="text-xs text-slate-500 font-medium">
                     Validated Earth Observation products from Oceansat-3 (OCM-3) & INSAT-3DR TIR
                   </p>
                 </div>
 
                 <button
                   onClick={() => setIsBulletinModalOpen(true)}
-                  className="flex items-center justify-center space-x-2 px-6 py-3 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs shadow-lg transition-all active:scale-95 cursor-pointer"
+                  className="flex items-center justify-center space-x-2 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
                 >
                   <Printer className="w-4 h-4" />
                   <span>Print / Export Official PDF</span>
@@ -340,74 +342,74 @@ export function App() {
 
               {/* 4 Core Executive Metric Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-2 shadow-sm">
+                  <div className="flex items-center justify-between text-xs font-bold text-emerald-700">
                     <span>Sea Venture Verdict</span>
                     <ShieldCheck className="w-4 h-4" />
                   </div>
-                  <div className="text-lg font-black text-emerald-300">
+                  <div className="text-lg font-black text-emerald-700">
                     {latestResponse?.official_bulletin.sea_venture_verdict.replace(/_/g, ' ') || "SAFE FOR VENTURE"}
                   </div>
-                  <div className="text-[11px] text-zinc-400">
-                    Sector: <strong>{latestResponse?.official_bulletin.coastal_sector}</strong>
+                  <div className="text-[11px] text-slate-500">
+                    Sector: <strong className="text-slate-700">{latestResponse?.official_bulletin.coastal_sector}</strong>
                   </div>
                 </div>
 
-                <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold text-cyan-400">
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-2 shadow-sm">
+                  <div className="flex items-center justify-between text-xs font-bold text-blue-700">
                     <span>Safety Index Score</span>
                     <Compass className="w-4 h-4" />
                   </div>
-                  <div className="text-2xl font-black font-mono text-white">
-                    {latestResponse?.official_bulletin.safety_index_score || 85}<span className="text-xs text-zinc-500">/100</span>
+                  <div className="text-2xl font-black font-mono text-slate-900">
+                    {latestResponse?.official_bulletin.safety_index_score || 85}<span className="text-xs text-slate-400">/100</span>
                   </div>
-                  <div className="text-[11px] text-zinc-400">
-                    Validity: <strong>{latestResponse?.official_bulletin.validity_period}</strong>
+                  <div className="text-[11px] text-slate-500">
+                    Validity: <strong className="text-slate-700">{latestResponse?.official_bulletin.validity_period}</strong>
                   </div>
                 </div>
 
-                <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold text-amber-400">
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-2 shadow-sm">
+                  <div className="flex items-center justify-between text-xs font-bold text-amber-700">
                     <span>PFZ Hotspots Detected</span>
                     <Fish className="w-4 h-4" />
                   </div>
-                  <div className="text-2xl font-black font-mono text-white">
-                    {latestResponse?.official_bulletin.recommended_pfz_count || 15} <span className="text-xs text-amber-400 font-bold">Fronts</span>
+                  <div className="text-2xl font-black font-mono text-slate-900">
+                    {latestResponse?.official_bulletin.recommended_pfz_count || 15} <span className="text-xs text-amber-600 font-bold">Fronts</span>
                   </div>
-                  <div className="text-[11px] text-zinc-400">
-                    Top Catch Multiplier: <strong>4.5x Enhance</strong>
+                  <div className="text-[11px] text-slate-500">
+                    Top Catch Multiplier: <strong className="text-slate-700">4.5x Enhance</strong>
                   </div>
                 </div>
 
-                <div className="bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold text-blue-400">
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-2 shadow-sm">
+                  <div className="flex items-center justify-between text-xs font-bold text-blue-600">
                     <span>Wave & Wind State</span>
                     <Waves className="w-4 h-4" />
                   </div>
-                  <div className="text-lg font-black text-white font-mono">
+                  <div className="text-lg font-black text-slate-900 font-mono">
                     {latestResponse?.official_bulletin.meteorological_summary.wave_height_m || 1.03}m · {latestResponse?.official_bulletin.meteorological_summary.wind_speed_knots || 14.9} kts
                   </div>
-                  <div className="text-[11px] text-zinc-400 truncate">
+                  <div className="text-[11px] text-slate-500 truncate">
                     {latestResponse?.official_bulletin.meteorological_summary.sea_state || "Smooth Sea"}
                   </div>
                 </div>
               </div>
 
               {/* High-Resolution PFZ Recommendation Table */}
-              <div className="bg-zinc-900/90 p-6 rounded-3xl border border-zinc-800 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-                  <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                    <Fish className="w-4 h-4 text-cyan-400" />
+              <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-4 shadow-sm text-slate-900">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+                    <Fish className="w-4 h-4 text-blue-600" />
                     <span>High-Confidence Potential Fishing Zones (PFZ)</span>
                   </h3>
-                  <span className="text-xs font-mono text-cyan-400 font-bold bg-cyan-950/60 px-3 py-1 rounded-full border border-cyan-500/40">
+                  <span className="text-xs font-mono text-blue-700 font-bold bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
                     Oceansat-3 Coincidence Analyzed
                   </span>
                 </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-zinc-950 text-zinc-400 font-bold uppercase text-[10px] tracking-wider border-b border-zinc-800">
+                    <thead className="bg-slate-100 text-slate-600 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                       <tr>
                         <th className="p-3">Zone & Name</th>
                         <th className="p-3">Coordinates</th>
@@ -418,29 +420,29 @@ export function App() {
                         <th className="p-3 text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-800 text-zinc-200">
+                    <tbody className="divide-y divide-slate-100 text-slate-800">
                       {(latestResponse?.all_pfz_hotspots || pfzHotspots).map((pfz, idx) => (
-                        <tr key={idx} className="hover:bg-zinc-800/50 transition-colors">
-                          <td className="p-3 font-bold text-white flex items-center space-x-2">
-                            <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+                        <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                          <td className="p-3 font-bold text-slate-900 flex items-center space-x-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
                             <span>{pfz.name}</span>
                           </td>
-                          <td className="p-3 font-mono text-zinc-400">{pfz.latitude}°N, {pfz.longitude}°E</td>
+                          <td className="p-3 font-mono text-slate-600">{pfz.latitude}°N, {pfz.longitude}°E</td>
                           <td className="p-3">
-                            <span className="px-2.5 py-1 rounded-full font-bold bg-zinc-800 text-cyan-300 border border-cyan-500/30">
+                            <span className="px-2.5 py-1 rounded-full font-bold bg-blue-50 text-blue-700 border border-blue-200">
                               {pfz.dominant_species}
                             </span>
                           </td>
-                          <td className="p-3 font-mono">{pfz.recommended_depth_m} m</td>
-                          <td className="p-3 font-mono text-cyan-300">{pfz.sst_celsius}°C / {pfz.chlorophyll_a_mg_m3} mg/m³</td>
-                          <td className="p-3 font-black text-amber-400">{pfz.confidence_score_percent}%</td>
+                          <td className="p-3 font-mono text-slate-700">{pfz.recommended_depth_m} m</td>
+                          <td className="p-3 font-mono text-blue-700">{pfz.sst_celsius}°C / {pfz.chlorophyll_a_mg_m3} mg/m³</td>
+                          <td className="p-3 font-black text-amber-600">{pfz.confidence_score_percent}%</td>
                           <td className="p-3 text-right">
                             <button
                               onClick={() => {
                                 handleSelectPFZ(pfz);
                                 setActiveTab('map');
                               }}
-                              className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold border border-zinc-700 text-[11px] transition-all cursor-pointer"
+                              className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition-all cursor-pointer shadow-xs"
                             >
                               View on Map ➔
                             </button>
