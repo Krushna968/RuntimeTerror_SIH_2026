@@ -123,14 +123,47 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
     }
   };
 
+  const renderFormattedMarkdown = (text: string) => {
+    return text.split('\n').map((line, lineIdx) => {
+      if (!line.trim()) return <div key={lineIdx} className="h-1.5" />;
+      
+      const parts = line.split(/(\*\*.*?\*\*)/g);
+      const formattedLine = parts.map((part, partIdx) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return (
+            <strong key={partIdx} className="font-bold text-slate-900">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+        return part;
+      });
+
+      if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
+        return (
+          <div key={lineIdx} className="flex items-start space-x-2 pl-2 py-0.5">
+            <span className="text-blue-500 font-bold">•</span>
+            <span className="text-slate-800">{formattedLine}</span>
+          </div>
+        );
+      }
+
+      return (
+        <p key={lineIdx} className="text-slate-800 py-0.5">
+          {formattedLine}
+        </p>
+      );
+    });
+  };
+
   return (
     <div className="relative w-full min-h-screen font-sans bg-[#fcfbf8] text-slate-900 overflow-hidden flex flex-col justify-between select-none">
       
-      {/* Holographic Beams with Rich Crimson, Ruby & Flame Red Chromatic Colors on Bright Background */}
+      {/* Holographic Beams with Rich Crimson, Indigo, Cyan Chromatic Colors on Bright Background */}
       <HolographicBeams 
         theme="light"
         density={20}
-        speed={1.5}
+        speed={1.4}
         aberration={3.5}
         opacity={95}
       />
@@ -325,8 +358,8 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
                 </span>
               </div>
 
-              <div className="text-xs text-slate-800 leading-relaxed whitespace-pre-line font-normal">
-                {latestResponse.response.markdown}
+              <div className="text-xs text-slate-800 leading-relaxed font-normal">
+                {renderFormattedMarkdown(latestResponse.response.markdown)}
               </div>
             </div>
           </motion.div>
