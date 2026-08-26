@@ -182,13 +182,13 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
       {/* Main Content Area */}
       <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-8 w-full">
         
-        {/* Centered Heading with Bold Modern Outfit Typography */}
+        {/* Centered Heading with Exact Gradient Styling from DAG Agent Ui */}
         <div className="text-center space-y-3">
           <motion.h1 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="px-4 text-center text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight text-slate-900 select-none leading-none drop-shadow-xs"
+            className="px-4 text-center text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-slate-950 via-slate-800 to-slate-400 drop-shadow-[0_0_35px_rgba(0,0,0,0.12)] select-none leading-none"
           >
             Autonomous Multi-Agent DAG
           </motion.h1>
@@ -197,7 +197,7 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
-            className="text-slate-600 text-sm sm:text-base md:text-lg max-w-3xl mx-auto text-center font-medium leading-relaxed"
+            className="text-slate-600 text-sm sm:text-base md:text-lg max-w-3xl mx-auto text-center font-normal leading-relaxed"
           >
             Decomposes complex maritime intent into parallel asynchronous subtasks across satellite telemetry, ocean thermal-chlorophyll front correlation, IMBL geofencing, and Indic vernacular synthesis.
           </motion.p>
