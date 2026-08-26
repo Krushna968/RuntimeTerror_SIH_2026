@@ -75,7 +75,7 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
 
     const drawBeam = (x: number, t: number, color: string, widthMod: number) => {
       const n = noise(x, t * 0.5);
-      const beamHeight = height * (0.7 + n * 0.3); 
+      const beamHeight = height * (0.82 + n * 0.25); 
       const beamWidth = (width / density) * widthMod;
 
       const gradient = ctx.createLinearGradient(x, height, x, height - beamHeight);
@@ -106,32 +106,32 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
         
         if (isLight) {
           // 1. ROYAL COBALT BLUE / INDIGO CHANNEL (Left to Center)
-          const bAlpha = (opacity / 100) * (0.6 + 0.4 * Math.sin(i * 0.5 + time * 1.1));
-          const blueWeight = Math.max(0.3, 1.2 - pos * 1.1);
+          const bAlpha = (opacity / 100) * (0.7 + 0.3 * Math.sin(i * 0.5 + time * 1.1));
+          const blueWeight = Math.max(0.35, 1.3 - pos * 1.1);
           drawBeam(
-              x - aberration * 1.4, 
+              x - aberration * 1.5, 
               time + i * 0.1, 
-              `rgba(29, 78, 216, ${bAlpha * 0.65 * blueWeight})`, 
+              `rgba(29, 78, 216, ${bAlpha * 0.85 * blueWeight})`, 
               1.8
           );
 
           // 2. CRIMSON / SCARLET RED CHANNEL (Right to Center)
-          const rAlpha = (opacity / 100) * (0.6 + 0.4 * Math.cos(i * 0.45 + time));
-          const redWeight = Math.max(0.3, pos * 1.1 + 0.1);
+          const rAlpha = (opacity / 100) * (0.7 + 0.3 * Math.cos(i * 0.45 + time));
+          const redWeight = Math.max(0.35, pos * 1.1 + 0.2);
           drawBeam(
-              x + aberration * 1.4, 
+              x + aberration * 1.5, 
               time + i * 0.12 + 10, 
-              `rgba(225, 29, 72, ${rAlpha * 0.68 * redWeight})`, 
+              `rgba(225, 29, 72, ${rAlpha * 0.88 * redWeight})`, 
               1.8
           );
 
           // 3. VIOLET / MAGENTA / PURPLE CORE CHANNEL (Mid transitions)
-          const coreAlpha = (opacity / 100) * (0.55 + 0.35 * Math.sin(i * 0.35 - time));
+          const coreAlpha = (opacity / 100) * (0.65 + 0.35 * Math.sin(i * 0.35 - time));
           drawBeam(
               x, 
               time + i * 0.1 + 5, 
-              `rgba(147, 51, 234, ${coreAlpha * 0.55})`, 
-              1.1
+              `rgba(147, 51, 234, ${coreAlpha * 0.75})`, 
+              1.2
           );
         } else {
           // Dark Hologram Mode (Pure RGB)
@@ -187,13 +187,13 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
     >
       <canvas 
         ref={canvasRef} 
-        className="block w-full h-full filter blur-[7px]" // Smooth buttery diffusion
+        className="block w-full h-full filter blur-[3px]" // Sharp, distinct shader pillar cones
       />
 
       {/* Ambient Blue & Red Dual Atmosphere Glow at the bottom on light theme */}
       {theme === 'light' && (
-        <div className="absolute inset-x-0 bottom-0 h-[70%] pointer-events-none z-10 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/8 to-rose-600/14 [mask-image:linear-gradient(to_top,black_40%,transparent)]" />
+        <div className="absolute inset-x-0 bottom-0 h-[75%] pointer-events-none z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/15 via-purple-600/12 to-rose-600/18 [mask-image:linear-gradient(to_top,black_50%,transparent)]" />
         </div>
       )}
       

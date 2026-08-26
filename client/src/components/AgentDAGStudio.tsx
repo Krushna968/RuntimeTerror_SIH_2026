@@ -182,13 +182,13 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
       {/* Main Content Area */}
       <div className="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-8 w-full">
         
-        {/* Centered Heading with Exact Gradient Styling from DAG Agent Ui */}
+        {/* Centered Heading with High Contrast Crisp Typography */}
         <div className="text-center space-y-3">
           <motion.h1 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="px-4 text-center text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-slate-950 via-slate-800 to-slate-400 drop-shadow-[0_0_35px_rgba(0,0,0,0.12)] select-none leading-none"
+            className="px-4 text-center text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight text-slate-950 select-none leading-none drop-shadow-xs"
           >
             Autonomous Multi-Agent DAG
           </motion.h1>
@@ -197,7 +197,7 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
-            className="text-slate-600 text-sm sm:text-base md:text-lg max-w-3xl mx-auto text-center font-normal leading-relaxed"
+            className="text-slate-800 text-sm sm:text-base md:text-lg max-w-3xl mx-auto text-center font-semibold leading-relaxed"
           >
             Decomposes complex maritime intent into parallel asynchronous subtasks across satellite telemetry, ocean thermal-chlorophyll front correlation, IMBL geofencing, and Indic vernacular synthesis.
           </motion.p>
@@ -211,13 +211,13 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Ask anything about PFZ coordinates, sea safety, border clearance..."
-              className="w-full pl-6 pr-28 py-4 rounded-full bg-white border border-slate-200 text-slate-900 placeholder-slate-400 font-normal focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 backdrop-blur-xl shadow-xl transition-all text-sm"
+              className="w-full pl-6 pr-28 py-4 rounded-full bg-white border border-slate-300 text-slate-950 placeholder-slate-500 font-medium focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 backdrop-blur-xl shadow-xl transition-all text-sm"
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={isLoading || !inputText.trim()}
-              className="absolute right-2 px-5 py-2.5 rounded-full bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition-all flex items-center space-x-1.5 shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="absolute right-2 px-5 py-2.5 rounded-full bg-slate-950 text-white font-bold text-xs hover:bg-slate-800 transition-all flex items-center space-x-1.5 shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {isLoading ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
@@ -237,7 +237,7 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
                 key={idx}
                 onClick={() => onSendMessage(preset.query)}
                 disabled={isLoading}
-                className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/85 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 transition-all backdrop-blur-md shadow-xs cursor-pointer active:scale-95 whitespace-nowrap"
+                className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white hover:bg-blue-50 border border-slate-300 hover:border-blue-400 text-slate-900 hover:text-blue-700 transition-all backdrop-blur-md shadow-xs cursor-pointer active:scale-95 whitespace-nowrap"
               >
                 {preset.label}
               </button>
@@ -374,12 +374,12 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
 
         {/* 6 Domain Agent Graph Constellation (Overview Section) */}
         <div className="space-y-4 pt-4">
-          <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
-            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2 tracking-wide">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 className="text-sm font-black text-slate-950 flex items-center space-x-2 tracking-wide">
               <GitBranch className="w-4 h-4 text-blue-600" />
               <span>Autonomous Domain Agent Architecture</span>
             </h3>
-            <span className="text-xs font-mono text-blue-700 font-bold bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+            <span className="text-xs font-mono text-blue-800 font-black bg-blue-100 px-3.5 py-1 rounded-full border border-blue-300 shadow-xs">
               6 Active Domain Agents
             </span>
           </div>
@@ -391,7 +391,7 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: idx * 0.08 }}
-                className="p-5 rounded-2xl bg-white/85 border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 backdrop-blur-xl transition-all space-y-3 group"
+                className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-md hover:border-blue-400 backdrop-blur-xl transition-all space-y-3 group"
               >
                 <div className="flex items-center justify-between">
                   <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white font-black text-xs shadow-xs group-hover:scale-105 transition-transform`}>
@@ -403,17 +403,17 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
                 </div>
 
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                  <h4 className="text-sm font-bold text-slate-950 group-hover:text-blue-600 transition-colors">
                     {agent.name}
                   </h4>
-                  <p className="text-xs text-slate-500 font-normal mt-0.5">
+                  <p className="text-xs text-slate-600 font-medium mt-0.5">
                     {agent.role}
                   </p>
                 </div>
 
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
                   <span>Engine:</span>
-                  <span className="text-slate-800 font-semibold">{agent.model}</span>
+                  <span className="text-slate-950 font-bold">{agent.model}</span>
                 </div>
               </motion.div>
             ))}
