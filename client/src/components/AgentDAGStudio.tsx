@@ -217,7 +217,7 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
           </p>
         </motion.div>
 
-        {/* Ultra-Clean Interactive Query Launcher */}
+        {/* Ultra-Clean Borderless Interactive Query Launcher */}
         <div className="max-w-2xl mx-auto space-y-3.5">
           <form onSubmit={handleSend} className="relative flex items-center">
             <div className="absolute left-4 text-blue-600 pointer-events-none">
@@ -228,13 +228,13 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Ask anything about PFZ coordinates, sea safety, border clearance..."
-              className="w-full pl-11 pr-28 py-3.5 rounded-full bg-white border border-slate-300 text-slate-950 placeholder-slate-500 font-medium focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/15 backdrop-blur-xl shadow-xl hover:border-slate-400 transition-all text-sm"
+              className="w-full pl-11 pr-28 py-4 rounded-full bg-white text-slate-950 placeholder-slate-400 font-medium border-0 outline-none focus:outline-none focus:ring-0 shadow-lg shadow-slate-900/5 transition-all text-sm"
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={isLoading || !inputText.trim()}
-              className="absolute right-1.5 px-5 py-2 rounded-full bg-slate-950 text-white font-bold text-xs hover:bg-slate-800 transition-all flex items-center space-x-1.5 shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="absolute right-1.5 px-5 py-2.5 rounded-full bg-slate-950 text-white font-bold text-xs hover:bg-slate-800 transition-all flex items-center space-x-1.5 shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {isLoading ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
@@ -247,14 +247,14 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
             </button>
           </form>
 
-          {/* Preset Chips */}
+          {/* Borderless Preset Chips */}
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
             {PRESET_QUERIES.map((preset, idx) => (
               <button
                 key={idx}
                 onClick={() => onSendMessage(preset.query)}
                 disabled={isLoading}
-                className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/95 hover:bg-white border border-slate-200/90 hover:border-blue-400 text-slate-800 hover:text-blue-700 transition-all backdrop-blur-md shadow-xs cursor-pointer active:scale-95 whitespace-nowrap"
+                className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-slate-800 hover:text-blue-700 transition-all shadow-xs hover:shadow-sm cursor-pointer active:scale-95 whitespace-nowrap border-0"
               >
                 {preset.label}
               </button>
