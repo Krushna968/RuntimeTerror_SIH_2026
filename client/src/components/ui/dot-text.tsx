@@ -189,6 +189,11 @@ export const DotMatrixText = React.forwardRef<HTMLDivElement, DotMatrixTextProps
         const width = container.clientWidth;
         const height = container.clientHeight;
 
+        if (width === 0 || height === 0) {
+          animationFrameId = requestAnimationFrame(animate);
+          return;
+        }
+
         ctx.clearRect(0, 0, width, height);
 
         if (isScrambling && time > scrambleEndTime) {
@@ -196,16 +201,25 @@ export const DotMatrixText = React.forwardRef<HTMLDivElement, DotMatrixTextProps
         }
 
         const radius = dotSize / 2;
+        let hasChanges = isScrambling;
 
         for (let i = 0; i < dots.length; i++) {
           const dot = dots[i];
 
           if (isScrambling) {
             dot.currentScale = Math.random() > 0.5 ? 1 : showInactive ? 0.3 : 0;
+            hasChanges = true;
           } else if (transition === "fade") {
             if (time > dot.delay) {
               const diff = dot.targetScale - dot.currentScale;
-              dot.currentScale += diff * 0.18;
+              if (Math.abs(diff) > 0.01) {
+                dot.currentScale += diff * 0.22;
+                hasChanges = true;
+              } else {
+                dot.currentScale = dot.targetScale;
+              }
+            } else if (dot.currentScale > 0) {
+              hasChanges = true;
             }
           } else {
             dot.currentScale = dot.targetScale;
@@ -220,7 +234,7 @@ export const DotMatrixText = React.forwardRef<HTMLDivElement, DotMatrixTextProps
         ctx.beginPath();
         for (let i = 0; i < dots.length; i++) {
           const dot = dots[i];
-          if (dot.currentScale > 0.5) {
+          if (dot.currentScale > 0.4) {
             const r = radius * dot.currentScale;
             const cx = dot.x + radius;
             const cy = dot.y + radius;
@@ -236,7 +250,7 @@ export const DotMatrixText = React.forwardRef<HTMLDivElement, DotMatrixTextProps
           ctx.beginPath();
           for (let i = 0; i < dots.length; i++) {
             const dot = dots[i];
-            if (dot.currentScale <= 0.5 && dot.currentScale > 0.01) {
+            if (dot.currentScale <= 0.4 && dot.currentScale > 0.01) {
               const r = radius * dot.currentScale;
               const cx = dot.x + radius;
               const cy = dot.y + radius;

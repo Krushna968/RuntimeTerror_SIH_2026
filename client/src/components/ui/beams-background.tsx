@@ -178,7 +178,7 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
     <div
       ref={containerRef}
       className={cn(
-        "absolute inset-0 z-0 overflow-hidden",
+        "absolute inset-0 z-0 overflow-hidden pointer-events-none transform-gpu will-change-transform",
         theme === 'light' ? "bg-[#fcfbf8]" : "bg-black",
         className
       )}
@@ -187,12 +187,12 @@ export const HolographicBeams: React.FC<HolographicBeamsProps> = ({
     >
       <canvas 
         ref={canvasRef} 
-        className="block w-full h-full filter blur-[3px]" // Sharp, distinct shader pillar cones
+        className="block w-full h-full filter blur-[3px] pointer-events-none transform-gpu will-change-transform" // Sharp, distinct shader pillar cones
       />
 
       {/* Ambient Blue & Red Dual Atmosphere Glow at the bottom on light theme */}
       {theme === 'light' && (
-        <div className="absolute inset-x-0 bottom-0 h-[75%] pointer-events-none z-10 overflow-hidden">
+        <div className="absolute inset-x-0 bottom-0 h-[75%] pointer-events-none z-10 overflow-hidden transform-gpu">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/15 via-purple-600/12 to-rose-600/18 [mask-image:linear-gradient(to_top,black_50%,transparent)]" />
         </div>
       )}
