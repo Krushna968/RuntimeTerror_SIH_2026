@@ -316,7 +316,7 @@ export const DeviceTrackerDashboard: React.FC<DeviceTrackerDashboardProps> = ({
                 type="password"
                 value={passcodeInput}
                 onChange={(e) => setPasscodeInput(e.target.value)}
-                placeholder="Enter Passcode (e.g. ISRO-2026)"
+                placeholder="Enter Authorization Passcode"
                 autoFocus
                 className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 focus:border-cyan-400 focus:outline-none text-white text-sm font-mono placeholder-slate-600 transition-all"
               />
@@ -337,11 +337,17 @@ export const DeviceTrackerDashboard: React.FC<DeviceTrackerDashboardProps> = ({
             </button>
           </form>
 
-          <div className="pt-2 border-t border-slate-800/80 text-center">
-            <div className="text-[11px] text-slate-500 font-mono">
-              Evaluator Access Key: <span className="text-cyan-400 font-bold">ISRO-2026</span>
+          {onExitPortal && (
+            <div className="pt-2 border-t border-slate-800/80 text-center">
+              <button
+                type="button"
+                onClick={onExitPortal}
+                className="text-xs text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
+              >
+                Return to Public Platform
+              </button>
             </div>
-          </div>
+          )}
 
         </div>
       </div>
