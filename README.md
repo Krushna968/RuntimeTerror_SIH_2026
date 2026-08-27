@@ -1,4 +1,4 @@
-# 🛰️ ORCA — Marine EcOsystem Reasoning with Collaborative Agents
+# 🛰️ Blue Orbit — Marine Ecosystem Reasoning with Collaborative Agents
 
 **Smart India Hackathon 2026**  
 **Problem Statement ID:** 26176  
@@ -10,9 +10,9 @@
 
 ## 📖 Overview
 
-**ORCA (Oceanic Reasoning & Collaborative Agentic Network)** is an autonomous, state-of-the-art Agentic AI conversational decision-support platform designed for the Indian Space Research Organisation (ISRO). It orchestrates specialized AI agents over satellite Earth Observation (EO) products from **Oceansat-3 (OCM-3)**, **INSAT-3DR TIR**, and in-situ oceanographic feeds from **INCOIS**.
+**Blue Orbit** is an autonomous, state-of-the-art Agentic AI conversational decision-support platform designed for the Indian Space Research Organisation (ISRO). It orchestrates specialized AI agents over satellite Earth Observation (EO) products from **Oceansat-3 (OCM-3)**, **INSAT-3DR TIR**, and in-situ oceanographic feeds from **INCOIS**.
 
-ORCA provides real-time, explainable, and multi-lingual marine intelligence to fishermen, coastal disaster authorities, maritime operators, and researchers.
+Blue Orbit provides real-time, explainable, and multi-lingual marine intelligence to fishermen, coastal disaster authorities, maritime operators, and researchers.
 
 ---
 
@@ -25,7 +25,7 @@ ORCA provides real-time, explainable, and multi-lingual marine intelligence to f
                                     └─────────────┬──────────────┘
                                                   ▼
                                     ┌────────────────────────────┐
-                                    │    ORCA Master Planner     │
+                                    │    Blue Orbit Master       │
                                     │  (DAG Intent Decomposer)   │
                                     └─────────────┬──────────────┘
                                                   │

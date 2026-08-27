@@ -1,5 +1,5 @@
 """
-Geospatial Reference Datasets for ORCA (ISRO SIH 2026 - Problem 26176)
+Geospatial Reference Datasets for Blue Orbit (ISRO SIH 2026 - Problem 26176)
 Contains Indian Maritime Zones, IMBL Borders, Marine Protected Areas, Harbours, Buoys & Cyclone tracks.
 """
 

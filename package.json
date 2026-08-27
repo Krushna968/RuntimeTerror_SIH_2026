@@ -1,7 +1,7 @@
 {
-  "name": "orca-sih-2026",
+  "name": "blue-orbit-sih-2026",
   "version": "1.0.0",
-  "description": "ORCA — Marine EcOsystem Reasoning with Collaborative Agents (ISRO SIH 26176)",
+  "description": "Blue Orbit — Marine Ecosystem Reasoning with Collaborative Agents (ISRO SIH 26176)",
   "scripts": {
     "build": "cd client && npm install && npm run build",
     "dev": "cd client && npm run dev",

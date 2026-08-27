@@ -1,5 +1,5 @@
 """
-Geospatial & Geofencing Intelligence Agent for ORCA
+Geospatial & Geofencing Intelligence Agent for Blue Orbit
 Provides:
 - International Maritime Boundary Line (IMBL) geofence compliance and real-time proximity alerts
 - Marine Protected Areas (MPAs) & ecologically sensitive reserve encroachment detection

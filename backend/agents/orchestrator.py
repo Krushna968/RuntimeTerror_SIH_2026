@@ -1,5 +1,5 @@
 """
-Supervisor / Master Orchestrator Agent for ORCA
+Supervisor / Master Orchestrator Agent for Blue Orbit
 Coordinates multi-agent execution DAGs, routes subtasks, manages conversation state,
 and streams reasoning step telemetry to the frontend.
 """
@@ -86,7 +86,7 @@ class MasterOrchestrator:
         
         execution_trace.append({
             "step_id": "STEP_01_SUPERVISOR_PLANNING",
-            "agent": "ORCA Master Supervisor & DAG Planner",
+            "agent": "Blue Orbit Master Supervisor & DAG Planner",
             "status": "COMPLETED",
             "duration_ms": round((time.time() - step1_start) * 1000, 2),
             "thought": f"Parsed query intent: '{intent}'. Reference port: '{port_info['name']}'. Language detected: '{detected_lang}'. Formulated 6-stage collaborative execution graph.",
@@ -179,7 +179,7 @@ class MasterOrchestrator:
             localized_result = self.lang_agent.synthesize_localized_response(intent, context_bundle, lang_code=detected_lang)
             final_markdown = localized_result["formatted_markdown"]
             tts_clean = localized_result["tts_speech_text"]
-            model_used_name = "ORCA Deterministic Rule Engine"
+            model_used_name = "Blue Orbit Deterministic Rule Engine"
 
         evidence_pkg = self.explain_agent.generate_evidence_package(query, execution_trace, context_bundle)
         bulletin = self.explain_agent.generate_official_marine_bulletin(port_info["name"], pfz_list, weather, geofence)

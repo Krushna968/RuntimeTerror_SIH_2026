@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Automated Verification & Test Suite for ORCA
+Automated Verification & Test Suite for Blue Orbit
 ISRO SIH 2026 - Problem Statement 26176
 """
 
@@ -15,7 +15,7 @@ def print_header(title):
 
 async def run_tests():
     all_passed = True
-    print("🚀 Initiating ORCA Automated Verification Suite...")
+    print("🚀 Initiating Blue Orbit Automated Verification Suite...")
 
     # 1. Test Marine Data Discovery Agent
     print_header("1. Satellite Earth Observation & Marine Data Ingestion")
@@ -100,7 +100,7 @@ async def run_tests():
         print(f"✓ Endpoint registered: {ep}")
 
     print("\n" + "=" * 60)
-    print("🎉 ALL 7 TEST SUITES PASSED PERFECTLY! ORCA IS READY FOR SIH 2026.")
+    print("🎉 ALL 7 TEST SUITES PASSED PERFECTLY! BLUE ORBIT IS READY FOR SIH 2026.")
     print("=" * 60 + "\n")
 
 if __name__ == "__main__":

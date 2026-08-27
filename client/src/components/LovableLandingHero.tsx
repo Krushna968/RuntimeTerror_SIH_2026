@@ -207,12 +207,12 @@ export const LovableLandingHero: React.FC<LovableLandingHeroProps> = ({
             Get a demo
           </button>
 
-          {/* Secondary Quick Jump into ORCA Platform */}
+          {/* Secondary Quick Jump into Blue Orbit Platform */}
           <button 
             onClick={onExplorePlatform}
             className="px-6 py-2.5 rounded-full text-sm font-semibold text-zinc-200 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 hover:border-cyan-400 transition-all flex items-center space-x-2 active:scale-95 cursor-pointer"
           >
-            <span>Launch ORCA Studio</span>
+            <span>Launch Blue Orbit Studio</span>
             <ArrowRight className="w-4 h-4 text-cyan-400" />
           </button>
         </motion.div>

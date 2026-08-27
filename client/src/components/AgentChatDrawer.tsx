@@ -121,7 +121,7 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
           </div>
           <div>
             <h2 className="text-sm font-black text-slate-900 flex items-center space-x-2">
-              <span>ORCA Agentic Assistant</span>
+              <span>Blue Orbit Agentic Assistant</span>
               <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
                 Multi-Agent DAG
               </span>
@@ -167,7 +167,7 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
           <div className="p-5 rounded-2xl bg-white border border-blue-200 space-y-3.5 animate-pulse shadow-md">
             <div className="flex items-center space-x-2 text-blue-700 text-xs font-extrabold">
               <Sparkles className="w-4 h-4 animate-spin text-blue-600" />
-              <span>ORCA Multi-Agent Network Collaborating...</span>
+              <span>Blue Orbit Multi-Agent Network Collaborating...</span>
             </div>
             <div className="space-y-2 text-xs text-slate-700">
               <div className="flex items-center space-x-2.5">

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ORCA Master System Launcher
+Blue Orbit Master System Launcher
 ISRO SIH 2026 - Problem Statement 26176
 Launches both FastAPI Multi-Agent Backend (port 8000) and React Vite Frontend (port 5173).
 """
@@ -13,7 +13,7 @@ import signal
 
 def main():
     print("=" * 70)
-    print("🌊 ORCA — Marine EcOsystem Reasoning with Collaborative Agents")
+    print("🌊 Blue Orbit — Marine Ecosystem Reasoning with Collaborative Agents")
     print("🚀 Indian Space Research Organisation (ISRO) · SIH 2026")
     print("=" * 70)
 
@@ -39,7 +39,7 @@ def main():
     )
 
     print("\n" + "=" * 70)
-    print("✨ ORCA Marine Intelligence Network is LIVE:")
+    print("✨ Blue Orbit Marine Intelligence Network is LIVE:")
     print("   • Web Command Center:   http://localhost:5173")
     print("   • FastAPI Backend Docs: http://localhost:8000/docs")
     print("   • Live Agent WebSocket: ws://localhost:8000/ws/agent-stream")
@@ -47,7 +47,7 @@ def main():
     print("=" * 70 + "\n")
 
     def handle_shutdown(sig, frame):
-        print("\n🛑 Shutting down ORCA services...")
+        print("\n🛑 Shutting down Blue Orbit services...")
         backend_proc.terminate()
         frontend_proc.terminate()
         backend_proc.wait()

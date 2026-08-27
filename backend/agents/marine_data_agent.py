@@ -1,5 +1,5 @@
 """
-Marine Data Discovery & Ingestion Agent for ORCA
+Marine Data Discovery & Ingestion Agent for Blue Orbit
 Simulates and queries ISRO Earth Observation satellite feeds:
 - Oceansat-3 OCM-3 (Ocean Colour Monitor - Chlorophyll-a)
 - INSAT-3DR TIR (Thermal Infrared - Sea Surface Temperature)

@@ -1,5 +1,5 @@
 """
-ORCA Backend Server (FastAPI + WebSockets)
+Blue Orbit Backend Server (FastAPI + WebSockets)
 ISRO Smart India Hackathon 2026 - Problem Statement 26176
 Modular Agentic AI Marine Intelligence & Decision Support Platform
 """
@@ -25,7 +25,7 @@ from backend.data.geodata import (
 )
 
 app = FastAPI(
-    title="ORCA — Marine Ecosystem Reasoning with Collaborative Agents",
+    title="Blue Orbit — Marine Ecosystem Reasoning with Collaborative Agents",
     description="ISRO Agentic AI Marine Decision Support & Conversational Intelligence Platform",
     version="1.0.0"
 )
@@ -66,7 +66,7 @@ class GeofenceCheckRequest(BaseModel):
 def root_status():
     return {
         "status": "ONLINE",
-        "platform": "ORCA — Marine Ecosystem Reasoning with Collaborative Agents",
+        "platform": "Blue Orbit — Marine Ecosystem Reasoning with Collaborative Agents",
         "organization": "Indian Space Research Organisation (ISRO)",
         "sih_problem_id": 26176,
         "active_agents": 6,
@@ -184,7 +184,7 @@ async def websocket_agent_stream(websocket: WebSocket):
             await websocket.send_json({
                 "type": "STAGE_UPDATE",
                 "stage": "INITIALIZING",
-                "message": "ORCA Supervisor initialized. Building collaborative execution graph..."
+                "message": "Blue Orbit Supervisor initialized. Building collaborative execution graph..."
             })
             await asyncio.sleep(0.3)
             

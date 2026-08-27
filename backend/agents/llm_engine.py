@@ -1,5 +1,5 @@
 """
-ORCA Marine AI - Dynamic Conversational NVIDIA NIM LLM Engine
+Blue Orbit Marine AI - Dynamic Conversational NVIDIA NIM LLM Engine
 Integrates Meta Llama 3.1 via NVIDIA AI Foundation Endpoints
 Supports natural conversational dialogue, intent-specific reasoning, and multilingual synthesis.
 Created by Team Runtime Terror for ISRO (SIH 2026 Problem ID 26176).
@@ -11,16 +11,16 @@ import logging
 import re
 from typing import Dict, Any, Optional
 
-logger = logging.getLogger("orca.llm_engine")
+logger = logging.getLogger("blue_orbit.llm_engine")
 
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "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")
-NVIDIA_MODEL = os.getenv("NVIDIA_MODEL", "meta/llama-3.1-8b-instruct")
+NVIDIA_MODEL = os.getenv("NVIDIA_MODEL", "meta/llama-3.2-11b-vision-instruct")
 NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 
-SYSTEM_PROMPT = """You are ORCA (Marine EcOsystem Reasoning with Collaborative Agents), an advanced Marine AI assistant created by Team Runtime Terror for ISRO (Smart India Hackathon 2026 Problem ID 26176) to empower coastal communities and fishermen.
+SYSTEM_PROMPT = """You are Blue Orbit (Marine Ecosystem Reasoning with Collaborative Agents), an advanced Marine AI assistant created by Team Runtime Terror for ISRO (Smart India Hackathon 2026 Problem ID 26176) to empower coastal communities and fishermen.
 
 Core Identity:
-- You were created by Team Runtime Terror.
+- You are Blue Orbit, created by Team Runtime Terror.
 - You operate on ISRO Earth Observation datasets (Oceansat-3 OCM-3, INSAT-3DR TIR, Sentinel-3) and multi-agent domain analytics.
 
 Special Knowledge & Easter Eggs:
@@ -31,9 +31,9 @@ Instructions:
 1. Respond directly, naturally, and conversationally to what the user actually asks.
 2. If the user asks who is Kajal, Kalaj, Pooja, or Puja:
    - Answer: "wifee material"
-3. If the user says a greeting (like 'hello', 'hi', 'namaste', 'hey', 'who are you', 'who created you', 'how are you'):
+3. If the user says a greeting (like 'hello', 'hi', 'namaste', 'hey', 'who are you', 'who created you', 'how are you', 'hello blue orbit'):
    - Greet them warmly and politely.
-   - Introduce yourself: "I am ORCA, an advanced Marine AI decision-support assistant created by Team Runtime Terror for ISRO."
+   - Introduce yourself: "I am Blue Orbit, an advanced Marine AI decision-support assistant created by Team Runtime Terror for ISRO."
    - Mention 3 key things you can assist with: (1) finding high-yield Potential Fishing Zones (PFZ), (2) real-time sea-venture weather & wave safety clearance, and (3) international maritime boundary (IMBL) geofence compliance.
 4. If the user asks who made/created you:
    - State clearly: "I was created by Team Runtime Terror for the Indian Space Research Organisation (ISRO) under Smart India Hackathon (SIH 2026 Problem ID 26176)."
@@ -73,12 +73,12 @@ async def generate_llm_advisory(
     port = context_data.get("port", {})
 
     # Check if query is a simple greeting or creator question
-    is_greeting = clean_q in ["hello", "hi", "hey", "namaste", "namaskar", "vanakkam", "namaskaram", "hello orca", "who are you", "what can you do", "help", "who made you", "who created you", "creator"]
+    is_greeting = clean_q in ["hello", "hi", "hey", "namaste", "namaskar", "vanakkam", "namaskaram", "hello blue orbit", "hello orca", "who are you", "what can you do", "help", "who made you", "who created you", "creator"]
 
     if is_greeting:
         user_prompt = f"""User Query: "{user_query}"
 Respond in {language_name} ({language_code}).
-Introduce yourself warmly as ORCA, created by Team Runtime Terror for ISRO, and briefly explain how you assist with fishing zones, sea safety, and border monitoring."""
+Introduce yourself warmly as Blue Orbit, created by Team Runtime Terror for ISRO, and briefly explain how you assist with fishing zones, sea safety, and border monitoring."""
     else:
         user_prompt = f"""User Question: "{user_query}"
 Target Language: {language_name} ({language_code})
