@@ -57,7 +57,12 @@ class MasterOrchestrator:
 
     def classify_intent(self, query: str) -> str:
         """Determines primary objective of user prompt."""
-        q = query.lower()
+        q = query.lower().strip()
+        # Greetings & Identity Checks
+        if any(w in q for w in ["who are you", "who created", "who made", "what is blue orbit", "what are you", "your name", "introduce yourself", "tell me about yourself", "creator"]):
+            return "identity"
+        if any(w in q for w in ["hello", "hi", "hey", "namaste", "namaskar", "vanakkam", "namaskaram", "good morning", "good evening", "how are you"]):
+            return "greeting"
         if any(w in q for w in ["pfz", "fish", "fishing", "machhli", "machli", "meen", "chepala", "catch", "tuna", "sardine", "mackerel", "pomfret", "zone"]):
             return "pfz_discovery"
         if any(w in q for w in ["safe", "safety", "weather", "wave", "cyclone", "wind", "storm", "lightning", "surakshit", "mausam", "venture", "rain", "alert"]):
@@ -67,7 +72,7 @@ class MasterOrchestrator:
         if any(w in q for w in ["route", "navigation", "waypoint", "distance", "fuel", "travel", "rasta", "vazhi", "direction"]):
             return "route_planning"
             
-        return "pfz_discovery"  # Default primary capability
+        return "general_inquiry"
 
     async def execute_query_pipeline(self, query: str, requested_lang: Optional[str] = None) -> Dict[str, Any]:
         """

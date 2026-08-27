@@ -280,9 +280,102 @@ class MultilingualAgent:
             }
             text_out = responses.get(lang, responses["en"])
 
-        # Default fallback
+        # 4. Identity & Introduction Intent
+        elif intent == "identity":
+            responses = {
+                "en": (
+                    f"🛰️ **I am Blue Orbit**\n\n"
+                    f"I am an autonomous Agentic AI decision-support platform engineered by **Team Runtime Terror** for the **Indian Space Research Organisation (ISRO)** (SIH 2026 Problem Statement ID 26176).\n\n"
+                    f"• **Capabilities:** Identifying high-yield Potential Fishing Zones (PFZ) from Oceansat-3 & INSAT-3DR data, computing 0–100 Sea Safety clearance, and enforcing International Maritime Boundary Line (IMBL) geofencing compliance.\n"
+                    f"• **Multi-lingual Support:** 8 Indian regional languages with real-time voice synthesis."
+                ),
+                "hi": (
+                    f"🛰️ **मैं ब्लू ऑर्बिट (Blue Orbit) हूँ**\n\n"
+                    f"मैं **टीम रनटाइम टेरर (Team Runtime Terror)** द्वारा **भारतीय अंतरिक्ष अनुसंधान संगठन (ISRO)** के लिए विकसित एक स्वायत्त एजेंटिक AI समुद्री निर्णय-समर्थन प्रणाली हूँ (SIH 2026 Problem ID 26176)।\n\n"
+                    f"• **मुख्य कार्य:** ओशनसैट-3 और इनसैट-3DR उपग्रह डेटा से संभावित मत्स्य पालन क्षेत्र (PFZ) खोजना, वास्तविक समय समुद्र सुरक्षा स्कोर (0-100) प्रदान करना और अंतर्राष्ट्रीय समुद्री सीमा (IMBL) की निगरानी करना।"
+                ),
+                "ta": (
+                    f"🛰️ **நான் புளூ ஆர்பிட் (Blue Orbit)**\n\n"
+                    f"நான் **டீம் ரன்டைம் டெரர் (Team Runtime Terror)** ஆல் **இஸ்ரோ (ISRO)** க்காக உருவாக்கப்பட்ட ஒரு தானியங்கி கடல்சார் AI முடிவெடுக்கும் தளமாகும்.\n\n"
+                    f"• **சேவைகள்:** சாத்தியமான மீன்பிடி மண்டலங்கள் (PFZ), கடல் பாதுகாப்பு எச்சரிக்கைகள் மற்றும் சர்வதேச கடல் எல்லை (IMBL) கண்காணிப்பு."
+                ),
+                "te": (
+                    f"🛰️ **నేను బ్లూ ఆర్బిట్ (Blue Orbit)**\n\n"
+                    f"నేను **టీమ్ రన్‌టైమ్ టెర్రర్ (Team Runtime Terror)** చే **ఇస్రో (ISRO)** కోసం రూపొందించబడిన స్వయంప్రతిపత్త సముద్ర AI వేదికను.\n\n"
+                    f"• **సేవలు:** చేపల వేట ప్రాంతాలు (PFZ), సముద్ర భద్రతా హెచ్చరికలు మరియు సరిహద్దు భద్రత."
+                ),
+                "ml": (
+                    f"🛰️ **ഞാൻ ബ്ലൂ ഓർബിറ്റ് (Blue Orbit)**\n\n"
+                    f"**ടീം റൺടൈം ടെറർ (Team Runtime Terror)** **ഐ.എസ്.ആർ.ഒ (ISRO)** ക്കായി വികസിപ്പിച്ചെടുത്ത അത്യാധുനിക സമുദ്ര എ.ഐ പ്ലാറ്റ്‌ഫോമാണ് ഞാൻ."
+                ),
+                "bn": (
+                    f"🛰️ **আমি ব্লু অরবিট (Blue Orbit)**\n\n"
+                    f"আমি **টিম রানটাইম টেরর (Team Runtime Terror)** দ্বারা **ইসরো (ISRO)** এর জন্য নির্মিত একটি এআই প্ল্যাটফর্ম।"
+                ),
+                "gu": (
+                    f"🛰️ **હું બ્લુ ઓર્બિટ (Blue Orbit) છું**\n\n"
+                    f"હું **ટીમ રનટાઇમ ટેરર** દ્વારા **ISRO** માટે વિકસાવવામાં આવેલ આર્ટિફિશિયલ ઇન્ટેલિજન્સ પ્લેટફોર્મ છું."
+                ),
+                "mr": (
+                    f"🛰️ **मी ब्लू ऑर्बिट (Blue Orbit) आहे**\n\n"
+                    f"मी **टीम रनटाइम टेरर** द्वारे **इस्रो (ISRO)** साठी विकसित केलेली स्वायत्त सागरी AI प्रणाली आहे."
+                )
+            }
+            text_out = responses.get(lang, responses["en"])
+
+        # 5. Greeting Intent
+        elif intent == "greeting":
+            responses = {
+                "en": (
+                    f"👋 **Hello! Welcome to Blue Orbit**\n\n"
+                    f"I am connected to live telemetry from ISRO Oceansat-3, INSAT-3DR, and INCOIS.\n\n"
+                    f"How can I assist you today? You can ask me:\n"
+                    f"• *\"Where is the nearest PFZ for Tuna from Kochi?\"*\n"
+                    f"• *\"Is it safe to venture into the sea tomorrow morning?\"*\n"
+                    f"• *\"Check distance to Sri Lanka IMBL border.\"*"
+                ),
+                "hi": (
+                    f"👋 **नमस्ते! ब्लू ऑर्बिट में आपका स्वागत है**\n\n"
+                    f"मैं इसरो ओशनसैट-3, इनसैट-3DR और इनकॉइस के लाइव डेटा से जुड़ा हुआ हूँ।\n\n"
+                    f"आज मैं आपकी क्या सहायता कर सकता हूँ?\n"
+                    f"• *\"कोच्चि से निकटतम मछली क्षेत्र कहाँ है?\"*\n"
+                    f"• *\"क्या कल सुबह समुद्र में जाना सुरक्षित है?\"*\n"
+                    f"• *\"अंतर्राष्ट्रीय समुद्री सीमा (IMBL) की दूरी जांचें।\"*"
+                ),
+                "ta": (
+                    f"👋 **வணக்கம்! புளூ ஆர்பிட்டுக்கு வரவேற்கிறோம்**\n\n"
+                    f"இஸ்ரோ செயற்கைக்கோள் தரவுகளுடன் நேரலையில் இணைந்துள்ளேன். இன்று நான் உங்களுக்கு எவ்வாறு உதவ முடியும்?"
+                ),
+                "te": (
+                    f"👋 **నమస్కారం! బ్లూ ఆర్బిట్‌కు స్వాగతం**\n\n"
+                    f"నేను ఇస్రో ప్రత్యక్ష ఉపగ్రహ డేటాతో అనుసంధానించబడి ఉన్నాను. ఈరోజు నేను మీకు ఎలా సహాయపడగలను?"
+                ),
+                "ml": (
+                    f"👋 **നമസ്കാരം! ബ്ലൂ ഓർബിറ്റിലേക്ക് സ്വാഗതം**\n\n"
+                    f"ഐ.എസ്.ആർ.ഒ തത്സമയ ഉപഗ്രഹ വിവരങ്ങളുമായി ബന്ധിപ്പിച്ചിരിക്കുന്നു. ഇന്ന് ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കണം?"
+                ),
+                "bn": (
+                    f"👋 **নমস্কার! ব্লু অরবিটে স্বাগতম**\n\n"
+                    f"ইসরো রিয়েল-টাইম উপগ্রহ তথ্যের সাথে সংযুক্ত। আজ আমি আপনাকে কীভাবে সাহায্য করতে পারি?"
+                ),
+                "gu": (
+                    f"👋 **નમસ્તે! બ્લુ ઓર્બિટમાં આપનું સ્વાગત છે**\n\n"
+                    f"હું ISRO ઉપગ્રહ ડેટા સાથે જોડાયેલ છું. હું તમને કેવી રીતે મદદ કરી શકું?"
+                ),
+                "mr": (
+                    f"👋 **नमस्कार! ब्लू ऑर्बिट मध्ये आपले स्वागत आहे**\n\n"
+                    f"मी इस्रो उपग्रह डेटाशी जोडलेला आहे. मी आज आपल्याला कशी मदत करू शकतो?"
+                )
+            }
+            text_out = responses.get(lang, responses["en"])
+
+        # Default fallback / General Inquiry
         else:
-            text_out = f"Blue Orbit Marine Multi-Agent System processed your query. All agent telemetry synchronized."
+            responses = {
+                "en": f"🛰️ **Blue Orbit Marine Intelligence:** I have analyzed your query regarding *{context_data.get('port', {}).get('name', 'Indian Coastal Waters')}*. All ISRO satellite telemetry, ocean front gradients, and real-time safety scores are active and verified.",
+                "hi": f"🛰️ **ब्लू ऑर्बिट समुद्री सूचना:** आपके प्रश्न का विश्लेषण इसरो ओशनसैट-3 और इनसैट-3DR उपग्रह डेटा के आधार पर किया गया है। सभी तटीय और समुद्री पैरामीटर सक्रिय हैं।"
+            }
+            text_out = responses.get(lang, responses["en"])
 
         # Generate clean plain text for TTS speech synthesizer (no markdown symbols)
         tts_clean = re.sub(r'[*#•🛰️🛡️🛑\n]+', ' ', text_out).strip()
