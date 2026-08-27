@@ -34,7 +34,8 @@ import {
   Wind,
   ShieldCheck,
   Printer,
-  QrCode
+  QrCode,
+  Home
 } from 'lucide-react';
 
 const API_BASE = (import.meta as any).env?.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://orca-backend-0dxj.onrender.com');
@@ -257,6 +258,12 @@ export function App() {
       {activeTab === 'home' && (
         <OrcaLandingHero
           onExplorePlatform={(tab) => setActiveTab(tab)}
+          weather={weather}
+          selectedPFZ={selectedPFZ}
+          onQuickQuery={(q) => {
+            handleSendMessage(q);
+            setActiveTab('chat');
+          }}
         />
       )}
 
@@ -519,6 +526,49 @@ export function App() {
           </div>
         </div>
       )}
+
+      {/* Native Mobile Bottom Navigation Dock (Visible on mobile screens) */}
+      <nav aria-label="Mobile Navigation" className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/95 backdrop-blur-2xl border-t border-slate-200/80 px-2 py-1.5 flex items-center justify-around shadow-[0_-8px_25px_rgba(0,0,0,0.06)]">
+        <button
+          onClick={() => setActiveTab('home')}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all cursor-pointer ${activeTab === 'home' ? 'text-blue-600 font-bold' : 'text-slate-500 font-medium'}`}
+        >
+          <Home className="w-4 h-4" />
+          <span className="text-[10px] mt-0.5">Home</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('chat')}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all cursor-pointer ${activeTab === 'chat' ? 'text-blue-600 font-bold' : 'text-slate-500 font-medium'}`}
+        >
+          <Sparkles className="w-4 h-4" />
+          <span className="text-[10px] mt-0.5">AI Chat</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('map')}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all cursor-pointer ${activeTab === 'map' ? 'text-blue-600 font-bold' : 'text-slate-500 font-medium'}`}
+        >
+          <Compass className="w-4 h-4" />
+          <span className="text-[10px] mt-0.5">GIS Map</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('agent-lab')}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all cursor-pointer ${activeTab === 'agent-lab' ? 'text-blue-600 font-bold' : 'text-slate-500 font-medium'}`}
+        >
+          <Cpu className="w-4 h-4" />
+          <span className="text-[10px] mt-0.5">DAG</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('safety')}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all cursor-pointer ${activeTab === 'safety' ? 'text-blue-600 font-bold' : 'text-slate-500 font-medium'}`}
+        >
+          <ShieldCheck className="w-4 h-4" />
+          <span className="text-[10px] mt-0.5">Safety</span>
+        </button>
+      </nav>
     </div>
   );
 }
