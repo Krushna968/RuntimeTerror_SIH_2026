@@ -42,6 +42,24 @@ export const Header: React.FC<HeaderProps> = ({
   onSOSClick
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const logoClicksRef = React.useRef<{ count: number; lastTime: number }>({ count: 0, lastTime: 0 });
+
+  const handleLogoClick = () => {
+    const now = Date.now();
+    if (now - logoClicksRef.current.lastTime < 2000) {
+      logoClicksRef.current.count += 1;
+      if (logoClicksRef.current.count >= 5) {
+        logoClicksRef.current.count = 0;
+        setActiveTab('devices');
+        return;
+      }
+    } else {
+      logoClicksRef.current.count = 1;
+    }
+    logoClicksRef.current.lastTime = now;
+    setActiveTab('home');
+  };
+
   const isMap = activeTab === 'map';
   const isChat = activeTab === 'chat';
   const isHome = activeTab === 'home';
@@ -106,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <div 
-            onClick={() => setActiveTab('home')}
+            onClick={handleLogoClick}
             className="flex items-center space-x-2 cursor-pointer group shrink-0"
           >
             {/* Minimalist Geometric Emblem */}

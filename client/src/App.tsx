@@ -61,6 +61,30 @@ export function App() {
   useEffect(() => {
     document.title = "Blue Orbit — ISRO Marine Ecosystem Reasoning with Collaborative Agents";
     requestLocationAndInitialize();
+
+    // 1. Secret URL Hash Listener (#admin, #noc, #telemetry)
+    const checkHash = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#admin' || hash === '#noc' || hash === '#telemetry') {
+        setActiveTab('devices');
+      }
+    };
+    checkHash();
+    window.addEventListener('hashchange', checkHash);
+
+    // 2. Secret Keyboard Shortcut (Ctrl+Shift+A or Cmd+Shift+A)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a' || e.key === 'L' || e.key === 'l')) {
+        e.preventDefault();
+        setActiveTab(prev => (prev === 'devices' ? 'home' : 'devices'));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('hashchange', checkHash);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const requestLocationAndInitialize = async () => {
@@ -181,6 +205,12 @@ export function App() {
 
   // Chat message submission
   const handleSendMessage = async (query: string, langOverride?: string) => {
+    const cleanQuery = query.trim().toLowerCase();
+    if (cleanQuery === '/admin' || cleanQuery === '/noc' || cleanQuery === '/telemetry' || cleanQuery === '/devices') {
+      setActiveTab('devices');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const res = await fetch(`${API_BASE}/api/chat`, {
