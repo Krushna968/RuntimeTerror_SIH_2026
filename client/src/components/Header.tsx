@@ -10,13 +10,14 @@ import {
   Cpu,
   ShieldCheck,
   FileText,
-  Home
+  Home,
+  Radio
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface HeaderProps {
-  activeTab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin';
-  setActiveTab: (tab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin') => void;
+  activeTab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin' | 'devices';
+  setActiveTab: (tab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin' | 'devices') => void;
   currentLang?: string;
   setCurrentLang?: (lang: string) => void;
   onSOSClick: () => void;
@@ -45,6 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
   const isChat = activeTab === 'chat';
   const isHome = activeTab === 'home';
   const isAgentLab = activeTab === 'agent-lab';
+  const isDevices = activeTab === 'devices';
   const isDark = activeTab === 'map';
 
   // Header background styling based on active view
@@ -61,9 +63,9 @@ export const Header: React.FC<HeaderProps> = ({
         ? 'text-cyan-300 font-black drop-shadow-sm' 
         : 'text-zinc-100 hover:text-white font-semibold drop-shadow-sm';
     }
-    if (isHome || isChat || isAgentLab) {
+    if (isHome || isChat || isAgentLab || isDevices) {
       return isActive 
-        ? (tabKey === 'agent-lab' ? 'text-blue-600 font-black' : 'text-zinc-950 font-black') 
+        ? (tabKey === 'agent-lab' || tabKey === 'devices' ? 'text-blue-600 font-black' : 'text-zinc-950 font-black') 
         : 'text-zinc-500 hover:text-zinc-950 font-semibold';
     }
     return isActive 
@@ -77,6 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
     { key: 'map', label: 'GIS Command', icon: Map },
     { key: 'agent-lab', label: 'Agent DAG', icon: Cpu },
     { key: 'safety', label: 'Safety Barometer', icon: ShieldCheck },
+    { key: 'devices', label: 'Fleet & Devices', icon: Radio },
     { key: 'bulletin', label: 'Advisory Bulletin', icon: FileText }
   ] as const;
 

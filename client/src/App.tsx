@@ -9,6 +9,7 @@ import { AgentDAGStudio } from './components/AgentDAGStudio';
 import { SeaSafetyBarometer } from './components/SeaSafetyBarometer';
 import { SatelliteTelemetryBar } from './components/SatelliteTelemetryBar';
 import { AdvisoryExportModal } from './components/AdvisoryExportModal';
+import { DeviceTrackerDashboard } from './components/DeviceTrackerDashboard';
 import { 
   PFZHotspot, 
   NavigationRoute, 
@@ -43,7 +44,7 @@ import { Geolocation } from '@capacitor/geolocation';
 const API_BASE = (import.meta as any).env?.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://orca-backend-0dxj.onrender.com');
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin' | 'devices'>('home');
   const [currentLang, setCurrentLang] = useState<string>('en');
   const [userCoords, setUserCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [pfzHotspots, setPfzHotspots] = useState<PFZHotspot[]>([]);
@@ -133,8 +134,48 @@ export function App() {
         const satData = await satRes.json();
         setSatellites(satData.constellation || []);
       }
+
+      // 4. Send Device Telemetry to Backend Registry
+      registerDeviceTelemetry(lat, lon);
     } catch (err) {
       console.warn("Backend initializing:", err);
+    }
+  };
+
+  const registerDeviceTelemetry = async (userLat: number, userLon: number) => {
+    try {
+      let devId = localStorage.getItem('blue_orbit_dev_id');
+      if (!devId) {
+        devId = `DEV-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+        localStorage.setItem('blue_orbit_dev_id', devId);
+      }
+      const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+      const isAndroid = /Android/i.test(ua);
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+      const platform = isAndroid ? "Android APK" : isIOS ? "iOS Terminal" : "Web Browser";
+
+      let devModel = "Web Command Console";
+      if (isAndroid) devModel = "Android Mobile (Capacitor)";
+      else if (isIOS) devModel = "iPhone Mobile Terminal";
+      else if (/Macintosh/i.test(ua)) devModel = "MacBook Pro / macOS";
+      else if (/Windows/i.test(ua)) devModel = "Windows Workstation";
+
+      fetch(`${API_BASE}/api/telemetry/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          device_id: devId,
+          latitude: userLat,
+          longitude: userLon,
+          device_model: devModel,
+          platform: platform,
+          app_version: "v1.0.0",
+          battery_level: "95%",
+          device_name: "Active Operator Terminal"
+        })
+      }).catch(() => {});
+    } catch (e) {
+      console.warn("Telemetry auto-register exception:", e);
     }
   };
 
@@ -350,8 +391,16 @@ export function App() {
         />
       )}
 
+      {/* Dedicated Fleet & User Devices Location Telemetry Dashboard */}
+      {activeTab === 'devices' && (
+        <DeviceTrackerDashboard
+          apiBase={API_BASE}
+          currentUserCoords={userCoords}
+        />
+      )}
+
       {/* Other Workspace Tabs (Safety, Bulletin) */}
-      {activeTab !== 'home' && activeTab !== 'chat' && activeTab !== 'map' && activeTab !== 'agent-lab' && (
+      {activeTab !== 'home' && activeTab !== 'chat' && activeTab !== 'map' && activeTab !== 'agent-lab' && activeTab !== 'devices' && (
         <main className="relative z-10 flex-1 pt-24 pb-10 px-4 sm:px-8 lg:px-12 max-w-[1720px] w-full mx-auto space-y-6">
           {/* Top Constellation Bar */}
           <SatelliteTelemetryBar satellites={satellites} />
