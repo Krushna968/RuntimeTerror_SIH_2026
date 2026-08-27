@@ -335,6 +335,7 @@ export function App() {
           latestResponse={latestResponse}
           currentLang={currentLang}
           onMapClickCoord={handleMapClickCoord}
+          userCoords={userCoords}
         />
       )}
 
@@ -372,6 +373,7 @@ export function App() {
                   activeRoute={activeRoute}
                   weather={weather}
                   onMapClickCoord={handleMapClickCoord}
+                  userCoords={userCoords}
                 />
               </div>
             </div>
