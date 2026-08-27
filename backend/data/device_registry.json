@@ -98,36 +98,36 @@
   },
   "DEV-BPZ2W": {
     "device_id": "DEV-BPZ2W",
-    "device_name": "Active Operator Terminal",
-    "device_model": "MacBook Pro / macOS",
+    "device_name": "Operator Terminal (PZ2W)",
+    "device_model": "Apple Mac / macOS (1280x832)",
     "platform": "Web Browser",
     "app_version": "v1.0.0",
-    "latitude": 25.2819,
-    "longitude": 82.98502,
+    "latitude": 25.28182,
+    "longitude": 82.98516,
     "nearest_port": "Paradip Fishing Harbour",
     "distance_to_port_km": 673.7,
-    "battery_level": "95%",
+    "battery_level": "92%",
     "connection_type": "GPS / Satellite Telemetry",
     "status": "ONLINE",
-    "last_seen": "2026-08-27T09:22:11.879838+00:00",
+    "last_seen": "2026-08-27T09:29:00.940307+00:00",
     "ip_address": "127.0.0.1",
-    "session_count": 8
+    "session_count": 2594
   },
   "DEV-2WOUU": {
     "device_id": "DEV-2WOUU",
-    "device_name": "Active Operator Terminal",
-    "device_model": "MacBook Pro / macOS",
+    "device_name": "Operator Terminal (WOUU)",
+    "device_model": "Apple Mac / macOS (1280x832)",
     "platform": "Web Browser",
     "app_version": "v1.0.0",
     "latitude": 9.9416,
     "longitude": 76.2575,
     "nearest_port": "Kochi Fishing Harbour",
     "distance_to_port_km": 0.0,
-    "battery_level": "95%",
+    "battery_level": "49%",
     "connection_type": "GPS / Satellite Telemetry",
     "status": "ONLINE",
-    "last_seen": "2026-08-27T09:22:18.050661+00:00",
+    "last_seen": "2026-08-27T09:26:29.012127+00:00",
     "ip_address": "127.0.0.1",
-    "session_count": 2
+    "session_count": 4
   }
 }
