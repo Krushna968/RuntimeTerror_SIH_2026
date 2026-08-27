@@ -396,6 +396,7 @@ export function App() {
         <DeviceTrackerDashboard
           apiBase={API_BASE}
           currentUserCoords={userCoords}
+          onExitPortal={() => setActiveTab('home')}
         />
       )}
 

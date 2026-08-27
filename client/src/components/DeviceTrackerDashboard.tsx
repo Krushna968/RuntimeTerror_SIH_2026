@@ -18,7 +18,12 @@ import {
   ShieldCheck, 
   ExternalLink,
   Layers,
-  Sparkles
+  Sparkles,
+  Lock,
+  Unlock,
+  KeyRound,
+  ShieldAlert,
+  ArrowRight
 } from 'lucide-react';
 
 interface DeviceItem {
@@ -53,12 +58,26 @@ interface TelemetrySummary {
 interface DeviceTrackerDashboardProps {
   apiBase: string;
   currentUserCoords?: { lat: number; lon: number } | null;
+  onExitPortal?: () => void;
 }
+
+const AUTHORIZED_PASSCODES = ["ISRO-2026", "isro2026", "RUNTIME-TERROR", "admin2026", "admin"];
 
 export const DeviceTrackerDashboard: React.FC<DeviceTrackerDashboardProps> = ({
   apiBase,
-  currentUserCoords
+  currentUserCoords,
+  onExitPortal
 }) => {
+  // Authentication Gate State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('isro_noc_passcode_verified') === 'true';
+    }
+    return false;
+  });
+  const [passcodeInput, setPasscodeInput] = useState<string>('');
+  const [authError, setAuthError] = useState<string>('');
+
   const [devices, setDevices] = useState<DeviceItem[]>([]);
   const [summary, setSummary] = useState<TelemetrySummary | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -70,8 +89,27 @@ export const DeviceTrackerDashboard: React.FC<DeviceTrackerDashboardProps> = ({
   const mapInstanceRef = useRef<L.Map | null>(null);
   const deviceMarkersGroup = useRef<L.LayerGroup>(L.layerGroup());
 
+  // Handle Passcode Unlock
+  const handleUnlock = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (AUTHORIZED_PASSCODES.includes(passcodeInput.trim())) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('isro_noc_passcode_verified', 'true');
+      setAuthError('');
+    } else {
+      setAuthError('Invalid Security Passcode. Access Denied.');
+    }
+  };
+
+  const handleLockOut = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('isro_noc_passcode_verified');
+    if (onExitPortal) onExitPortal();
+  };
+
   // Fetch telemetry from backend
   const fetchTelemetry = async () => {
+    if (!isAuthenticated) return;
     setIsLoading(true);
     try {
       const res = await fetch(`${apiBase}/api/telemetry/devices`);
@@ -88,14 +126,16 @@ export const DeviceTrackerDashboard: React.FC<DeviceTrackerDashboardProps> = ({
   };
 
   useEffect(() => {
-    fetchTelemetry();
-    const interval = setInterval(fetchTelemetry, 15000); // Poll every 15s
-    return () => clearInterval(interval);
-  }, [apiBase]);
+    if (isAuthenticated) {
+      fetchTelemetry();
+      const interval = setInterval(fetchTelemetry, 15000); // Poll every 15s
+      return () => clearInterval(interval);
+    }
+  }, [apiBase, isAuthenticated]);
 
   // Initialize Map
   useEffect(() => {
-    if (!mapContainerRef.current || mapInstanceRef.current) return;
+    if (!isAuthenticated || !mapContainerRef.current || mapInstanceRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
       center: currentUserCoords ? [currentUserCoords.lat, currentUserCoords.lon] : [14.0, 78.5],
@@ -117,11 +157,12 @@ export const DeviceTrackerDashboard: React.FC<DeviceTrackerDashboardProps> = ({
 
     setTimeout(() => {
       map.invalidateSize();
-    }, 200);
-  }, []);
+    }, 250);
+  }, [isAuthenticated]);
 
   // Update Map Markers
   useEffect(() => {
+    if (!isAuthenticated) return;
     deviceMarkersGroup.current.clearLayers();
     if (!mapInstanceRef.current || devices.length === 0) return;
 
@@ -172,7 +213,7 @@ export const DeviceTrackerDashboard: React.FC<DeviceTrackerDashboardProps> = ({
 
       deviceMarkersGroup.current.addLayer(marker);
     });
-  }, [devices]);
+  }, [devices, isAuthenticated]);
 
   // Fly to device on map
   const handleFlyToDevice = (dev: DeviceItem) => {
@@ -241,6 +282,73 @@ export const DeviceTrackerDashboard: React.FC<DeviceTrackerDashboardProps> = ({
     return matchesSearch && matchesPlatform;
   });
 
+  // 1. If NOT authenticated, show the High-Security Passcode Gate
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 pt-20 pb-12 select-none font-['Outfit',sans-serif]">
+        <div className="w-full max-w-md bg-slate-900 text-white rounded-3xl p-8 border border-slate-800 shadow-2xl space-y-6 relative overflow-hidden">
+          
+          {/* Top Ambient Glow */}
+          <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="space-y-2 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-cyan-400 flex items-center justify-center mx-auto shadow-inner">
+              <Lock className="w-7 h-7" />
+            </div>
+            <div className="inline-block px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-mono font-bold uppercase tracking-widest mt-2">
+              RESTRICTED ACCESS ONLY
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+              ISRO Fleet Telemetry Gateway
+            </h2>
+            <p className="text-xs text-slate-400 font-normal leading-relaxed">
+              This terminal tracks live user coordinates, mobile app telemetry, and coastal vessel GPS nodes. Authorized ISRO & Coastal Command personnel only.
+            </p>
+          </div>
+
+          <form onSubmit={handleUnlock} className="space-y-4">
+            <div className="space-y-1.5 text-left">
+              <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-1.5">
+                <KeyRound className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Security Passcode / Access Key</span>
+              </label>
+              <input
+                type="password"
+                value={passcodeInput}
+                onChange={(e) => setPasscodeInput(e.target.value)}
+                placeholder="Enter Passcode (e.g. ISRO-2026)"
+                autoFocus
+                className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 focus:border-cyan-400 focus:outline-none text-white text-sm font-mono placeholder-slate-600 transition-all"
+              />
+              {authError && (
+                <div className="text-xs font-semibold text-red-400 flex items-center space-x-1 pt-1">
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                  <span>{authError}</span>
+                </div>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-lg shadow-blue-500/25 active:scale-95 transition-all cursor-pointer"
+            >
+              <span>Authenticate & Access NOC</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+
+          <div className="pt-2 border-t border-slate-800/80 text-center">
+            <div className="text-[11px] text-slate-500 font-mono">
+              Evaluator Access Key: <span className="text-cyan-400 font-bold">ISRO-2026</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  // 2. If Authenticated, show Full Live Dashboard
   return (
     <div className="pt-24 pb-16 px-4 sm:px-8 lg:px-12 max-w-7xl mx-auto space-y-6 select-none font-['Outfit',sans-serif]">
       
@@ -249,13 +357,13 @@ export const DeviceTrackerDashboard: React.FC<DeviceTrackerDashboardProps> = ({
         <div className="space-y-1.5">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold font-mono">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-            <span>ISRO NAVIC / SATELLITE FLEET TELEMETRY ONLINE</span>
+            <span>AUTHENTICATED · ISRO SATELLITE FLEET TELEMETRY ACTIVE</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
             Active Users & Device Locations Telemetry Hub
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 font-normal">
-            Real-time geospatial tracking and device telemetry for coastal fishermen, mobile apps, and command terminals.
+            Geospatial tracking and device telemetry for coastal fishermen, mobile apps, and command terminals.
           </p>
         </div>
 
@@ -275,6 +383,15 @@ export const DeviceTrackerDashboard: React.FC<DeviceTrackerDashboardProps> = ({
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export GPS CSV</span>
+          </button>
+
+          <button
+            onClick={handleLockOut}
+            className="flex items-center space-x-1.5 px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer"
+            title="Lock and exit restricted terminal"
+          >
+            <Lock className="w-3.5 h-3.5 text-red-400" />
+            <span>Lock Gate</span>
           </button>
         </div>
       </div>

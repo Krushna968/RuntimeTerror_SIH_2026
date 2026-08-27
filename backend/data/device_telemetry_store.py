@@ -148,7 +148,8 @@ class DeviceTelemetryStore:
         # Calculate nearest reference port
         nearest_port = "Indian Coastal Waters"
         min_dist = 9999.0
-        for port in INDIAN_PORTS:
+        ports_dict = INDIAN_PORTS if isinstance(INDIAN_PORTS, dict) else {}
+        for port in ports_dict.values():
             d = calculate_distance_km(latitude, longitude, port["lat"], port["lon"])
             if d < min_dist:
                 min_dist = d

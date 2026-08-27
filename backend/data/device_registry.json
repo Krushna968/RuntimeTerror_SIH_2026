@@ -78,5 +78,39 @@
     "status": "ONLINE",
     "last_seen": "2026-08-27T08:47:48.117271+00:00",
     "ip_address": "117.211.89.5"
+  },
+  "DEV-WTH4D": {
+    "device_id": "DEV-WTH4D",
+    "device_name": "Active Operator Terminal",
+    "device_model": "MacBook Pro / macOS",
+    "platform": "Web Browser",
+    "app_version": "v1.0.0",
+    "latitude": 9.9416,
+    "longitude": 76.2575,
+    "nearest_port": "Kochi Fishing Harbour",
+    "distance_to_port_km": 0.0,
+    "battery_level": "95%",
+    "connection_type": "GPS / Satellite Telemetry",
+    "status": "ONLINE",
+    "last_seen": "2026-08-27T08:51:52.973911+00:00",
+    "ip_address": "127.0.0.1",
+    "session_count": 2
+  },
+  "DEV-BPZ2W": {
+    "device_id": "DEV-BPZ2W",
+    "device_name": "Active Operator Terminal",
+    "device_model": "MacBook Pro / macOS",
+    "platform": "Web Browser",
+    "app_version": "v1.0.0",
+    "latitude": 25.26958,
+    "longitude": 82.99399,
+    "nearest_port": "Paradip Fishing Harbour",
+    "distance_to_port_km": 672.0,
+    "battery_level": "95%",
+    "connection_type": "GPS / Satellite Telemetry",
+    "status": "ONLINE",
+    "last_seen": "2026-08-27T08:51:53.004812+00:00",
+    "ip_address": "127.0.0.1",
+    "session_count": 2
   }
 }

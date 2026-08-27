@@ -79,7 +79,6 @@ export const Header: React.FC<HeaderProps> = ({
     { key: 'map', label: 'GIS Command', icon: Map },
     { key: 'agent-lab', label: 'Agent DAG', icon: Cpu },
     { key: 'safety', label: 'Safety Barometer', icon: ShieldCheck },
-    { key: 'devices', label: 'Fleet & Devices', icon: Radio },
     { key: 'bulletin', label: 'Advisory Bulletin', icon: FileText }
   ] as const;
 
