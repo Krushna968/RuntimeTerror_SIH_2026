@@ -14,7 +14,8 @@ import {
   Copy, 
   Check,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Navigation
 } from 'lucide-react';
 import { PFZHotspot, NavigationRoute, WeatherObservation, SatelliteTelemetry, ChatResponsePayload } from '../types';
 
@@ -30,6 +31,7 @@ interface GisCommandViewProps {
   latestResponse: ChatResponsePayload | null;
   currentLang: string;
   onMapClickCoord: (lat: number, lon: number) => void;
+  userCoords?: { lat: number; lon: number } | null;
 }
 
 const INDIAN_PORTS = [
@@ -54,7 +56,8 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   onSendMessage,
   isLoading,
   latestResponse,
-  onMapClickCoord
+  onMapClickCoord,
+  userCoords
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -94,14 +97,15 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   const routeLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const cycloneLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const clickMarkerGroup = useRef<L.LayerGroup>(L.layerGroup());
+  const userLocationGroup = useRef<L.LayerGroup>(L.layerGroup());
 
   // Initialize Fullscreen Leaflet Map
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
-      center: [14.0, 78.5],
-      zoom: 6,
+      center: userCoords ? [userCoords.lat, userCoords.lon] : [14.0, 78.5],
+      zoom: userCoords ? 8 : 6,
       minZoom: 4,
       maxZoom: 15,
       zoomControl: false,
@@ -125,6 +129,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
     routeLayerGroup.current.addTo(map);
     cycloneLayerGroup.current.addTo(map);
     clickMarkerGroup.current.addTo(map);
+    userLocationGroup.current.addTo(map);
 
     // Map click handler with instant visual feedback
     map.on('click', (e: L.LeafletMouseEvent) => {
@@ -382,6 +387,45 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
     }
   }, [activeRoute, vesselProgress]);
 
+  // Live User GPS Location Beacon Effect
+  useEffect(() => {
+    userLocationGroup.current.clearLayers();
+    if (!userCoords || !mapInstanceRef.current) return;
+
+    const userGpsIcon = L.divIcon({
+      className: 'custom-gps-user-beacon',
+      html: `
+        <div class="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
+          <span class="absolute w-12 h-12 rounded-full bg-blue-500/25 animate-ping"></span>
+          <span class="absolute w-7 h-7 rounded-full bg-blue-500/50 animate-pulse"></span>
+          <div class="relative w-4 h-4 rounded-full bg-blue-600 border-2 border-white shadow-xl flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+          </div>
+        </div>
+      `,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
+    });
+
+    const marker = L.marker([userCoords.lat, userCoords.lon], { icon: userGpsIcon, zIndexOffset: 1500 })
+      .bindPopup(`
+        <div class="p-2 text-slate-900 text-xs space-y-1">
+          <div class="font-bold text-blue-700 flex items-center space-x-1">
+            <span>📍 Your Exact GPS Location</span>
+          </div>
+          <div class="text-[11px] text-slate-600 font-mono">
+            ${userCoords.lat.toFixed(4)}°N, ${userCoords.lon.toFixed(4)}°E
+          </div>
+          <div class="text-[10px] text-emerald-600 font-bold">
+            ✓ Live ISRO Satellite Stream Connected
+          </div>
+        </div>
+      `);
+
+    userLocationGroup.current.addLayer(marker);
+    mapInstanceRef.current.flyTo([userCoords.lat, userCoords.lon], 9, { duration: 1.5 });
+  }, [userCoords]);
+
   // Trawler animation ticker
   useEffect(() => {
     if (!isSimulatingVessel) return;
@@ -434,6 +478,22 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
         ref={mapContainerRef} 
         className="absolute inset-0 w-full h-full z-0 cursor-crosshair" 
       />
+
+      {/* Floating "My Location" GPS Button */}
+      {userCoords && (
+        <button
+          onClick={() => {
+            if (userCoords && mapInstanceRef.current) {
+              mapInstanceRef.current.flyTo([userCoords.lat, userCoords.lon], 10, { duration: 1.2 });
+            }
+          }}
+          className="absolute bottom-24 left-6 z-20 pointer-events-auto flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-white/95 backdrop-blur-xl border border-zinc-200/80 shadow-md text-xs font-bold text-zinc-900 hover:bg-zinc-50 active:scale-95 transition-all cursor-pointer"
+          title="Recenter map to your GPS location"
+        >
+          <Navigation className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
+          <span>My GPS Location</span>
+        </button>
+      )}
 
       {/* 2. Top-Left Sleek Apple-Style Layer Controls */}
       <div className="absolute top-24 left-6 z-20 pointer-events-auto w-56 rounded-2xl bg-white/95 backdrop-blur-xl border border-zinc-200/80 shadow-lg text-zinc-900 overflow-hidden transition-all">

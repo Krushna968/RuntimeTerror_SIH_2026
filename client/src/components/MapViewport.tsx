@@ -23,6 +23,7 @@ interface MapViewportProps {
   activeRoute: NavigationRoute | null;
   weather: WeatherObservation | null;
   onMapClickCoord: (lat: number, lon: number) => void;
+  userCoords?: { lat: number; lon: number } | null;
 }
 
 export const MapViewport: React.FC<MapViewportProps> = ({
@@ -31,7 +32,8 @@ export const MapViewport: React.FC<MapViewportProps> = ({
   onSelectPFZ,
   activeRoute,
   weather,
-  onMapClickCoord
+  onMapClickCoord,
+  userCoords
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -55,6 +57,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
   const mpaLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const routeLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const cycloneLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
+  const userLocationGroup = useRef<L.LayerGroup>(L.layerGroup());
   const vesselMarkerRef = useRef<L.Marker | null>(null);
 
   // Initialize Map
@@ -88,6 +91,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
     mpaLayerGroup.current.addTo(map);
     routeLayerGroup.current.addTo(map);
     cycloneLayerGroup.current.addTo(map);
+    userLocationGroup.current.addTo(map);
 
     // Map click handler for arbitrary coordinate inspection
     map.on('click', (e: L.LeafletMouseEvent) => {
@@ -364,6 +368,45 @@ export const MapViewport: React.FC<MapViewportProps> = ({
     }
   }, [showRoute, activeRoute, vesselProgress]);
 
+  // Live User GPS Location Beacon Effect
+  useEffect(() => {
+    userLocationGroup.current.clearLayers();
+    if (!userCoords || !mapInstanceRef.current) return;
+
+    const userGpsIcon = L.divIcon({
+      className: 'custom-gps-user-beacon',
+      html: `
+        <div class="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
+          <span class="absolute w-12 h-12 rounded-full bg-blue-500/25 animate-ping"></span>
+          <span class="absolute w-7 h-7 rounded-full bg-blue-500/50 animate-pulse"></span>
+          <div class="relative w-4 h-4 rounded-full bg-blue-600 border-2 border-white shadow-xl flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+          </div>
+        </div>
+      `,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
+    });
+
+    const marker = L.marker([userCoords.lat, userCoords.lon], { icon: userGpsIcon, zIndexOffset: 1500 })
+      .bindPopup(`
+        <div class="p-2 text-slate-900 text-xs space-y-1">
+          <div class="font-bold text-blue-700 flex items-center space-x-1">
+            <span>📍 Your Exact GPS Location</span>
+          </div>
+          <div class="text-[11px] text-slate-600 font-mono">
+            ${userCoords.lat.toFixed(4)}°N, ${userCoords.lon.toFixed(4)}°E
+          </div>
+          <div class="text-[10px] text-emerald-600 font-bold">
+            ✓ Live ISRO Satellite Stream Connected
+          </div>
+        </div>
+      `);
+
+    userLocationGroup.current.addLayer(marker);
+    mapInstanceRef.current.flyTo([userCoords.lat, userCoords.lon], 9, { duration: 1.5 });
+  }, [userCoords]);
+
   // Vessel animation ticker
   useEffect(() => {
     if (!isSimulatingVessel || !activeRoute) return;
@@ -386,6 +429,22 @@ export const MapViewport: React.FC<MapViewportProps> = ({
         className="w-full h-full min-h-[520px] flex-1" 
         style={{ width: '100%', height: '100%', minHeight: '520px' }} 
       />
+
+      {/* Floating My Location GPS Button */}
+      {userCoords && (
+        <button
+          onClick={() => {
+            if (userCoords && mapInstanceRef.current) {
+              mapInstanceRef.current.flyTo([userCoords.lat, userCoords.lon], 10, { duration: 1.2 });
+            }
+          }}
+          className="absolute bottom-6 right-6 z-[400] flex items-center space-x-2 px-3.5 py-2.5 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200 shadow-xl hover:bg-slate-50 text-xs font-bold text-slate-800 active:scale-95 transition-all cursor-pointer"
+          title="Recenter to your GPS location"
+        >
+          <Navigation className="w-4 h-4 text-blue-600 animate-pulse" />
+          <span>My GPS Location</span>
+        </button>
+      )}
 
       {/* Floating Layer Control Panel (Bright Glass) */}
       <div className="absolute top-4 left-4 z-[400] bg-white/95 backdrop-blur-md p-3.5 rounded-2xl border border-slate-200 shadow-xl max-w-xs space-y-2.5 text-xs text-slate-800">
