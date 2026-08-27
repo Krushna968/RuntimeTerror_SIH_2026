@@ -2,13 +2,14 @@ import React from 'react';
 import { 
   ArrowRight, 
   Sparkles, 
-  Compass
+  Compass,
+  Lock
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import KineticGrid from './ui/kinetic-grid';
 
 interface BlueOrbitLandingHeroProps {
-  onExplorePlatform: (tab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin') => void;
+  onExplorePlatform: (tab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin' | 'devices') => void;
 }
 
 export const BlueOrbitLandingHero: React.FC<BlueOrbitLandingHeroProps> = ({
@@ -77,8 +78,17 @@ export const BlueOrbitLandingHero: React.FC<BlueOrbitLandingHeroProps> = ({
         <div>
           Created by <strong className="text-slate-700 font-medium">Team Runtime Terror</strong> for ISRO · Smart India Hackathon 2026
         </div>
-        <div className="text-xs text-slate-500 font-mono">
-          Oceansat-3 · INSAT-3DR · INCOIS
+        <div className="flex items-center space-x-3 text-xs text-slate-500 font-mono">
+          <span>Oceansat-3 · INSAT-3DR · INCOIS</span>
+          <span>·</span>
+          <button
+            onClick={() => onExplorePlatform('devices')}
+            className="hover:text-blue-600 transition-colors flex items-center space-x-1 cursor-pointer text-[11px] text-slate-400 hover:underline"
+            title="Restricted NOC Telemetry Gate"
+          >
+            <Lock className="w-3 h-3" />
+            <span>NOC Access</span>
+          </button>
         </div>
       </footer>
     </KineticGrid>
