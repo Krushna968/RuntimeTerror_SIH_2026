@@ -38,11 +38,14 @@ import {
   Home
 } from 'lucide-react';
 
+import { Geolocation } from '@capacitor/geolocation';
+
 const API_BASE = (import.meta as any).env?.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://orca-backend-0dxj.onrender.com');
 
 export function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin'>('home');
   const [currentLang, setCurrentLang] = useState<string>('en');
+  const [userCoords, setUserCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [pfzHotspots, setPfzHotspots] = useState<PFZHotspot[]>([]);
   const [selectedPFZ, setSelectedPFZ] = useState<PFZHotspot | null>(null);
   const [activeRoute, setActiveRoute] = useState<NavigationRoute | null>(null);
@@ -53,13 +56,59 @@ export function App() {
   const [isBulletinModalOpen, setIsBulletinModalOpen] = useState<boolean>(false);
   const [isSOSModalOpen, setIsSOSModalOpen] = useState<boolean>(false);
 
-  // Initial load
+  // Initial load & Location Permission Prompt
   useEffect(() => {
     document.title = "Blue Orbit — ISRO Marine Ecosystem Reasoning with Collaborative Agents";
-    fetchInitialData();
+    requestLocationAndInitialize();
   }, []);
 
-  const fetchInitialData = async () => {
+  const requestLocationAndInitialize = async () => {
+    let lat = 9.9416;
+    let lon = 76.2575;
+
+    try {
+      if (typeof window !== 'undefined') {
+        // 1. Try Native Capacitor Geolocation Permission Request
+        try {
+          const permStatus = await Geolocation.requestPermissions();
+          if (permStatus.location === 'granted') {
+            const pos = await Geolocation.getCurrentPosition({
+              enableHighAccuracy: true,
+              timeout: 10000
+            });
+            lat = pos.coords.latitude;
+            lon = pos.coords.longitude;
+            setUserCoords({ lat, lon });
+            console.log(`[Blue Orbit GPS] Location granted: ${lat}, ${lon}`);
+          }
+        } catch (capErr) {
+          // 2. Fallback to Standard HTML5 Geolocation API
+          if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                const browserLat = pos.coords.latitude;
+                const browserLon = pos.coords.longitude;
+                setUserCoords({ lat: browserLat, lon: browserLon });
+                fetchInitialData(browserLat, browserLon);
+              },
+              (err) => {
+                console.warn('[Blue Orbit GPS] Location declined or unavailable:', err);
+                fetchInitialData(lat, lon);
+              },
+              { enableHighAccuracy: true, timeout: 8000 }
+            );
+            return;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[Blue Orbit GPS] Permission initialization exception:', err);
+    }
+
+    fetchInitialData(lat, lon);
+  };
+
+  const fetchInitialData = async (lat: number = 9.9416, lon: number = 76.2575) => {
     try {
       // 1. Fetch PFZ Hotspots
       const pfzRes = await fetch(`${API_BASE}/api/pfz?port=kochi`);
@@ -71,8 +120,8 @@ export function App() {
         }
       }
 
-      // 2. Fetch Weather & Safety
-      const weatherRes = await fetch(`${API_BASE}/api/weather?lat=9.9416&lon=76.2575`);
+      // 2. Fetch Weather & Safety for current location
+      const weatherRes = await fetch(`${API_BASE}/api/weather?lat=${lat}&lon=${lon}`);
       if (weatherRes.ok) {
         const wData = await weatherRes.json();
         setWeather(wData);
