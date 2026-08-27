@@ -1,5 +1,5 @@
 """
-Multilingual & Regional Indian Language Conversational Agent for ORCA
+Multilingual & Regional Indian Language Conversational Agent for Blue Orbit
 Supports 8 Indian regional languages:
 - Hindi (हिंदी)
 - Tamil (தமிழ்)
@@ -282,7 +282,7 @@ class MultilingualAgent:
 
         # Default fallback
         else:
-            text_out = f"ORCA Marine Multi-Agent System processed your query. All agent telemetry synchronized."
+            text_out = f"Blue Orbit Marine Multi-Agent System processed your query. All agent telemetry synchronized."
 
         # Generate clean plain text for TTS speech synthesizer (no markdown symbols)
         tts_clean = re.sub(r'[*#•🛰️🛡️🛑\n]+', ' ', text_out).strip()

@@ -5,7 +5,7 @@ import './index.css'
 import { App } from './App'
 
 // Ensure browser tab title is updated immediately
-document.title = "ORCA — ISRO Marine EcOsystem Reasoning with Collaborative Agents";
+document.title = "Blue Orbit — ISRO Marine Ecosystem Reasoning with Collaborative Agents";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

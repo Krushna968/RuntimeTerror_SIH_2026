@@ -1,5 +1,5 @@
 """
-Ocean Analytics & Potential Fishing Zone (PFZ) Agent for ORCA
+Ocean Analytics & Potential Fishing Zone (PFZ) Agent for Blue Orbit
 Implements the scientific PFZ generation methodology:
 - Thermal front identification (horizontal SST gradient |∇SST|)
 - Ocean color chlorophyll front extraction (|∇Chl-a|)

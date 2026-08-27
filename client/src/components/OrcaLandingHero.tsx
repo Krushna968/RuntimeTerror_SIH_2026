@@ -7,11 +7,11 @@ import {
 import { motion } from 'framer-motion';
 import KineticGrid from './ui/kinetic-grid';
 
-interface OrcaLandingHeroProps {
+interface BlueOrbitLandingHeroProps {
   onExplorePlatform: (tab: 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin') => void;
 }
 
-export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
+export const BlueOrbitLandingHero: React.FC<BlueOrbitLandingHeroProps> = ({
   onExplorePlatform
 }) => {
   return (
@@ -27,21 +27,21 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
       />
 
       {/* Main Left-Aligned Calibrated Hero Section */}
-      <main className="relative z-10 flex-1 flex flex-col items-start justify-center text-left px-6 sm:px-12 lg:px-20 pt-32 sm:pt-40 pb-16 max-w-7xl mx-auto w-full pointer-events-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-start justify-center text-left px-4 sm:px-12 lg:px-20 pt-28 sm:pt-40 pb-12 max-w-7xl mx-auto w-full pointer-events-auto">
         
         {/* Calibrated Display Headline & Subtitle */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="space-y-4 max-w-3xl"
+          className="space-y-3 sm:space-y-4 max-w-3xl"
         >
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-[-0.035em] leading-[1.1] select-none text-slate-900 drop-shadow-xs">
+          <h1 className="text-3xl sm:text-6xl md:text-7xl font-extrabold tracking-[-0.035em] leading-[1.15] select-none text-slate-900 drop-shadow-xs">
             The Agentic Brain<br />
             for the <span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 bg-clip-text text-transparent">Indian Ocean</span>
           </h1>
 
-          <p className="text-slate-600 text-sm sm:text-base md:text-lg max-w-2xl font-normal leading-[1.65] pt-1">
+          <p className="text-slate-600 text-xs sm:text-base md:text-lg max-w-2xl font-normal leading-[1.65] pt-1">
             Autonomous multi-agent platform reasoning over ISRO satellite oceanography, SST-chlorophyll thermal fronts, and IMBL geofencing to empower 4 million+ coastal fishermen.
           </p>
         </motion.div>
@@ -51,11 +51,11 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
-          className="mt-8 flex flex-col sm:flex-row items-center gap-3.5"
+          className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto"
         >
           <button 
             onClick={() => onExplorePlatform('chat')}
-            className="px-6 py-3 rounded-full text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-all shadow-md active:scale-95 cursor-pointer flex items-center space-x-2 group"
+            className="w-full sm:w-auto px-6 py-3 rounded-full text-xs sm:text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center space-x-2 group"
           >
             <Sparkles className="w-4 h-4 text-cyan-300 group-hover:rotate-12 transition-transform" />
             <span>Launch AI Decision Studio</span>
@@ -64,7 +64,7 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
 
           <button 
             onClick={() => onExplorePlatform('map')}
-            className="px-6 py-3 rounded-full text-sm font-semibold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 transition-all flex items-center space-x-2 active:scale-95 cursor-pointer shadow-xs"
+            className="w-full sm:w-auto px-6 py-3 rounded-full text-xs sm:text-sm font-semibold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 transition-all flex items-center justify-center space-x-2 active:scale-95 cursor-pointer shadow-xs"
           >
             <Compass className="w-4 h-4 text-blue-600" />
             <span>GIS Command Map</span>
@@ -84,3 +84,6 @@ export const OrcaLandingHero: React.FC<OrcaLandingHeroProps> = ({
     </KineticGrid>
   );
 };
+
+export const OrcaLandingHero = BlueOrbitLandingHero;
+

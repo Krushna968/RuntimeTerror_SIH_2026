@@ -81,6 +81,11 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   const [speaking, setSpeaking] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Mobile Drawer Toggle State
+  const [isAssistantOpen, setIsAssistantOpen] = useState(
+    typeof window !== 'undefined' ? window.innerWidth >= 768 : true
+  );
+
   // Layer Groups
   const pfzLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const imblLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
@@ -551,18 +556,29 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       </div>
 
       {/* 4. Right-Side Minimalist AI Assistant Drawer */}
-      <div className="absolute top-24 right-6 bottom-6 z-20 pointer-events-auto w-84 lg:w-[400px] max-w-[92vw] flex flex-col rounded-3xl bg-white/95 backdrop-blur-2xl border border-zinc-200/80 shadow-xl text-zinc-900 overflow-hidden">
-        
-        {/* Minimal Header */}
-        <div className="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between shrink-0">
-          <div className="flex items-center space-x-2">
-            <span className={`w-2 h-2 rounded-full ${isLoading ? 'bg-blue-600 animate-ping' : 'bg-emerald-500 animate-pulse'}`} />
-            <h3 className="text-xs font-bold text-zinc-900 tracking-tight">ORCA Assistant</h3>
+      {isAssistantOpen ? (
+        <div className="absolute top-20 sm:top-24 right-3 sm:right-6 bottom-4 sm:bottom-6 z-20 pointer-events-auto w-[calc(100vw-24px)] sm:w-84 lg:w-[400px] max-w-[400px] flex flex-col rounded-3xl bg-white/95 backdrop-blur-2xl border border-zinc-200/80 shadow-2xl text-zinc-900 overflow-hidden transition-all">
+          
+          {/* Minimal Header */}
+          <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-zinc-100 flex items-center justify-between shrink-0">
+            <div className="flex items-center space-x-2">
+              <span className={`w-2 h-2 rounded-full ${isLoading ? 'bg-blue-600 animate-ping' : 'bg-emerald-500 animate-pulse'}`} />
+              <h3 className="text-xs font-bold text-zinc-900 tracking-tight">Blue Orbit Assistant</h3>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-[10px] font-medium text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full">
+                ISRO AI
+              </span>
+              {/* Close Button on Mobile */}
+              <button
+                onClick={() => setIsAssistantOpen(false)}
+                className="p-1 rounded-full text-zinc-400 hover:text-zinc-900 md:hidden cursor-pointer"
+                title="Minimize Assistant"
+              >
+                ✕
+              </button>
+            </div>
           </div>
-          <span className="text-[10px] font-medium text-zinc-500 bg-zinc-100 px-2.5 py-0.5 rounded-full">
-            ISRO AI
-          </span>
-        </div>
 
         {/* Minimalist Query Chips */}
         <div className="px-4 py-2 border-b border-zinc-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
@@ -719,6 +735,16 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
           </form>
         </div>
       </div>
+      ) : (
+        /* Floating Trigger Pill on Mobile when closed */
+        <button
+          onClick={() => setIsAssistantOpen(true)}
+          className="absolute bottom-6 right-6 z-20 pointer-events-auto flex items-center space-x-2 px-4 py-2.5 rounded-full bg-zinc-950 text-white text-xs font-bold shadow-2xl border border-white/20 active:scale-95 transition-all cursor-pointer hover:bg-zinc-800"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <span>Ask Blue Orbit AI</span>
+        </button>
+      )}
     </div>
   );
 };

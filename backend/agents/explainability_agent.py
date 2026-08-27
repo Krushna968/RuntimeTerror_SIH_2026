@@ -1,5 +1,5 @@
 """
-Explainability & Verification Agent for ORCA
+Explainability & Verification Agent for Blue Orbit
 Provides transparent reasoning traces, satellite data provenance citations,
 and standard INCOIS/ISRO Marine Advisory Bulletin generation.
 """
@@ -61,7 +61,7 @@ class ExplainabilityAgent:
         """
         Generates an official INCOIS-ISRO format Marine Advisory Bulletin.
         """
-        bulletin_id = f"INCOIS-ISRO-ORCA-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
+        bulletin_id = f"INCOIS-ISRO-BLUEORBIT-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
         
         return {
             "bulletin_id": bulletin_id,
@@ -82,5 +82,5 @@ class ExplainabilityAgent:
             },
             "geofence_advisory": geofence.get("nearest_imbl", {}).get("alert_message", "Safe within EEZ"),
             "emergency_contact": "Indian Coast Guard MRCC: Toll-Free 1554 / VHF Channel 16",
-            "qr_verification_token": f"ORCA-AUTH-{hash(bulletin_id) & 0xFFFFFFFF:08X}"
+            "qr_verification_token": f"BLUEORBIT-AUTH-{hash(bulletin_id) & 0xFFFFFFFF:08X}"
         }

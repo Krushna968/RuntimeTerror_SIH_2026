@@ -153,7 +153,7 @@ export const AdvisoryExportModal: React.FC<AdvisoryExportModalProps> = ({
           {/* Footer & QR Token */}
           <div className="flex items-center justify-between border-t border-slate-200 pt-3 text-xs text-slate-500">
             <div>
-              Generated autonomously by <strong>ORCA Agentic AI System (ISRO SIH 26176)</strong>
+              Generated autonomously by <strong>Blue Orbit Agentic AI System (ISRO SIH 26176)</strong>
             </div>
             <div className="font-mono text-blue-700 font-bold">
               Auth Token: {bulletin.qr_verification_token}

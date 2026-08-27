@@ -1,2 +1,2 @@
-# ORCA Backend Package
+# Blue Orbit Backend Package
 __version__ = "1.0.0"

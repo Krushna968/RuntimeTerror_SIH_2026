@@ -1,5 +1,5 @@
 """
-Weather & Marine Disaster Hazard Intelligence Agent for ORCA
+Weather & Marine Disaster Hazard Intelligence Agent for Blue Orbit
 Processes meteorological and ocean state feeds:
 - Cyclone tracking and impact circle calculation
 - High wave warning (INCOIS Ocean State Forecast)

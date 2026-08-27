@@ -18,7 +18,7 @@ import { ChatResponsePayload } from '../types';
 
 interface Message {
   id: string;
-  sender: 'user' | 'orca';
+  sender: 'user' | 'blueorbit' | 'orca';
   text: string;
   timestamp: string;
   data?: ChatResponsePayload;
@@ -47,17 +47,17 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Sync latestResponse into messages list ONLY if there is an ongoing conversation
+  // Sync latestResponse into messages list whenever a response arrives
   useEffect(() => {
     if (latestResponse && messages.length > 0) {
       const last = messages[messages.length - 1];
-      if (last && last.sender === 'user' && last.text === latestResponse.query) {
+      if (last && last.sender === 'user') {
         const newMsgId = `msg-${Date.now()}`;
         setMessages(prev => [
           ...prev,
           {
             id: newMsgId,
-            sender: 'orca',
+            sender: 'blueorbit',
             text: latestResponse.response.markdown,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             data: latestResponse
@@ -166,14 +166,14 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
 
       {/* STATE 1: EXACT 1:1 LOVABLE HERO WITH CENTER CHATBOX */}
       {!hasMessages && (
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-4xl w-full mx-auto px-6 my-auto pt-20 pb-16">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-4xl w-full mx-auto px-4 sm:px-6 my-auto pt-24 pb-16">
           
-          {/* Main Headline: Single Line Bold */}
+          {/* Main Headline: Responsive Sizing */}
           <motion.h1 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-6xl sm:text-7xl md:text-8xl font-black text-[#111113] tracking-[-0.04em] leading-tight select-none whitespace-nowrap mb-6"
+            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-[#111113] tracking-[-0.035em] leading-[1.1] select-none mb-4 sm:mb-6"
           >
             Reasoning by design
           </motion.h1>
@@ -183,31 +183,31 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-[#52525b] text-base sm:text-[17px] max-w-[640px] font-normal leading-[1.6] mb-8 text-center"
+            className="text-[#52525b] text-sm sm:text-base md:text-[17px] max-w-[640px] font-normal leading-[1.6] mb-6 sm:mb-8 text-center px-2"
           >
             Reason over ISRO satellite oceanography, verify 0–100 ocean safety clearance,<br className="hidden sm:inline" />
             discover high-yield fishing zones, and maintain strict maritime border compliance.
           </motion.p>
 
-          {/* Action Buttons (Exact Lovable Geometry: rounded-lg) */}
+          {/* Action Buttons (Responsive Wrap) */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex items-center space-x-3 mb-8"
+            className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8 w-full max-w-lg"
           >
             <button
               onClick={() => handleSend("Where is the nearest Potential Fishing Zone for Tuna from Kochi today?")}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#111113] hover:bg-zinc-800 shadow-sm transition-all active:scale-98 cursor-pointer"
+              className="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-white bg-[#111113] hover:bg-zinc-800 shadow-sm transition-all active:scale-98 cursor-pointer"
             >
-              Tuna PFZ Advisory
+              🐟 Tuna PFZ Advisory
             </button>
 
             <button
               onClick={() => handleSend("Is it safe to venture into the sea tomorrow morning?")}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-[#18181b] bg-white hover:bg-zinc-50 border border-[#e4e4e7] shadow-sm transition-all active:scale-98 cursor-pointer"
+              className="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-[#18181b] bg-white hover:bg-zinc-50 border border-[#e4e4e7] shadow-sm transition-all active:scale-98 cursor-pointer"
             >
-              Sea Safety Clearance
+              🛡️ Sea Safety Clearance
             </button>
           </motion.div>
 
@@ -216,11 +216,11 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="w-full max-w-xl"
+            className="w-full max-w-xl px-2 sm:px-0"
           >
             <form 
               onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-              className="relative flex items-center bg-white border border-[#e4e4e7] hover:border-zinc-400 focus-within:border-blue-500 rounded-full px-5 py-3 shadow-[0_10px_35px_rgba(0,0,0,0.06)] transition-all"
+              className="relative flex items-center bg-white border border-[#e4e4e7] hover:border-zinc-400 focus-within:border-blue-500 rounded-full px-3.5 sm:px-5 py-2.5 sm:py-3 shadow-[0_10px_35px_rgba(0,0,0,0.06)] transition-all"
             >
               {/* Plus icon on left */}
               <button 
@@ -238,7 +238,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
                 autoFocus
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Ask ORCA AI anything..."
+                placeholder="Ask Blue Orbit AI anything..."
                 className="flex-1 bg-transparent text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none font-normal"
                 disabled={isLoading}
               />
@@ -290,7 +290,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
                     <div className="w-full bg-white/95 backdrop-blur-md p-6 rounded-2xl border border-[#e4e4e7] shadow-sm space-y-3">
                       <div className="flex items-center space-x-2 text-xs font-bold text-blue-600">
                         <Sparkles className="w-4 h-4" />
-                        <span>ORCA AI Advisory</span>
+                        <span>Blue Orbit AI Advisory</span>
                       </div>
 
                       <div className="text-sm leading-relaxed text-zinc-800 whitespace-pre-line font-normal">
@@ -356,7 +356,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
                 autoFocus
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Ask ORCA AI anything..."
+                placeholder="Ask Blue Orbit AI anything..."
                 className="flex-1 bg-transparent text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none font-normal"
                 disabled={isLoading}
               />

@@ -1,6 +1,6 @@
-# ORCA Design System & UI/UX Specification
+# Blue Orbit Design System & UI/UX Specification
 **ISRO SIH 2026 — Problem Statement 26176**  
-**Platform**: ORCA (Oceanic Reasoning & Collaborative Agentic Network)
+**Platform**: Blue Orbit — Marine Ecosystem Reasoning with Collaborative Agents
 
 ---
 
@@ -20,7 +20,7 @@
 ## 2. Core Layout Architecture
 
 ### A. Top Command Navigation Bar (`Header.tsx`)
-- **Left**: ISRO logo insignia + ORCA brand title with live blinking satellite connection pulse (`Oceansat-3 Live Feed`).
+- **Left**: ISRO logo insignia + Blue Orbit brand title with live blinking satellite connection pulse (`Oceansat-3 Live Feed`).
 - **Center**: Quick-switch module tabs:
   - 🗺️ **GIS Ocean Command** (Full geospatial multi-layer map)
   - 🤖 **Agent Reasoning Lab** (Visual DAG execution inspector)
