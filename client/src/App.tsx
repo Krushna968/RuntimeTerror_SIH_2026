@@ -9,7 +9,6 @@ import { AgentDAGStudio } from './components/AgentDAGStudio';
 import { SeaSafetyBarometer } from './components/SeaSafetyBarometer';
 import { SatelliteTelemetryBar } from './components/SatelliteTelemetryBar';
 import { AdvisoryExportModal } from './components/AdvisoryExportModal';
-import { DeviceTrackerDashboard } from './components/DeviceTrackerDashboard';
 import { 
   PFZHotspot, 
   NavigationRoute, 
@@ -44,7 +43,7 @@ import { Geolocation } from '@capacitor/geolocation';
 const API_BASE = (import.meta as any).env?.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://orca-backend-0dxj.onrender.com');
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin' | 'devices'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin'>('home');
   const [currentLang, setCurrentLang] = useState<string>('en');
   const [userCoords, setUserCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [pfzHotspots, setPfzHotspots] = useState<PFZHotspot[]>([]);
@@ -61,39 +60,7 @@ export function App() {
   useEffect(() => {
     document.title = "Blue Orbit — ISRO Marine Ecosystem Reasoning with Collaborative Agents";
     requestLocationAndInitialize();
-
-    // 1. Secret URL Hash Listener (#admin, #noc, #telemetry)
-    const checkHash = () => {
-      const hash = window.location.hash.toLowerCase();
-      if (hash === '#admin' || hash === '#noc' || hash === '#telemetry') {
-        setActiveTab('devices');
-      }
-    };
-    checkHash();
-    window.addEventListener('hashchange', checkHash);
-
-    // 2. Secret Keyboard Shortcut (Ctrl+Shift+A or Cmd+Shift+A)
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a' || e.key === 'L' || e.key === 'l')) {
-        e.preventDefault();
-        setActiveTab(prev => (prev === 'devices' ? 'home' : 'devices'));
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-
-    // 3. Periodic Background Telemetry Heartbeat (every 45 seconds)
-    const heartbeatInterval = setInterval(() => {
-      if (userCoords) {
-        registerDeviceTelemetry(userCoords.lat, userCoords.lon);
-      }
-    }, 45000);
-
-    return () => {
-      window.removeEventListener('hashchange', checkHash);
-      window.removeEventListener('keydown', handleKeyDown);
-      clearInterval(heartbeatInterval);
-    };
-  }, [userCoords]);
+  }, []);
 
   const requestLocationAndInitialize = async () => {
     let lat = 9.9416;
@@ -166,96 +133,13 @@ export function App() {
         const satData = await satRes.json();
         setSatellites(satData.constellation || []);
       }
-
-      // 4. Send Device Telemetry to Backend Registry
-      registerDeviceTelemetry(lat, lon);
     } catch (err) {
       console.warn("Backend initializing:", err);
     }
   };
 
-  const registerDeviceTelemetry = async (userLat: number, userLon: number) => {
-    try {
-      let devId = localStorage.getItem('blue_orbit_dev_id');
-      if (!devId) {
-        devId = `DEV-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-        localStorage.setItem('blue_orbit_dev_id', devId);
-      }
-      
-      const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-      const isAndroid = /Android/i.test(ua);
-      const isIOS = /iPhone|iPad|iPod/i.test(ua);
-      const platform = isAndroid ? "Android APK" : isIOS ? "iOS Terminal" : "Web Browser";
-
-      // Detect detailed hardware & OS model
-      let devModel = "Web Command Console";
-      if (isAndroid) {
-        if (/Samsung|SM-/i.test(ua)) devModel = "Samsung Galaxy (Android)";
-        else if (/Redmi|POCO|Xiaomi/i.test(ua)) devModel = "Xiaomi / Redmi (Android)";
-        else if (/OnePlus/i.test(ua)) devModel = "OnePlus Mobile (Android)";
-        else if (/Pixel/i.test(ua)) devModel = "Google Pixel (Android)";
-        else if (/Vivo/i.test(ua)) devModel = "Vivo Smartphone (Android)";
-        else if (/Oppo/i.test(ua)) devModel = "Oppo Smartphone (Android)";
-        else devModel = "Android Mobile Terminal";
-      } else if (isIOS) {
-        if (/iPad/i.test(ua)) devModel = "Apple iPad";
-        else devModel = "Apple iPhone";
-      } else if (/Macintosh/i.test(ua)) {
-        devModel = "Apple Mac / macOS";
-      } else if (/Windows/i.test(ua)) {
-        devModel = "Windows PC / Workstation";
-      } else if (/Linux/i.test(ua)) {
-        devModel = "Linux Maritime Station";
-      }
-
-      // Check screen resolution
-      if (typeof window !== 'undefined' && window.screen) {
-        devModel += ` (${window.screen.width}x${window.screen.height})`;
-      }
-
-      // Query real battery level if supported
-      let batteryStr = "92%";
-      try {
-        if (typeof navigator !== 'undefined' && (navigator as any).getBattery) {
-          const battery = await (navigator as any).getBattery();
-          batteryStr = `${Math.round(battery.level * 100)}%`;
-        }
-      } catch (_) {}
-
-      // Informative assigned node name
-      let nodeName = localStorage.getItem('blue_orbit_node_name');
-      if (!nodeName) {
-        nodeName = isAndroid ? `Mobile Node (${devId.slice(-4)})` : `Operator Terminal (${devId.slice(-4)})`;
-        localStorage.setItem('blue_orbit_node_name', nodeName);
-      }
-
-      fetch(`${API_BASE}/api/telemetry/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          device_id: devId,
-          latitude: userLat,
-          longitude: userLon,
-          device_model: devModel,
-          platform: platform,
-          app_version: "v1.0.0",
-          battery_level: batteryStr,
-          device_name: nodeName
-        })
-      }).catch(() => {});
-    } catch (e) {
-      console.warn("Telemetry auto-register exception:", e);
-    }
-  };
-
   // Chat message submission
   const handleSendMessage = async (query: string, langOverride?: string) => {
-    const cleanQuery = query.trim().toLowerCase();
-    if (cleanQuery === '/admin' || cleanQuery === '/noc' || cleanQuery === '/telemetry' || cleanQuery === '/devices') {
-      setActiveTab('devices');
-      return;
-    }
-
     setIsLoading(true);
     try {
       const res = await fetch(`${API_BASE}/api/chat`, {
@@ -466,17 +350,8 @@ export function App() {
         />
       )}
 
-      {/* Dedicated Fleet & User Devices Location Telemetry Dashboard */}
-      {activeTab === 'devices' && (
-        <DeviceTrackerDashboard
-          apiBase={API_BASE}
-          currentUserCoords={userCoords}
-          onExitPortal={() => setActiveTab('home')}
-        />
-      )}
-
       {/* Other Workspace Tabs (Safety, Bulletin) */}
-      {activeTab !== 'home' && activeTab !== 'chat' && activeTab !== 'map' && activeTab !== 'agent-lab' && activeTab !== 'devices' && (
+      {activeTab !== 'home' && activeTab !== 'chat' && activeTab !== 'map' && activeTab !== 'agent-lab' && (
         <main className="relative z-10 flex-1 pt-24 pb-10 px-4 sm:px-8 lg:px-12 max-w-[1720px] w-full mx-auto space-y-6">
           {/* Top Constellation Bar */}
           <SatelliteTelemetryBar satellites={satellites} />
