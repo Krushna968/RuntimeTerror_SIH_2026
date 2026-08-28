@@ -47,8 +47,6 @@ ocean_agent = OceanAnalyticsAgent(marine_agent)
 geo_agent = GeospatialAgent()
 
 # Request Models
-from backend.data.device_telemetry_store import telemetry_store
-
 class ChatQueryRequest(BaseModel):
     query: str
     language: Optional[str] = None
@@ -63,16 +61,6 @@ class RouteRequest(BaseModel):
 class GeofenceCheckRequest(BaseModel):
     latitude: float
     longitude: float
-
-class DeviceTelemetryPayload(BaseModel):
-    device_id: str
-    latitude: float
-    longitude: float
-    device_model: Optional[str] = "Generic Device"
-    platform: Optional[str] = "Web Browser"
-    app_version: Optional[str] = "v1.0.0"
-    battery_level: Optional[str] = "95%"
-    device_name: Optional[str] = None
 
 @app.get("/")
 def root_status():
@@ -179,50 +167,7 @@ def get_geodata_layers():
         "active_cyclone": ACTIVE_CYCLONE
     }
 
-# ==========================================
-# DEVICE & USER LOCATION TELEMETRY ENDPOINTS
-# ==========================================
 
-@app.post("/api/telemetry/register")
-def register_device_telemetry(payload: DeviceTelemetryPayload):
-    """
-    Stores and updates user location, device model, OS, and timestamp.
-    """
-    dev = telemetry_store.register_or_update(
-        device_id=payload.device_id,
-        latitude=payload.latitude,
-        longitude=payload.longitude,
-        device_model=payload.device_model or "Generic Device",
-        platform=payload.platform or "Web Browser",
-        app_version=payload.app_version or "v1.0.0",
-        battery_level=payload.battery_level,
-        device_name=payload.device_name
-    )
-    return {
-        "status": "SUCCESS",
-        "message": "Device telemetry updated successfully.",
-        "device": dev
-    }
-
-@app.get("/api/telemetry/devices")
-def get_active_telemetry_devices():
-    """
-    Returns all registered user devices and locations with summary metrics.
-    """
-    return {
-        "summary": telemetry_store.get_summary(),
-        "devices": telemetry_store.get_all()
-    }
-
-@app.delete("/api/telemetry/devices/{device_id}")
-def delete_telemetry_device(device_id: str):
-    """
-    Removes a device record from the telemetry registry.
-    """
-    success = telemetry_store.delete(device_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Device not found.")
-    return {"status": "SUCCESS", "message": f"Device {device_id} deleted."}
 
 @app.websocket("/ws/agent-stream")
 async def websocket_agent_stream(websocket: WebSocket):

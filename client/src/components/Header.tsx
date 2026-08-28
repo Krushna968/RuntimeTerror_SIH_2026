@@ -16,8 +16,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface HeaderProps {
-  activeTab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin' | 'devices';
-  setActiveTab: (tab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin' | 'devices') => void;
+  activeTab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin';
+  setActiveTab: (tab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin') => void;
   currentLang?: string;
   setCurrentLang?: (lang: string) => void;
   onSOSClick: () => void;
@@ -42,21 +42,8 @@ export const Header: React.FC<HeaderProps> = ({
   onSOSClick
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const logoClicksRef = React.useRef<{ count: number; lastTime: number }>({ count: 0, lastTime: 0 });
 
   const handleLogoClick = () => {
-    const now = Date.now();
-    if (now - logoClicksRef.current.lastTime < 2000) {
-      logoClicksRef.current.count += 1;
-      if (logoClicksRef.current.count >= 5) {
-        logoClicksRef.current.count = 0;
-        setActiveTab('devices');
-        return;
-      }
-    } else {
-      logoClicksRef.current.count = 1;
-    }
-    logoClicksRef.current.lastTime = now;
     setActiveTab('home');
   };
 
@@ -64,7 +51,6 @@ export const Header: React.FC<HeaderProps> = ({
   const isChat = activeTab === 'chat';
   const isHome = activeTab === 'home';
   const isAgentLab = activeTab === 'agent-lab';
-  const isDevices = activeTab === 'devices';
   const isDark = activeTab === 'map';
 
   // Header background styling based on active view
@@ -81,9 +67,9 @@ export const Header: React.FC<HeaderProps> = ({
         ? 'text-cyan-300 font-black drop-shadow-sm' 
         : 'text-zinc-100 hover:text-white font-semibold drop-shadow-sm';
     }
-    if (isHome || isChat || isAgentLab || isDevices) {
+    if (isHome || isChat || isAgentLab) {
       return isActive 
-        ? (tabKey === 'agent-lab' || tabKey === 'devices' ? 'text-blue-600 font-black' : 'text-zinc-950 font-black') 
+        ? (tabKey === 'agent-lab' ? 'text-blue-600 font-black' : 'text-zinc-950 font-black') 
         : 'text-zinc-500 hover:text-zinc-950 font-semibold';
     }
     return isActive 

@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import KineticGrid from './ui/kinetic-grid';
 
 interface BlueOrbitLandingHeroProps {
-  onExplorePlatform: (tab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin' | 'devices') => void;
+  onExplorePlatform: (tab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin') => void;
 }
 
 export const BlueOrbitLandingHero: React.FC<BlueOrbitLandingHeroProps> = ({
