@@ -26,7 +26,7 @@ interface GisCommandViewProps {
   activeRoute: NavigationRoute | null;
   weather: WeatherObservation | null;
   satellites: SatelliteTelemetry[];
-  onSendMessage: (query: string, langOverride?: string) => Promise<void>;
+  onSendMessage: (query: string, langOverride?: string) => Promise<any>;
   isLoading: boolean;
   latestResponse: ChatResponsePayload | null;
   currentLang: string;
