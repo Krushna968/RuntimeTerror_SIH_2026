@@ -74,6 +74,17 @@ export function App() {
   const [satellites, setSatellites] = useState<SatelliteTelemetry[]>([]);
   const [latestResponse, setLatestResponse] = useState<ChatResponsePayload | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Scoped states per studio/view to prevent cross-page state leakage
+  const [chatResponse, setChatResponse] = useState<ChatResponsePayload | null>(null);
+  const [isChatLoading, setIsChatLoading] = useState<boolean>(false);
+
+  const [dagResponse, setDagResponse] = useState<ChatResponsePayload | null>(null);
+  const [isDagLoading, setIsDagLoading] = useState<boolean>(false);
+
+  const [gisResponse, setGisResponse] = useState<ChatResponsePayload | null>(null);
+  const [isGisLoading, setIsGisLoading] = useState<boolean>(false);
+
   const [isBulletinModalOpen, setIsBulletinModalOpen] = useState<boolean>(false);
   const [isSOSModalOpen, setIsSOSModalOpen] = useState<boolean>(false);
 
@@ -159,9 +170,17 @@ export function App() {
     }
   };
 
-  // Chat message submission
-  const handleSendMessage = async (query: string, langOverride?: string): Promise<ChatResponsePayload | null> => {
+  // Chat message submission with source-scoped state isolation
+  const handleSendMessage = async (
+    query: string,
+    langOverride?: string,
+    source: 'chat' | 'dag-lab' | 'map' | 'global' = 'global'
+  ): Promise<ChatResponsePayload | null> => {
+    if (source === 'chat') setIsChatLoading(true);
+    else if (source === 'dag-lab') setIsDagLoading(true);
+    else if (source === 'map') setIsGisLoading(true);
     setIsLoading(true);
+
     const targetLang = langOverride || currentLang;
 
     const executeChatRequest = async (baseUrl: string): Promise<ChatResponsePayload> => {
@@ -194,6 +213,7 @@ export function App() {
         }
       }
 
+      // Background domain state updates
       setLatestResponse(data);
       if (data.all_pfz_hotspots) {
         setPfzHotspots(data.all_pfz_hotspots);
@@ -210,27 +230,46 @@ export function App() {
       if (data.satellite_telemetry) {
         setSatellites(data.satellite_telemetry);
       }
+
+      // Scoped view isolation to avoid cross-page state leakage
+      if (source === 'chat' || source === 'global') {
+        setChatResponse(data);
+      }
+      if (source === 'dag-lab' || source === 'global') {
+        setDagResponse(data);
+      }
+      if (source === 'map' || source === 'global') {
+        setGisResponse(data);
+      }
+
       return data;
     } catch (error) {
       console.error("Error executing chat query:", error);
       return null;
     } finally {
+      if (source === 'chat') setIsChatLoading(false);
+      else if (source === 'dag-lab') setIsDagLoading(false);
+      else if (source === 'map') setIsGisLoading(false);
       setIsLoading(false);
     }
   };
 
   // Map Click coordinate investigation
   const handleMapClickCoord = async (lat: number, lon: number) => {
-    setIsLoading(true);
+    setIsGisLoading(true);
     try {
       fetch(`${API_BASE}/api/weather?lat=${lat}&lon=${lon}`)
         .then(res => res.ok ? res.json() : null)
         .then(w => { if (w) setWeather(w); })
         .catch(() => {});
-      await handleSendMessage(`What are the sea conditions, PFZ suitability, and IMBL border proximity at coordinates ${lat.toFixed(2)}N, ${lon.toFixed(2)}E?`);
+      await handleSendMessage(
+        `What are the sea conditions, PFZ suitability, and IMBL border proximity at coordinates ${lat.toFixed(2)}N, ${lon.toFixed(2)}E?`,
+        undefined,
+        'map'
+      );
     } catch (e) {
       console.error(e);
-      setIsLoading(false);
+      setIsGisLoading(false);
     }
   };
 
@@ -268,8 +307,12 @@ export function App() {
         currentLang={currentLang}
         setCurrentLang={(lang) => {
           setCurrentLang(lang);
-          if (latestResponse) {
-            handleSendMessage(latestResponse.query, lang);
+          if (activeTab === 'chat' && chatResponse) {
+            handleSendMessage(chatResponse.query, lang, 'chat');
+          } else if (activeTab === 'agent-lab' && dagResponse) {
+            handleSendMessage(dagResponse.query, lang, 'dag-lab');
+          } else if (activeTab === 'map' && gisResponse) {
+            handleSendMessage(gisResponse.query, lang, 'map');
           }
         }}
         onSOSClick={() => setIsSOSModalOpen(true)}
@@ -285,9 +328,9 @@ export function App() {
       {/* Tab 1: Minimalist Dedicated AI Chatbot Studio Page (Gemini-style) */}
       {activeTab === 'chat' && (
         <AIChatStudio
-          onSendMessage={handleSendMessage}
-          isLoading={isLoading}
-          latestResponse={latestResponse}
+          onSendMessage={(q, l) => handleSendMessage(q, l, 'chat')}
+          isLoading={isChatLoading}
+          latestResponse={chatResponse}
           currentLang={currentLang}
           setCurrentLang={setCurrentLang}
         />
@@ -302,9 +345,9 @@ export function App() {
           activeRoute={activeRoute}
           weather={weather}
           satellites={satellites}
-          onSendMessage={handleSendMessage}
-          isLoading={isLoading}
-          latestResponse={latestResponse}
+          onSendMessage={(q, l) => handleSendMessage(q, l, 'map')}
+          isLoading={isGisLoading}
+          latestResponse={gisResponse}
           currentLang={currentLang}
           onMapClickCoord={handleMapClickCoord}
           userCoords={userCoords}
@@ -315,9 +358,9 @@ export function App() {
       {activeTab === 'agent-lab' && (
         <AgentDAGStudio
           satellites={satellites}
-          latestResponse={latestResponse}
-          isLoading={isLoading}
-          onSendMessage={handleSendMessage}
+          latestResponse={dagResponse}
+          isLoading={isDagLoading}
+          onSendMessage={(q, l) => handleSendMessage(q, l, 'dag-lab')}
           currentLang={currentLang}
         />
       )}
