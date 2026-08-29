@@ -18,6 +18,7 @@ import {
   Navigation
 } from 'lucide-react';
 import { PFZHotspot, NavigationRoute, WeatherObservation, SatelliteTelemetry, ChatResponsePayload } from '../types';
+import { speakText, stopSpeech, getBcp47LangTag } from '../utils/speechUtils';
 
 interface GisCommandViewProps {
   pfzHotspots: PFZHotspot[];
@@ -56,6 +57,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   onSendMessage,
   isLoading,
   latestResponse,
+  currentLang = 'en',
   onMapClickCoord,
   userCoords
 }) => {
@@ -449,19 +451,19 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   };
 
   const handleSpeak = (text: string) => {
-    if (!('speechSynthesis' in window)) return;
     if (speaking) {
-      window.speechSynthesis.cancel();
+      stopSpeech();
       setSpeaking(false);
       return;
     }
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-IN';
-    u.onend = () => setSpeaking(false);
-    u.onerror = () => setSpeaking(false);
-    setSpeaking(true);
-    window.speechSynthesis.speak(u);
+    const voiceLang = latestResponse?.language?.voice_code || currentLang || 'en';
+    speakText(
+      text,
+      voiceLang,
+      () => setSpeaking(true),
+      () => setSpeaking(false),
+      () => setSpeaking(false)
+    );
   };
 
   const handleCopy = (text: string) => {
@@ -770,7 +772,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
                 }
                 const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
                 const rec = new SpeechRecognition();
-                rec.lang = 'en-IN';
+                rec.lang = getBcp47LangTag(currentLang);
                 rec.start();
                 setIsListening(true);
                 rec.onresult = (e: any) => {
