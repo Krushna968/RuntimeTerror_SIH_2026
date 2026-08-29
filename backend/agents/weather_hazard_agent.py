@@ -10,7 +10,7 @@ Processes meteorological and ocean state feeds:
 
 import math
 from typing import Dict, Any, List
-from datetime import datetime
+from datetime import datetime, timezone
 from backend.data.geodata import ACTIVE_CYCLONE
 
 class WeatherHazardAgent:
@@ -136,7 +136,7 @@ class WeatherHazardAgent:
                 "distance_km": round(dist_to_cyclone_km, 1) if cyclone_alert else None,
                 "intensity": ACTIVE_CYCLONE["category"] if cyclone_alert else None
             },
-            "timestamp": datetime.utcnow().isoformat() + "Z"
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
     def get_active_cyclones_and_warnings(self) -> Dict[str, Any]:
