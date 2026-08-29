@@ -18,6 +18,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { ChatResponsePayload, AgentExecutionStep } from '../types';
+import { speakText, stopSpeech, getBcp47LangTag } from '../utils/speechUtils';
 
 interface AgentChatDrawerProps {
   onSendMessage: (query: string) => void;
@@ -57,7 +58,7 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
-    recognition.lang = currentLang === 'hi' ? 'hi-IN' : (currentLang === 'ta' ? 'ta-IN' : 'en-IN');
+    recognition.lang = getBcp47LangTag(currentLang);
 
     if (!isListening) {
       setIsListening(true);
@@ -84,24 +85,21 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
   };
 
   // Text to Speech (TTS)
-  const handleSpeak = (text: string, voiceCode: string = 'en-IN') => {
-    if (!('speechSynthesis' in window)) return;
-
+  const handleSpeak = (text: string, voiceCode?: string) => {
     if (isSpeaking) {
-      window.speechSynthesis.cancel();
+      stopSpeech();
       setIsSpeaking(false);
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = voiceCode;
-    utterance.rate = 0.95;
-
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    setIsSpeaking(true);
-    window.speechSynthesis.speak(utterance);
+    const effectiveLang = voiceCode || latestResponse?.language?.voice_code || currentLang || 'en';
+    speakText(
+      text,
+      effectiveLang,
+      () => setIsSpeaking(true),
+      () => setIsSpeaking(false),
+      () => setIsSpeaking(false)
+    );
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {

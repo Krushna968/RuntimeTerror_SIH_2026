@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatResponsePayload } from '../types';
+import { speakText, stopSpeech, getBcp47LangTag } from '../utils/speechUtils';
 
 interface Message {
   id: string;
@@ -93,7 +94,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
     }
   };
 
-  // Speech to Text (STT)
+  // Speech to Text (STT) - Full 8 Indian Languages Support
   const handleToggleMic = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       alert("Speech recognition is not supported in this browser. Please type your query.");
@@ -104,7 +105,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
-    recognition.lang = currentLang === 'hi' ? 'hi-IN' : (currentLang === 'ta' ? 'ta-IN' : 'en-IN');
+    recognition.lang = getBcp47LangTag(currentLang);
 
     if (!isListening) {
       setIsListening(true);
@@ -124,26 +125,22 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
     }
   };
 
-  // Text to Speech (TTS)
-  const handleSpeak = (msgId: string, text: string, voiceCode: string = 'en-IN') => {
-    if (!('speechSynthesis' in window)) return;
-
+  // Text to Speech (TTS) - Full 8 Indian Languages Support
+  const handleSpeak = (msgId: string, text: string, voiceCode?: string) => {
     if (speakingId === msgId) {
-      window.speechSynthesis.cancel();
+      stopSpeech();
       setSpeakingId(null);
       return;
     }
 
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = voiceCode;
-    utterance.rate = 0.95;
-
-    utterance.onend = () => setSpeakingId(null);
-    utterance.onerror = () => setSpeakingId(null);
-
-    setSpeakingId(msgId);
-    window.speechSynthesis.speak(utterance);
+    const effectiveLang = voiceCode || currentLang || 'en';
+    speakText(
+      text,
+      effectiveLang,
+      () => setSpeakingId(msgId),
+      () => setSpeakingId(null),
+      () => setSpeakingId(null)
+    );
   };
 
   const handleCopy = (id: string, text: string) => {

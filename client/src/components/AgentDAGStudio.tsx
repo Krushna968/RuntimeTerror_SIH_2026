@@ -26,6 +26,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import HolographicBeams from './ui/beams-background';
 import DotMatrixText from './ui/dot-text';
 import { SatelliteTelemetry, ChatResponsePayload } from '../types';
+import { speakText, stopSpeech } from '../utils/speechUtils';
 
 interface AgentDAGStudioProps {
   satellites: SatelliteTelemetry[];
@@ -119,20 +120,20 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
     setInputText('');
   };
 
-  const handleSpeak = (text: string, voiceCode: string) => {
-    if ('speechSynthesis' in window) {
-      if (isSpeaking) {
-        window.speechSynthesis.cancel();
-        setIsSpeaking(false);
-        return;
-      }
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = voiceCode || 'en-IN';
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-      setIsSpeaking(true);
-      window.speechSynthesis.speak(utterance);
+  const handleSpeak = (text: string, voiceCode?: string) => {
+    if (isSpeaking) {
+      stopSpeech();
+      setIsSpeaking(false);
+      return;
     }
+    const effectiveLang = voiceCode || latestResponse?.language?.voice_code || currentLang || 'en';
+    speakText(
+      text,
+      effectiveLang,
+      () => setIsSpeaking(true),
+      () => setIsSpeaking(false),
+      () => setIsSpeaking(false)
+    );
   };
 
   const renderFormattedMarkdown = (text: string) => {
