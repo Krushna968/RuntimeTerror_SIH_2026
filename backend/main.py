@@ -7,9 +7,12 @@ Modular Agentic AI Marine Intelligence & Decision Support Platform
 import asyncio
 import json
 from typing import Optional, List, Dict, Any
+from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+load_dotenv()
 
 from backend.agents.orchestrator import MasterOrchestrator
 from backend.agents.marine_data_agent import MarineDataAgent
@@ -86,6 +89,11 @@ async def chat_endpoint(payload: ChatQueryRequest):
         requested_lang=payload.language
     )
     return result
+
+@app.post("/api/query")
+async def query_alias(payload: ChatQueryRequest):
+    """Alias for /api/chat."""
+    return await chat_endpoint(payload)
 
 @app.get("/api/pfz")
 def get_pfz_hotspots(port: Optional[str] = None):

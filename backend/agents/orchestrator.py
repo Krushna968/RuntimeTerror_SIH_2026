@@ -7,7 +7,7 @@ and streams reasoning step telemetry to the frontend.
 import time
 import re
 from typing import Dict, Any, List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from backend.agents.marine_data_agent import MarineDataAgent
 from backend.agents.weather_hazard_agent import WeatherHazardAgent
@@ -227,6 +227,6 @@ class MasterOrchestrator:
                 "total_agents_involved": 6,
                 "llm_engine": model_used_name,
                 "total_latency_ms": total_latency_ms,
-                "timestamp": datetime.utcnow().isoformat() + "Z"
+                "timestamp": datetime.now(timezone.utc).isoformat()
             }
         }

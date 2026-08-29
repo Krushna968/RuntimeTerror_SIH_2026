@@ -5,7 +5,7 @@ and standard INCOIS/ISRO Marine Advisory Bulletin generation.
 """
 
 from typing import Dict, Any, List
-from datetime import datetime
+from datetime import datetime, timezone
 
 class ExplainabilityAgent:
     def __init__(self):
@@ -54,20 +54,21 @@ class ExplainabilityAgent:
             "execution_trace": execution_trace,
             "data_provenance_citations": citations,
             "verification_status": "ISRO_INCOIS_VERIFIED",
-            "generated_at": datetime.utcnow().isoformat() + "Z"
+            "generated_at": datetime.now(timezone.utc).isoformat()
         }
 
     def generate_official_marine_bulletin(self, port_name: str, pfz_list: List[Dict[str, Any]], weather: Dict[str, Any], geofence: Dict[str, Any]) -> Dict[str, Any]:
         """
         Generates an official INCOIS-ISRO format Marine Advisory Bulletin.
         """
-        bulletin_id = f"INCOIS-ISRO-BLUEORBIT-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
+        now = datetime.now(timezone.utc)
+        bulletin_id = f"INCOIS-ISRO-BLUEORBIT-{now.strftime('%Y%m%d%H%M')}"
         
         return {
             "bulletin_id": bulletin_id,
             "issuing_authority": "Joint Satellite Marine Information Advisory — ISRO & INCOIS",
             "department": "Department of Space, Government of India & Ministry of Earth Sciences",
-            "issue_date": datetime.utcnow().strftime("%d-%b-%Y %H:%M UTC"),
+            "issue_date": now.strftime("%d-%b-%Y %H:%M UTC"),
             "validity_period": "Next 36 Hours",
             "coastal_sector": port_name,
             "sea_venture_verdict": weather.get("safety_status", "SAFE_FOR_VENTURE"),

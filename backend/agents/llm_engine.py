@@ -10,10 +10,13 @@ import httpx
 import logging
 import re
 from typing import Dict, Any, Optional
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger("blue_orbit.llm_engine")
 
-NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "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")
+NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY")
 NVIDIA_CANDIDATE_MODELS = [
     "meta/llama-3.2-11b-vision-instruct",
     "google/gemma-3-12b-it",

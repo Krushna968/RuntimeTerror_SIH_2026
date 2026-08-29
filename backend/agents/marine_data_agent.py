@@ -10,7 +10,7 @@ Simulates and queries ISRO Earth Observation satellite feeds:
 import math
 import numpy as np
 from typing import Dict, Any, List, Tuple
-from datetime import datetime
+from datetime import datetime, timezone
 
 class MarineDataAgent:
     def __init__(self):
@@ -113,7 +113,7 @@ class MarineDataAgent:
             "dissolved_oxygen_mg_l": dissolved_oxygen,
             "cloud_cover_percent": cloud_cover,
             "data_source": "ISRO Oceansat-3 OCM-3 / INSAT-3DR Blended Level-3 Product",
-            "acquisition_time": datetime.utcnow().isoformat() + "Z",
+            "acquisition_time": datetime.now(timezone.utc).isoformat(),
             "quality_flag": "PASSED_CLOUD_MASKED_L3"
         }
 
@@ -138,6 +138,6 @@ class MarineDataAgent:
             "bounds": bounds,
             "step": step,
             "total_nodes": len(grid_points),
-            "generated_at": datetime.utcnow().isoformat() + "Z",
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "data": grid_points
         }

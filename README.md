@@ -233,11 +233,15 @@ python verify_system.py
 | `http://localhost:5173` | `GET` | **GIS Ocean Command Center Web Application** |
 | `http://localhost:8000/docs` | `GET` | **Interactive Swagger REST API Documentation** |
 | `ws://localhost:8000/ws/agent-stream` | `WS` | **WebSocket Live Agent DAG Execution Stream** |
-| `http://localhost:8000/api/query` | `POST` | Natural Language Query Agentic Orchestration |
+| `http://localhost:8000/api/chat` | `POST` | Natural Language Multi-Agent Conversational Orchestration |
+| `http://localhost:8000/api/query` | `POST` | Query Alias for Natural Language Chat |
 | `http://localhost:8000/api/pfz` | `GET` | Potential Fishing Zones & Species HSI Data |
 | `http://localhost:8000/api/weather` | `GET` | Sea-state, Swell, Wind & Safety Venture Clearance |
 | `http://localhost:8000/api/geofence` | `GET` | IMBL Distance & Active Security Buffer Status |
-| `http://localhost:8000/api/bulletin/export` | `POST` | Generate Official INCOIS-ISRO PDF Advisory |
+| `http://localhost:8000/api/route` | `POST` | Safe A* Navigational Route & Waypoints Computation |
+| `http://localhost:8000/api/satellites` | `GET` | Live ISRO Earth Observation Constellation Telemetry |
+| `http://localhost:8000/api/cyclones` | `GET` | Active Cyclone Storms & INCOIS High Wave Warnings |
+| `http://localhost:8000/api/ocean-grid` | `GET` | 2D Spatial Grid Matrix of SST & Chlorophyll-a |
 
 ---
 
