@@ -9,6 +9,7 @@ import { AgentDAGStudio } from './components/AgentDAGStudio';
 import { SeaSafetyBarometer } from './components/SeaSafetyBarometer';
 import { SatelliteTelemetryBar } from './components/SatelliteTelemetryBar';
 import { AdvisoryExportModal } from './components/AdvisoryExportModal';
+import { GeofenceAlarmHUD } from './components/GeofenceAlarmHUD';
 import { 
   PFZHotspot, 
   NavigationRoute, 
@@ -586,6 +587,12 @@ export function App() {
           </div>
         </div>
       )}
+
+      {/* Real-Time On-Device Offline GPS IMBL Geofence & Audio Siren Guard */}
+      <GeofenceAlarmHUD
+        userCoords={userCoords}
+        onSelectCoord={handleMapClickCoord}
+      />
     </div>
   );
 }
