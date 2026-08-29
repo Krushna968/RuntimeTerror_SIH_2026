@@ -4,32 +4,173 @@
 
 [![SIH 2026](https://img.shields.io/badge/SIH-2026-orange.svg?style=for-the-badge&logo=target)](https://www.sih.gov.in/)
 [![ISRO](https://img.shields.io/badge/Organization-ISRO%20%2F%20DOS-blue.svg?style=for-the-badge&logo=spacex)](https://www.isro.gov.in/)
+[![NVIDIA NIM](https://img.shields.io/badge/LLM-NVIDIA%20NIM%20AI-76B900.svg?style=for-the-badge&logo=nvidia&logoColor=white)](https://build.nvidia.com)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20%2B%20Python%203.10+-009688.svg?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%2B%20Vite%20%2B%20Tailwind-61DAFB.svg?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
 [![Leaflet](https://img.shields.io/badge/GIS-Leaflet%20Interactive%20Maps-199900.svg?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
 [![Android](https://img.shields.io/badge/Mobile-Android%20APK%20(Capacitor)-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://capacitorjs.com/)
+[![Live Demo](https://img.shields.io/badge/Production%20Web%20App-sihdeploy.vercel.app-blueviolet.svg?style=for-the-badge&logo=vercel&logoColor=white)](https://sihdeploy.vercel.app)
 
 **Smart India Hackathon 2026** | **Problem Statement ID:** 26176  
 **Problem Title:** ORCA — Marine EcOsystem Reasoning with Collaborative Agents  
 **Organization:** Indian Space Research Organisation (ISRO) / Department of Space  
 **Theme:** Disaster Management & Blue Economy | **Category:** Software / Agentic AI  
-**Team:** Runtime Terror
+**Team:** Runtime Terror  
+
+[🌐 Live Production App](https://sihdeploy.vercel.app) • [📱 Download Android APK](./BlueOrbit_ISRO_SIH2026.apk) • [📑 Interactive API Docs](http://localhost:8000/docs)
 
 </div>
 
 ---
 
-## 📖 Executive Summary
+## 📖 Table of Contents
 
-**Blue Orbit (ORCA)** is an autonomous, production-ready Agentic AI conversational decision-support system designed for the **Indian Space Research Organisation (ISRO)** and marine stakeholders. It ingests, analyzes, and orchestrates specialized AI agents over satellite Earth Observation (EO) products from **Oceansat-3 (OCM-3)**, **INSAT-3DR TIR**, and in-situ oceanographic feeds from **INCOIS** and **MOSDAC**.
-
-Blue Orbit empowers **artisanal and commercial fishermen, coastal disaster authorities, maritime operators, and marine scientists** with real-time, explainable, and multi-lingual marine intelligence through voice and interactive geospatial command centers.
+- [Executive Summary](#-executive-summary)
+- [Visual Platform Showcase & Module Walkthrough](#-visual-platform-showcase--module-walkthrough)
+  - [1. Landing Hero & Platform Entry](#1-landing-hero--platform-entry)
+  - [2. Conversational Decision Studio & Voice AI](#2-conversational-decision-studio--voice-ai)
+  - [3. Multi-Agent DAG Studio & Execution Lab](#3-multi-agent-dag-studio--execution-lab)
+  - [4. Interactive GIS Command Center & Real-Time Safety Barometer](#4-interactive-gis-command-center--real-time-safety-barometer)
+  - [5. Official ISRO-INCOIS Joint Marine Advisory Bulletin & PDF Exporter](#5-official-isro-incois-joint-marine-advisory-bulletin--pdf-exporter)
+  - [6. NVIDIA NIM Cognitive Microservices Infrastructure](#6-nvidia-nim-cognitive-microservices-infrastructure)
+  - [7. Production Cloud Architecture & CI/CD](#7-production-cloud-architecture--cicd)
+- [System Architecture & Multi-Agent Consensus DAG](#-system-architecture--multi-agent-consensus-dag)
+- [Specialized Autonomous Agents Breakdown](#-specialized-autonomous-agents-breakdown)
+- [Scientific Methodology & Innovation Highlights](#-scientific-methodology--innovation-highlights)
+- [Earth Observation & Oceanographic Telemetry Feeds](#-earth-observation--oceanographic-telemetry-feeds)
+- [REST & WebSocket API Reference](#-rest--websocket-api-reference)
+- [Automated Verification & Test Suite](#-automated-verification--test-suite)
+- [Quick Start & Local Setup Guide](#-quick-start--local-setup-guide)
+- [Cross-Platform Android Mobile App](#-cross-platform-android-mobile-app)
+- [Development Team & SIH 2026 Alignment](#-development-team--sih-2026-alignment)
 
 ---
 
-## 🏛️ Multi-Agent Collaborative Architecture
+## 🌊 Executive Summary
 
-Blue Orbit employs a **Directed Acyclic Graph (DAG)** intent decomposition and multi-agent consensus workflow:
+**Blue Orbit (ORCA)** is an autonomous, production-grade Agentic AI decision-support platform engineered for the **Indian Space Research Organisation (ISRO)** and coastal communities across India. By continuously fusing real-time satellite Earth Observation (EO) telemetry from **Oceansat-3 (EOS-06)**, **INSAT-3DR TIR**, and in-situ oceanographic feeds from **INCOIS** and **MOSDAC**, Blue Orbit democratizes complex marine intelligence into actionable, voice-enabled, multilingual advisories.
+
+The system directly tackles the core socio-economic and safety challenges faced by over **4 million Indian coastal fishermen and maritime operators**:
+1. **Maximizing Catch Yield:** High-accuracy Potential Fishing Zone (PFZ) discovery based on thermal-chlorophyll front coincidence ($\nabla \text{SST} \times \nabla \text{Chl-a}$).
+2. **Fishermen Safety & Disaster Preparedness:** Real-time sea-venture safety barometer, significant wave height forecasts, Beaufort scale wind analytics, and cyclone impact radii.
+3. **Preventing International Arrests:** High-precision geofencing along International Maritime Boundary Lines (IMBL) for India-Sri Lanka, India-Pakistan, and India-Bangladesh waters.
+4. **Ecological Conservation:** Strict perimeter alerts for Marine Protected Areas (MPAs) and sensitive coral reef biospheres.
+5. **Linguistic Accessibility:** Native conversational dialogue and voice speech synthesis across **8 Indian regional languages**.
+
+---
+
+## 📸 Visual Platform Showcase & Module Walkthrough
+
+Here is a visual walkthrough of the Blue Orbit platform, explaining each key interface component and scientific module:
+
+---
+
+### 1. Landing Hero & Platform Entry
+
+![Blue Orbit Landing Hero](documentation/hero_landing_ui.png)
+
+#### 🔍 What this module provides:
+- **Interactive Holographic Grid Hero:** Modern, tactile user interface introducing Blue Orbit as *"The Agentic Brain for the Indian Ocean"*.
+- **Instant Mode Navigation:** Direct entry points to **Launch AI Decision Studio** (for conversational reasoning) and **GIS Command Map** (for spatial exploration).
+- **Multi-lingual Language Switcher:** Instant access to 8 regional Indian languages right from the navigation header.
+- **Emergency SOS (1554):** One-tap emergency dispatch button linked to the Indian Coast Guard Maritime Rescue Coordination Centre (MRCC).
+
+---
+
+### 2. Conversational Decision Studio & Voice AI
+
+![AI Chatbot Studio Reasoning by Design](documentation/ai_chatbot_studio.png)
+
+#### 🔍 What this module provides:
+- **Reasoning by Design Interface:** Ambient conversational workspace designed for distraction-free oceanographic inquiries.
+- **Voice-Enabled Speech Input:** Native browser Speech-to-Text integration enabling hands-free voice commands in vernacular dialects for fishermen at sea.
+- **Preset Decision Chips:** Quick 1-tap prompts for common maritime questions:
+  - 🐟 *Tuna PFZ Advisory (Kochi)*
+  - 🛡️ *Sea Safety Clearance (Chennai)*
+  - 🛑 *IMBL Border Proximity (Rameswaram)*
+  - 🌪️ *Cyclone & High Wave Warnings (Bay of Bengal)*
+
+---
+
+### 3. Multi-Agent DAG Studio & Execution Lab
+
+![Multi-Agent DAG Studio](documentation/multi_agent_dag_studio.png)
+
+#### 🔍 What this module provides:
+- **Holographic Beam & Dot-Matrix Visualizer:** Displays the internal Directed Acyclic Graph (DAG) decomposition in real time as user queries are parsed.
+- **6 Active Domain Agent Cards:** Live telemetry and operational status for all underlying autonomous agents:
+  1. *Master Supervisor DAG Planner* (NVIDIA NIM LLaMA-3.1-8B)
+  2. *Marine EO Data Agent* (ISRO NRSC Telemetry)
+  3. *Weather & Marine Hazard Agent* (IMD / INCOIS Hydrodynamics)
+  4. *Ocean Analytics & PFZ Engine* (Thermal-Chlorophyll Coincidence Matrix)
+  5. *Geospatial & Geofencing Agent* (IMBL Geodesic Boundary Calculator)
+  6. *Neural Synthesis & Multilingual Agent* (8-Language NMT & TTS)
+- **Live Agent Execution Traces:** Step-by-step transparency showing millisecond execution latency, reasoning thoughts, and scientific citations.
+
+---
+
+### 4. Interactive GIS Command Center & Real-Time Safety Barometer
+
+![Live Marine GIS Dashboard and Real-Time Safety Barometer](documentation/dashboard_safety_gis.png)
+
+#### 🔍 What this module provides:
+- **Real-Time Satellite Telemetry Constellation (Top Cards):**
+  - **ISRO Oceansat-3 (EOS-06):** Ingesting OCM-3 (13 ocean colour bands), Thermal SSTM, and Ku-Band Scatterometer with sub-45 min ground pass latency via NRSC Shadnagar.
+  - **ISRO INSAT-3DR:** Continuous 15-minute thermal infrared stream (SST) from geostationary orbit (74°E).
+  - **Copernicus Sentinel-3A/B:** OLCI & SLSTR cross-validation ocean products.
+- **Fishermen Sea-Venture Clearance Card (Left):**
+  - **Safety Score (e.g. `74.2 / 100 — SAFE FOR VENTURE`):** Automated composite indicator based on significant wave height (`1.03m`), swell period (`7.9s`), wind speed (`14.9 kts`), Beaufort scale (`Moderate #4`), and lightning probability (`24.9%`).
+  - **Official Directives:** Clear advisory statements (e.g. *"Normal fishing and coastal navigation permitted. Maintain standard VHF monitoring."*).
+- **Interactive Marine GIS Leaflet Map (Right):**
+  - 🟢 **Potential Fishing Zones (PFZ):** Clickable high-confidence marine feeding hotspots.
+  - 🔴 **IMBL International Borders:** Geofence polylines with automated buffer alerts.
+  - 🟡 **Marine Protected Areas (MPA):** Ecologically sensitive coral reefs & wildlife reserves.
+  - 🌪️ **Cyclone Hazard Cones:** Active cyclone trajectories and impact danger zones.
+  - 🚢 **Live Trawler Simulation:** Real-time animated A* path tracking along safe waypoints.
+
+---
+
+### 5. Official ISRO-INCOIS Joint Marine Advisory Bulletin & PDF Exporter
+
+![Official ISRO-INCOIS Marine Advisory Bulletin Dashboard](documentation/bulletin_pfz_export.png)
+
+#### 🔍 What this module provides:
+- **Official Bulletin Tracking:** Standardized government advisory metadata with unique alphanumeric tracking ID (`INCOIS-ISRO-BLUEORBIT-2026...`), valid for 36 hours.
+- **Tabulated High-Confidence PFZ Matrix:**
+  - *Zone & Location:* Coordinates and named coastal sectors (e.g., *Off Kochi - Alleppey Thermal Front, 9.75°N, 75.65°E*).
+  - *Target Species:* Habitat Suitability classification (e.g., Oil Sardine, Yellowfin Tuna, Mackerel).
+  - *Depth & Hydrography:* Target depth (`45m`), SST (`27.18°C`), Chlorophyll-a (`2.8 mg/m³`).
+  - *Confidence & Map Focus:* Coincidence rating (`98%`) with 1-click GIS viewport pan.
+- **Print / Export Official PDF:** Generates a cryptographic, print-ready PDF advisory bulletin for harbour masters, fisheries cooperative societies, and port authorities.
+
+---
+
+### 6. NVIDIA NIM Cognitive Microservices Infrastructure
+
+![NVIDIA NIM Model Infrastructure and Inference Microservices](documentation/nvidia_nim_architecture.png)
+
+#### 🔍 What this module provides:
+- **Accelerated Inference Endpoints:** Blue Orbit integrates with NVIDIA NIM AI Foundation endpoints to orchestrate cutting-edge LLMs (Meta LLaMA 3.2 Vision, Gemma 3, Granite, and DeepSeek) with deterministic rule engines.
+- **Zero-Hallucination Grounding:** Multi-model pipeline cross-references raw satellite telemetry before generating plain-language advisories.
+
+---
+
+### 7. Production Cloud Architecture & CI/CD
+
+<div align="center">
+
+| **Frontend Edge Deployment (Vercel)** | **Backend Python Microservice (Render)** |
+| :---: | :---: |
+| ![Vercel Production Deployment](documentation/vercel_deployment.png) | ![Render Cloud Backend Deployment](documentation/render_backend.png) |
+| **Vercel Edge Platform:** Instant global CDN distribution, client-side routing, and continuous integration at [`sihdeploy.vercel.app`](https://sihdeploy.vercel.app). | **Render Cloud Platform:** Asynchronous Python 3 FastAPI microservice (`orca-backend`) handling multi-agent orchestration and live geospatial processing. |
+
+</div>
+
+---
+
+## 🏛️ System Architecture & Multi-Agent Consensus DAG
+
+Blue Orbit is built on a **Directed Acyclic Graph (DAG)** collaborative multi-agent architecture where domain-specific autonomous agents communicate under a Master Orchestrator:
 
 ```
                                   ┌───────────────────────────────────┐
@@ -38,17 +179,17 @@ Blue Orbit employs a **Directed Acyclic Graph (DAG)** intent decomposition and m
                                   └─────────────────┬─────────────────┘
                                                     ▼
                                   ┌───────────────────────────────────┐
-                                  │         Blue Orbit Master         │
-                                  │     (DAG Intent Decomposer)       │
+                                  │   Blue Orbit Master Orchestrator  │
+                                  │     (Intent & Port Extraction)    │
                                   └─────────────────┬─────────────────┘
                                                     │
         ┌───────────────────┬───────────────────────┼───────────────────────┬───────────────────┐
         ▼                   ▼                       ▼                       ▼                   ▼
 ┌───────────────┐   ┌───────────────┐       ┌───────────────┐       ┌───────────────┐   ┌───────────────┐
 │  Marine Data  │   │   Weather &   │       │ Ocean & PFZ   │       │ Geospatial &  │   │ Multilingual  │
-│Discovery Agent│   │ Hazard Agent  │       │Analytics Agent│       │Geofence Agent │   │Explainability │
+│Discovery Agent│   │ Hazard Agent  │       │Analytics Agent│       │Geofence Agent │   │Synthesis Agent│
 │(ISRO/MOSDAC/  │   │  (Cyclones,   │       │  (SST/Chl-a,  │       │(IMBL Borders, │   │ (8 Languages, │
-│INCOIS/Copern.)│   │ Waves, Rain)  │       │ Fishing Zones)│       │Nav Hazards)   │   │PDF Bulletins) │
+│INCOIS/Copern.)│   │ Waves, Wind)  │       │ Front Matrix) │       │Nav Hazards)   │   │Voice & Audio) │
 └───────────────┘   └───────────────┘       └───────────────┘       └───────────────┘   └───────────────┘
         │                   │                       │                       │                   │
         └───────────────────┴───────────────────────┼───────────────────────┴───────────────────┘
@@ -59,94 +200,102 @@ Blue Orbit employs a **Directed Acyclic Graph (DAG)** intent decomposition and m
                                   └───────────────────────────────────┘
 ```
 
-### Specialized Agents & Roles
+---
 
-| Agent | Core Functionality & Scientific Capabilities |
-| :--- | :--- |
-| **🎯 Master Orchestrator** | Dynamic query classification, sub-task DAG dependency graph construction, and multi-agent synthesis. |
-| **🛰️ Marine Data Discovery** | Metadata harvesting across ISRO MOSDAC, Oceansat-3 OCM-3, INSAT-3DR TIR, INCOIS, and Copernicus EO feeds. |
-| **🌊 Ocean Analytics & PFZ** | Scientific Potential Fishing Zone detection ($|\nabla \text{SST}|$ & $|\nabla \text{Chl-a}|$ thermal-chlorophyll coincidence) and species Habitat Suitability Indices (HSI). |
-| **⛈️ Weather & Hazard** | Live cyclone trajectory tracking, Beaufort wind scale calculation, wave height forecast, and Sea Safety Venture Index ($0-100$). |
-| **🧭 Geospatial & Geofence** | International Maritime Boundary Line (IMBL) distance calculations (India-Sri Lanka, India-Pakistan, India-Bangladesh), buffer breach alerts, and weather-aware A* route optimization. |
-| **🗣️ Multilingual & Explainability** | End-to-end multi-turn translation in 8 regional languages, voice STT/TTS synthesis, and evidence-backed rationale generation. |
+## 🤖 Specialized Autonomous Agents Breakdown
+
+| Agent | Module | Primary Responsibilities |
+| :--- | :--- | :--- |
+| **🎯 Master Supervisor & DAG Planner** | `orchestrator.py` | Decomposes maritime intent, extracts reference ports (Kochi, Chennai, Vizag, Mumbai, etc.), constructs parallel subtask execution DAGs, and aggregates agent outputs. |
+| **🛰️ Marine Data Discovery Agent** | `marine_data_agent.py` | Queries ISRO Oceansat-3 OCM-3, INSAT-3DR TIR, and in-situ buoys to retrieve Sea Surface Temperature (SST), Chlorophyll-a, salinity, and optical quality flags. |
+| **🌊 Ocean Analytics & PFZ Agent** | `ocean_analytics_agent.py` | Detects oceanic thermal fronts ($|\nabla \text{SST}|$) and chlorophyll gradients ($|\nabla \text{Chl-a}|$), identifies coincidence zones, and computes species Habitat Suitability Indices (HSI). |
+| **⛈️ Weather & Hazard Agent** | `weather_hazard_agent.py` | Analyzes cyclone trajectory models, Beaufort wind scales, significant wave height ($H_s$), lightning hazard probabilities, and computes the 0–100 Sea Safety Score. |
+| **🧭 Geospatial & Geofencing Agent** | `geospatial_agent.py` | Enforces International Maritime Boundary Line (IMBL) compliance (India-Sri Lanka, India-Pakistan, India-Bangladesh), computes proximity alerts, protects MPAs, and calculates safe A* routes. |
+| **🗣️ Multilingual & Synthesis Agent** | `multilingual_agent.py` | Translates advisories across 8 Indic languages with phonetic voice TTS and compiles evidence packages for official INCOIS-ISRO PDF bulletins. |
 
 ---
 
-## ✨ Key Features & Innovation Highlights
+## ✨ Scientific Methodology & Innovation Highlights
 
-### 1. 🐟 Scientific Potential Fishing Zone (PFZ) Engine
-- Computes spatial gradients for Sea Surface Temperature ($\nabla \text{SST}$) and Chlorophyll-a ($\nabla \text{Chl-a}$).
-- Detects oceanic thermal-chlorophyll coincidence boundaries to provide **$3.5\times - 4.5\times$ catch enhancement**.
-- **Species-Specific Habitat Suitability Index (HSI):** Yellowfin Tuna, Indian Mackerel, Oil Sardine, and Silver Pomfret.
+### 1. 🐟 Scientific Potential Fishing Zone (PFZ) Algorithm
+- **Thermal-Chlorophyll Front Coincidence:** Identifies oceanic boundaries where sharp SST gradients intersect high chlorophyll-a upwelling fronts:
+  $$\text{Coincidence Index} = f\left(|\nabla \text{SST}|, |\nabla \text{Chl-a}|\right)$$
+- **Catch Enhancement Factor:** Proven **$3.5\times - 4.5\times$ catch boost** while reducing search time and vessel diesel consumption by up to 30%.
+- **Target Species Modeling:** Habitat Suitability Index (HSI) tailored for *Yellowfin Tuna, Indian Mackerel, Oil Sardine,* and *Silver Pomfret*.
 
-### 2. 🛡️ Fishermen Safety & Disaster Early Warning
-- **Real-Time Sea Venture Safety Index ($0-100$):** Combines wave swell, wind velocity, precipitation, and convective cloud cover into an actionable GO / CAUTION / NO-GO advisory.
-- **Cyclone Vector Modeling:** Danger radius concentric buffers and track forecasting (e.g., Arabian Sea & Bay of Bengal systems).
-- **Lightning & Gust Alerts:** Immediate notifications for high-risk offshore coordinates.
+### 2. 🛡️ Real-Time Fishermen Sea-Venture Safety Barometer
+- Computes a dynamic composite score ($0-100$) factoring significant wave height, wind speeds, Beaufort sea scale, lightning risk, and cyclone proximity.
+- **Three-Tier Actionable Clearances:**
+  - 🟢 `SAFE_FOR_VENTURE` (Score $\ge 70$): Normal coastal navigation permitted.
+  - 🟡 `EXERCISE_CAUTION` (Score $45-69$): Small motorized crafts restricted to inner waters.
+  - 🔴 `HAZARDOUS_NO_VENTURE` (Score $< 45$): Immediate harbour return mandated.
 
 ### 3. 🛑 Geofencing & IMBL International Maritime Compliance
-- High-precision distance calculation to **India-Sri Lanka**, **India-Pakistan**, and **India-Bangladesh** maritime borders.
-- **Multi-tiered buffer alarms:** `NORMAL`, `PROXIMITY_WARNING`, and `CRITICAL_BUFFER_BREACH` preventing accidental vessel crossing.
-- Strict compliance checks for **Marine Protected Areas (MPA)**: Gulf of Mannar, Gahirmatha, Sundarbans, and Rani Jhansi National Park.
+- High-precision geodesic distance computation to **India-Sri Lanka (Palk Strait / Gulf of Mannar)**, **India-Pakistan (Sir Creek / Arabian Sea)**, and **India-Bangladesh** maritime borders.
+- **Tri-level Buffer Alarms:**
+  - `CLEAR` ($> 8.0$ NM): Safe Indian EEZ waters.
+  - `BUFFER_PROXIMITY_ALERT` ($1.0 - 3.5$ NM): Amber warning to alter course away from boundary.
+  - `CRITICAL_GEOFENCE_BREACH` ($\le 1.0$ NM): Red emergency warning mandating immediate 180° turn to avoid foreign arrest.
+- **Marine Protected Areas (MPA) Protection:** Real-time restriction enforcement for Gulf of Mannar, Gahirmatha turtle sanctuary, Sundarbans mangrove buffer, and Malvan sanctuary.
 
-### 4. 🚢 Weather-Aware Vessel Route Optimization
-- Modified A* navigation routing factoring sea-state impediments from major Indian harbours:
-  - *Kochi, Chennai, Rameswaram, Visakhapatnam, Mumbai, Porbandar, Mangalore, Paradip*.
-- Computes optimal transit waypoints, estimated time of arrival (ETA), and diesel consumption conservation metrics.
-
-### 5. 🇮🇳 8 Regional Indian Languages + Voice Dialogue
-- Full multi-turn conversational support in:
+### 4. 🇮🇳 8 Regional Indian Languages & Voice Dialogue
+- Multi-turn conversational support across:
   - **English**, **हिन्दी (Hindi)**, **தமிழ் (Tamil)**, **తెలుగు (Telugu)**, **മലയാളം (Malayalam)**, **বাংলা (Bengali)**, **ગુજરાતી (Gujarati)**, and **मराठी (Marathi)**.
-- Integrated Web Speech API for voice queries and spoken audio advisories.
-
-### 6. 🗺️ Interactive GIS Ocean Command Center
-- Dark ocean map with toggleable scientific layers:
-  - Satellite SST thermal gradient layers & Chlorophyll density heatmaps
-  - Ocean current streamlines & wave vector arrows
-  - Live vessel positioning & waypoint telemetry
-  - Interactive clickable PFZ coordinates and cyclone warning cones
-
-### 7. 📄 Official Marine Advisory Bulletin Exporter
-- Automated generation of INCOIS-ISRO compliant printable PDF advisories with cryptographic QR verification badges.
+- Integrated Web Speech API for zero-friction voice input and spoken audio responses.
 
 ---
 
-## 🗂️ Project Repository Structure
+## 🛰️ Earth Observation & Oceanographic Telemetry Feeds
 
-```
-RuntimeTerror_SIH_2026/
-├── backend/                              # Python FastAPI Agentic Backend
-│   ├── agents/                           # Autonomous Agent Suite
-│   │   ├── orchestrator.py               # Master DAG Orchestrator
-│   │   ├── marine_data_agent.py          # ISRO & INCOIS EO Discovery
-│   │   ├── ocean_analytics_agent.py      # PFZ, SST, Chl-a & HSI Engine
-│   │   ├── weather_hazard_agent.py       # Cyclones, Waves, Safety Index
-│   │   ├── geospatial_agent.py           # IMBL Geofencing & Route A*
-│   │   ├── multilingual_agent.py         # 8 Indic Languages Translator
-│   │   ├── explainability_agent.py       # Evidence & Reasoning Synthesis
-│   │   └── llm_engine.py                 # Multi-LLM Routing & Fallbacks
-│   ├── data/                             # Geospatial & Oceanographic Datasets
-│   └── main.py                           # FastAPI Server, REST APIs & WebSockets
-│
-├── client/                               # React 18 + Vite + Tailwind CSS Frontend
-│   ├── src/                              # Components, GIS Map, Voice UI, Dashboard
-│   ├── public/                           # Static assets, icons, sound effects
-│   ├── capacitor.config.json             # Cross-platform Mobile configuration
-│   └── package.json                      # Frontend dependencies
-│
-├── DAG Agent Ui/                         # Agent Execution & Graph Visualizer
-├── documentation/                        # Comprehensive Architectural Reports & Schemas
-├── BlueOrbit_ISRO_SIH2026.apk            # Pre-built Android Mobile Application
-├── verify_system.py                      # 7-Stage End-to-End Automated Test Suite
-├── run_system.py                         # Master Concurrent System Launcher
-├── requirements.txt                      # Python dependencies
-├── vercel.json                           # Vercel Frontend Deployment Config
-└── render.yaml                           # Render Backend Cloud Config
-```
+| Satellite / Sensor | Parameters Extracted | Spatial / Temporal Resolution | Source Agency |
+| :--- | :--- | :--- | :--- |
+| **ISRO Oceansat-3 (EOS-06) OCM-3** | Chlorophyll-a, optical diffuse attenuation ($K_{490}$), Total Suspended Matter | 360m LAC / Sub-45 min ground pass | ISRO / NRSC |
+| **ISRO INSAT-3DR / 3D TIR** | Sea Surface Temperature (SST), cloud brightness temperature | 4.0 km / 15-minute continuous stream | ISRO / MOSDAC |
+| **INCOIS Ocean State Forecast** | Significant wave height ($H_s$), swell direction/period, wind vectors | 1.5 km Coastal Grid / Hourly updates | INCOIS / MoES |
+| **UNCLOS ITLOS Vector Polylines** | International Maritime Boundary Lines (IMBL) | WGS-84 Geodetic Datum | MEA / UNCLOS |
 
 ---
 
-## 🚀 Quick Start Guide
+## 🌐 REST & WebSocket API Reference
+
+| Endpoint | Method | Description | Request / Query Parameters |
+| :--- | :---: | :--- | :--- |
+| `/` | `GET` | System health check and active agent telemetry | None |
+| `/api/chat` | `POST` | Primary natural language multi-agent query pipeline | `{"query": str, "language": str, "reference_port": str}` |
+| `/api/query` | `POST` | Alias endpoint for conversational query pipeline | `{"query": str, "language": str}` |
+| `/api/pfz` | `GET` | Potential Fishing Zone hotspots with front coincidence | `?port=kochi` *(optional)* |
+| `/api/weather` | `GET` | Metocean observation, wave height & safety score | `?lat=9.94&lon=76.25` |
+| `/api/geofence` | `GET` | IMBL boundary distance & MPA compliance check | `?lat=9.28&lon=79.31` |
+| `/api/route` | `POST` | Weather-aware, border-safe A* route computation | `{"start_port": str, "dest_lat": float, "dest_lon": float}` |
+| `/api/satellites` | `GET` | Live ISRO Earth Observation constellation telemetry | None |
+| `/api/cyclones` | `GET` | Active cyclone storms, tracks & INCOIS high wave alerts| None |
+| `/api/ocean-grid` | `GET` | 2D Spatial matrix of SST & Chlorophyll for GIS heatmaps | `?step=0.5` |
+| `/api/ports` | `GET` | Reference Indian fishing harbours & maritime ports | None |
+| `/api/geodata/layers`| `GET` | Vector layers for IMBL lines, MPAs, Buoys & Cyclones | None |
+| `/ws/agent-stream` | `WS` | Real-time WebSocket streaming of agent thought process | `{"query": str, "language": str}` |
+
+---
+
+## 🧪 Automated Verification & Test Suite
+
+Blue Orbit includes a comprehensive **7-Stage automated test suite** in `verify_system.py`:
+
+```bash
+python3 verify_system.py
+```
+
+### Verified Test Pipeline:
+- ✅ **Stage 1:** Satellite Earth Observation & Marine Data Ingestion (Oceansat-3 & INSAT-3DR).
+- ✅ **Stage 2:** Weather & Marine Disaster Hazard Intelligence (Wave, wind, and safety score).
+- ✅ **Stage 3:** Ocean Analytics & Scientific PFZ Engine ($|\nabla \text{SST}| \times |\nabla \text{Chl-a}|$).
+- ✅ **Stage 4:** Geospatial & International Maritime Boundary (IMBL) Geofencing & A* Routing.
+- ✅ **Stage 5:** Multilingual Indian Regional Language Agent (8 Indic scripts detection & synthesis).
+- ✅ **Stage 6:** Master Supervisor & Multi-Agent Collaborative Execution DAG.
+- ✅ **Stage 7:** FastAPI REST & WebSocket Endpoints Registration.
+
+---
+
+## 🚀 Quick Start & Local Setup Guide
 
 ### Prerequisites
 - **Python 3.10+** (with `pip`)
@@ -155,12 +304,12 @@ RuntimeTerror_SIH_2026/
 
 ---
 
-### ⚡ Method 1: One-Click Master Launcher (Recommended)
+### ⚡ Method 1: One-Click Concurrent Master Launcher (Recommended)
 
-Run the master launcher to concurrently start both the FastAPI backend and the React Vite GIS frontend:
+Run the unified system launcher to simultaneously start the FastAPI backend and Vite frontend:
 
 ```bash
-python run_system.py
+python3 run_system.py
 ```
 
 - **GIS Web App:** [http://localhost:5173](http://localhost:5173)
@@ -168,36 +317,42 @@ python run_system.py
 
 ---
 
-### 🛠️ Method 2: Manual Step-by-Step Startup
+### 🛠️ Method 2: Manual Step-by-Step Setup
 
 #### 1. Backend Setup (Port 8000)
 ```bash
-# Navigate to project root & install dependencies
+# Clone the repository
+git clone https://github.com/Krushna968/RuntimeTerror_SIH_2026.git
+cd RuntimeTerror_SIH_2026
+
+# Install Python dependencies
 pip install -r requirements.txt
 
 # Start FastAPI server
-python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 #### 2. Frontend Setup (Port 5173)
 ```bash
-# Navigate to client directory & install packages
+# Navigate to client directory
 cd client
+
+# Install NPM dependencies
 npm install
 
-# Start Vite dev server
+# Start Vite development server
 npm run dev
 ```
 
 ---
 
-### 📱 Method 3: Android Mobile App
+## 📱 Cross-Platform Android Mobile App
 
-The repository includes a ready-to-install Android APK:
-- File: `BlueOrbit_ISRO_SIH2026.apk`
-- Built using **Capacitor 8** with native GPS Geolocation & Offline Status features.
+Blue Orbit includes a ready-to-install Android APK with native GPS tracking:
+- **APK File:** [`BlueOrbit_ISRO_SIH2026.apk`](./BlueOrbit_ISRO_SIH2026.apk) (Root directory)
+- **Framework:** Capacitor 8 with native Geolocation and Status Bar plugins.
 
-To build from source:
+To build the Android APK from source:
 ```bash
 cd client
 npm run build
@@ -207,59 +362,11 @@ npx cap open android
 
 ---
 
-## 🧪 Verification & Automated Testing Suite
-
-Blue Orbit includes a comprehensive **7-Stage automated test suite** verifying agent reasoning, API endpoints, geofencing coordinates, and data synthesis:
-
-```bash
-python verify_system.py
-```
-
-### Verified Test Stages:
-- ✅ **Stage 1:** FastAPI Health & WebSocket Connectivity
-- ✅ **Stage 2:** Master Orchestrator Intent Decomposition & DAG Engine
-- ✅ **Stage 3:** Ocean Analytics SST & Chlorophyll-a PFZ Boundary Computation
-- ✅ **Stage 4:** Weather Hazard Hazard Scoring & Sea-Safety Thresholds
-- ✅ **Stage 5:** IMBL Border Distance & Geofence Buffer Alarm Triggers
-- ✅ **Stage 6:** Multilingual Engine & 8 Indic Language Bidirectional Translation
-- ✅ **Stage 7:** End-to-End Synthetic Query Resolution & PDF Bulletin Generation
-
----
-
-## 🌐 API Reference & Service Endpoints
-
-| Endpoint | Method | Description |
-| :--- | :---: | :--- |
-| `http://localhost:5173` | `GET` | **GIS Ocean Command Center Web Application** |
-| `http://localhost:8000/docs` | `GET` | **Interactive Swagger REST API Documentation** |
-| `ws://localhost:8000/ws/agent-stream` | `WS` | **WebSocket Live Agent DAG Execution Stream** |
-| `http://localhost:8000/api/chat` | `POST` | Natural Language Multi-Agent Conversational Orchestration |
-| `http://localhost:8000/api/query` | `POST` | Query Alias for Natural Language Chat |
-| `http://localhost:8000/api/pfz` | `GET` | Potential Fishing Zones & Species HSI Data |
-| `http://localhost:8000/api/weather` | `GET` | Sea-state, Swell, Wind & Safety Venture Clearance |
-| `http://localhost:8000/api/geofence` | `GET` | IMBL Distance & Active Security Buffer Status |
-| `http://localhost:8000/api/route` | `POST` | Safe A* Navigational Route & Waypoints Computation |
-| `http://localhost:8000/api/satellites` | `GET` | Live ISRO Earth Observation Constellation Telemetry |
-| `http://localhost:8000/api/cyclones` | `GET` | Active Cyclone Storms & INCOIS High Wave Warnings |
-| `http://localhost:8000/api/ocean-grid` | `GET` | 2D Spatial Grid Matrix of SST & Chlorophyll-a |
-
----
-
-## 🛰️ Earth Observation & Oceanographic Data Feeds
-
-- **Oceansat-3 (OCM-3):** Chlorophyll-a concentration, diffuse attenuation coefficient ($K_{490}$), Total Suspended Matter.
-- **INSAT-3DR / 3D (TIR):** High-resolution Sea Surface Temperature (SST) & convective cloud brightness temperature.
-- **INCOIS (Indian National Centre for Ocean Information Services):** Real-time High Wave Alerts, Ocean State Forecasts (OSF), and PFZ advisories.
-- **MOSDAC (ISRO):** Satellite meteorological and oceanographic data archive.
-- **Copernicus Marine Service:** Global reanalysis validation for currents and salinity.
-
----
-
-## 👥 Development Team
+## 👥 Development Team & SIH 2026 Alignment
 
 **Team Runtime Terror**  
-*Smart India Hackathon 2026 • Problem Statement 26176*  
-*Developed in collaboration with ISRO guidelines for Blue Economy & Disaster Management.*
+*Smart India Hackathon 2026 • Problem Statement ID: 26176*  
+*Developed in alignment with ISRO & INCOIS scientific guidelines for the Blue Economy, coastal security, and disaster management.*
 
 ---
 
