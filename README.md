@@ -9,6 +9,7 @@
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%2B%20Vite%20%2B%20Tailwind-61DAFB.svg?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
 [![Leaflet](https://img.shields.io/badge/GIS-Leaflet%20Interactive%20Maps-199900.svg?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
 [![Android](https://img.shields.io/badge/Mobile-Android%20APK%20(Capacitor)-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](https://capacitorjs.com/)
+[![CI/CD AI Verification](https://github.com/Krushna968/RuntimeTerror_SIH_2026/actions/workflows/ai_verification.yml/badge.svg)](https://github.com/Krushna968/RuntimeTerror_SIH_2026/actions/workflows/ai_verification.yml)
 [![Live Demo](https://img.shields.io/badge/Production%20Web%20App-sihdeploy.vercel.app-blueviolet.svg?style=for-the-badge&logo=vercel&logoColor=white)](https://sihdeploy.vercel.app)
 
 **Smart India Hackathon 2026** | **Problem Statement ID:** 26176  
