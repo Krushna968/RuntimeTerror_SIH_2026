@@ -25,7 +25,7 @@ interface Message {
 }
 
 interface AIChatStudioProps {
-  onSendMessage: (query: string, langOverride?: string) => Promise<void>;
+  onSendMessage: (query: string, langOverride?: string) => Promise<any>;
   isLoading: boolean;
   latestResponse: ChatResponsePayload | null;
   currentLang: string;
@@ -47,26 +47,6 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Sync latestResponse into messages list whenever a response arrives
-  useEffect(() => {
-    if (latestResponse && messages.length > 0) {
-      const last = messages[messages.length - 1];
-      if (last && last.sender === 'user') {
-        const newMsgId = `msg-${Date.now()}`;
-        setMessages(prev => [
-          ...prev,
-          {
-            id: newMsgId,
-            sender: 'blueorbit',
-            text: latestResponse.response.markdown,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            data: latestResponse
-          }
-        ]);
-      }
-    }
-  }, [latestResponse]);
-
   // Scroll to bottom when new messages arrive
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -86,7 +66,31 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
 
-    await onSendMessage(textToSend);
+    const res = await onSendMessage(textToSend);
+    if (res && res.response?.markdown) {
+      const newMsgId = `msg-${Date.now()}`;
+      setMessages(prev => [
+        ...prev,
+        {
+          id: newMsgId,
+          sender: 'blueorbit',
+          text: res.response.markdown,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          data: res
+        }
+      ]);
+    } else {
+      const errorMsgId = `msg-err-${Date.now()}`;
+      setMessages(prev => [
+        ...prev,
+        {
+          id: errorMsgId,
+          sender: 'blueorbit',
+          text: "⚠️ **Service Notice**: Unable to connect to Blue Orbit AI reasoning engine. Please ensure your device has internet access and try again.",
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+    }
   };
 
   // Speech to Text (STT)
