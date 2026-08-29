@@ -18,9 +18,11 @@ logger = logging.getLogger("blue_orbit.llm_engine")
 
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY")
 NVIDIA_CANDIDATE_MODELS = [
-    "meta/llama-3.2-11b-vision-instruct",
-    "google/gemma-3-12b-it",
-    "ibm/granite-3.0-8b-instruct"
+    "meta/llama-3.1-8b-instruct",
+    "meta/llama-3.1-70b-instruct",
+    "mistralai/mistral-7b-instruct-v0.3",
+    "google/gemma-2-9b-it",
+    "deepseek-ai/deepseek-r1"
 ]
 NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 

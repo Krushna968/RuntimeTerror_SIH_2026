@@ -30,47 +30,56 @@ class MasterOrchestrator:
     def identify_port_from_query(self, query: str) -> str:
         """Extracts coastal port or region mentioned in query, defaulting to kochi."""
         q = query.lower()
+        
+        # Direct key checks
+        if re.search(r'\b(cochin|kochi|kerala)\b', q):
+            return "kochi"
+        if re.search(r'\b(madras|chennai|kasimedu)\b', q):
+            return "chennai"
+        if re.search(r'\b(vizag|visakhapatnam|andhra)\b', q):
+            return "visakhapatnam"
+        if re.search(r'\b(bombay|mumbai|sassoon|versova|maharashtra)\b', q):
+            return "mumbai"
+        if re.search(r'\b(porbandar|gujarat)\b', q):
+            return "porbandar"
+        if re.search(r'\b(rameswaram|rameshwaram|mandapam|palk)\b', q):
+            return "rameswaram"
+        if re.search(r'\b(mangalore|karnataka)\b', q):
+            return "mangalore"
+        if re.search(r'\b(paradip|orissa|odisha)\b', q):
+            return "paradip"
+        if re.search(r'\b(kanyakumari|cape comorin)\b', q):
+            return "kanyakumari"
+        if re.search(r'\b(port blair|andaman|nicobar)\b', q):
+            return "port_blair"
+
         for port_key in INDIAN_PORTS:
             if port_key in q:
                 return port_key
-        # Check aliases
-        if "cochin" in q or "kerala" in q:
-            return "kochi"
-        if "madras" in q or "tamil" in q:
-            return "chennai"
-        if "vizag" in q or "andhra" in q:
-            return "visakhapatnam"
-        if "bombay" in q or "maharashtra" in q:
-            return "mumbai"
-        if "gujarat" in q:
-            return "porbandar"
-        if "palk" in q or "rameshwaram" in q:
-            return "rameswaram"
-        if "karnataka" in q:
-            return "mangalore"
-        if "orissa" in q or "odisha" in q:
-            return "paradip"
-        if "andaman" in q or "nicobar" in q:
-            return "port_blair"
             
         return "kochi"  # Default reference port
 
     def classify_intent(self, query: str) -> str:
-        """Determines primary objective of user prompt."""
+        """Determines primary objective of user prompt with word-boundary awareness."""
         q = query.lower().strip()
-        # Greetings & Identity Checks
-        if any(w in q for w in ["who are you", "who created", "who made", "what is blue orbit", "what are you", "your name", "introduce yourself", "tell me about yourself", "creator"]):
-            return "identity"
-        if any(w in q for w in ["hello", "hi", "hey", "namaste", "namaskar", "vanakkam", "namaskaram", "good morning", "good evening", "how are you"]):
-            return "greeting"
-        if any(w in q for w in ["pfz", "fish", "fishing", "machhli", "machli", "meen", "chepala", "catch", "tuna", "sardine", "mackerel", "pomfret", "zone"]):
-            return "pfz_discovery"
-        if any(w in q for w in ["safe", "safety", "weather", "wave", "cyclone", "wind", "storm", "lightning", "surakshit", "mausam", "venture", "rain", "alert"]):
-            return "sea_safety_check"
-        if any(w in q for w in ["border", "imbl", "srilanka", "sri lanka", "pakistan", "bangladesh", "geofence", "restricted", "mpa", "arrest", "seizure", "boundary"]):
+
+        # 1. Check Specific Domain Intents First
+        if any(w in q for w in ["border", "imbl", "srilanka", "sri lanka", "pakistan", "bangladesh", "geofence", "restricted", "mpa", "arrest", "seizure", "boundary", "palk strait"]):
             return "geofence_border_check"
-        if any(w in q for w in ["route", "navigation", "waypoint", "distance", "fuel", "travel", "rasta", "vazhi", "direction"]):
+        if any(w in q for w in ["route", "navigation", "navigating", "waypoint", "fuel", "travel", "rasta", "vazhi", "direction", "heading", "eta", "transit", "navigate", "coordinates to"]):
             return "route_planning"
+        if any(w in q for w in ["pfz", "fish", "fishing", "machhli", "machli", "meen", "chepala", "catch", "tuna", "sardine", "mackerel", "pomfret", "zone", "upwelling"]):
+            return "pfz_discovery"
+        if any(w in q for w in ["safe", "safety", "weather", "wave", "cyclone", "wind", "storm", "lightning", "surakshit", "mausam", "venture", "rain", "alert", "swell", "sea state", "squall"]):
+            return "sea_safety_check"
+
+        # 2. Identity & Creator Queries
+        if any(w in q for w in ["who are you", "who created", "who made", "what is blue orbit", "what are you", "your name", "introduce yourself", "tell me about yourself", "creator", "runtime terror"]):
+            return "identity"
+
+        # 3. Greetings (Word-boundary matching to prevent substring collisions with 'kochi', 'fishing', etc.)
+        if re.search(r'\b(hello|hi|hey|namaste|namaskar|vanakkam|namaskaram|good morning|good afternoon|good evening|how are you|pranam)\b', q):
+            return "greeting"
             
         return "general_inquiry"
 
