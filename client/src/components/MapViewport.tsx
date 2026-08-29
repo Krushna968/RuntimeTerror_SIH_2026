@@ -73,10 +73,9 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       zoomControl: false,
     });
 
-    // High-Resolution Crisp Light Ocean CartoDB Voyager Tiles
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a> | ISRO Oceansat-3',
-      subdomains: 'abcd',
+    // High-Resolution OpenStreetMap Tiles (100% Free & No API Key Required)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | ISRO Oceansat-3',
       maxZoom: 19
     }).addTo(map);
 

@@ -225,6 +225,7 @@ class MasterOrchestrator:
                 "model_engine": model_used_name
             },
             "top_pfz": top_pfz,
+
             "all_pfz_hotspots": pfz_list,
             "weather_and_safety": weather,
             "geofence_status": geofence,
