@@ -127,9 +127,9 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className={`absolute top-0 left-0 right-0 z-50 w-full px-4 sm:px-8 lg:px-20 flex items-center justify-between font-['Outfit',sans-serif] pointer-events-auto transition-all ${headerBgClass}`}>
+      <header className={`absolute top-0 left-0 right-0 z-50 w-full px-4 sm:px-6 lg:px-10 flex items-center justify-between gap-3 sm:gap-6 font-['Outfit',sans-serif] pointer-events-auto transition-all ${headerBgClass}`}>
         {/* Brand Logo & Mobile Toggle */}
-        <div className="flex items-center space-x-2.5 sm:space-x-3">
+        <div className="flex items-center space-x-2.5 sm:space-x-3 shrink-0 mr-2 sm:mr-4">
           {/* Mobile Hamburger Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -148,7 +148,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center space-x-2 cursor-pointer group shrink-0"
           >
             {/* Minimalist Geometric Emblem */}
-            <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105 ${
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105 shrink-0 ${
               !isDark 
                 ? 'bg-zinc-950 text-white shadow-xs' 
                 : 'bg-white text-zinc-950 shadow-sm'
@@ -159,13 +159,13 @@ export const Header: React.FC<HeaderProps> = ({
               </svg>
             </div>
 
-            <div className="flex items-center space-x-1.5">
-              <span className={`text-sm sm:text-base md:text-lg font-black tracking-wider transition-colors ${
+            <div className="flex items-center space-x-1.5 shrink-0">
+              <span className={`text-sm sm:text-base font-black tracking-wider transition-colors ${
                 !isDark ? 'text-zinc-950' : 'text-white'
               }`}>
                 BLUE ORBIT
               </span>
-              <span className={`text-[9px] sm:text-[10px] font-mono font-black tracking-widest px-1.5 py-0.5 rounded-md ${
+              <span className={`text-[9px] font-mono font-black tracking-widest px-1.5 py-0.5 rounded-md ${
                 !isDark ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-cyan-950 text-cyan-400 border border-cyan-500/30'
               }`}>
                 ISRO
@@ -175,7 +175,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Center Navigation: Desktop Tabs */}
-        <nav className="hidden md:flex items-center space-x-5 lg:space-x-8 text-sm">
+        <nav className="hidden md:flex items-center space-x-3 lg:space-x-6 text-xs lg:text-sm">
           {navItems.map((item) => (
             <button
               key={item.key}

@@ -317,6 +317,7 @@ export function App() {
 
   // Map Click coordinate investigation
   const handleMapClickCoord = async (lat: number, lon: number) => {
+    setUserCoords({ lat, lon });
     setIsGisLoading(true);
     try {
       fetch(`${API_BASE}/api/weather?lat=${lat}&lon=${lon}`)

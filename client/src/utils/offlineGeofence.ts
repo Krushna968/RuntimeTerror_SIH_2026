@@ -109,8 +109,81 @@ export interface GeofenceProximityResult {
 
 /**
  * Offline calculation of nearest IMBL boundary from device GPS
+ * Checks both distance and foreign boundary crossings (Sri Lanka, Pakistan, Bangladesh, Outer EEZ)
  */
 export function evaluateOfflineGeofence(lat: number, lon: number): GeofenceProximityResult {
+  // 1. Check if completely outside Sovereign Indian Maritime EEZ Bounds (e.g. Europe, International Waters)
+  const isOutsideIndianWaters = (lat < 2.0 || lat > 26.0 || lon < 64.0 || lon > 96.5);
+  
+  if (isOutsideIndianWaters) {
+    return {
+      latitude: lat,
+      longitude: lon,
+      nearestBorderName: "200 NM Indian EEZ Sovereign Outer Limit",
+      distanceKm: 0.0,
+      distanceNM: 0.0,
+      threatLevel: 'CRITICAL_BREACH',
+      alertMessage: `🚨 OUT OF BORDER WARNING: Vessel is in Foreign / International Waters (Lat: ${lat.toFixed(3)}°, Lon: ${lon.toFixed(3)}°). You are outside sovereign Indian Maritime jurisdiction. Turn 180° towards Indian Coast immediately!`,
+      isBreach: true,
+      isCaution: true
+    };
+  }
+
+  // 2. Check specific regional IMBL cross-border territorial incursions
+  // A. Sri Lanka IMBL Crossing (Palk Strait & Gulf of Mannar)
+  // Approximate line: from (10.08, 79.87) to (9.35, 79.37) to (7.83, 78.60)
+  if (lat >= 7.5 && lat <= 10.5 && lon >= 78.8) {
+    const imblLonAtLat = 79.37 + (lat - 9.35) * ((79.87 - 79.37) / (10.08 - 9.35));
+    if (lon > imblLonAtLat + 0.02) {
+      return {
+        latitude: lat,
+        longitude: lon,
+        nearestBorderName: "Sri Lankan Territorial Waters (Palk Strait)",
+        distanceKm: 0.0,
+        distanceNM: 0.0,
+        threatLevel: 'CRITICAL_BREACH',
+        alertMessage: `🚨 CRITICAL SRI LANKAN IMBL BREACH! Vessel has crossed the International Maritime Boundary Line into Sri Lankan Territorial Waters. Immediate foreign Navy arrest risk! Turn 180° West immediately!`,
+        isBreach: true,
+        isCaution: true
+      };
+    }
+  }
+
+  // B. Pakistan IMBL Crossing (Sir Creek & Arabian Sea)
+  // Approximate line: from (23.58, 68.10) down to (21.50, 65.50)
+  if (lat >= 21.0 && lat <= 24.5 && lon <= 68.5) {
+    const imblLonAtLat = 68.10 - ((23.58 - lat) / (23.58 - 21.50)) * (68.10 - 65.50);
+    if (lon < imblLonAtLat - 0.02) {
+      return {
+        latitude: lat,
+        longitude: lon,
+        nearestBorderName: "Pakistan Maritime Security Agency Zone (Sir Creek)",
+        distanceKm: 0.0,
+        distanceNM: 0.0,
+        threatLevel: 'CRITICAL_BREACH',
+        alertMessage: `🚨 CRITICAL PAKISTAN IMBL BREACH! Vessel has crossed into Pakistan Maritime Waters. Immediate seizure danger. Turn 180° East immediately!`,
+        isBreach: true,
+        isCaution: true
+      };
+    }
+  }
+
+  // C. Bangladesh IMBL Crossing (Bay of Bengal)
+  if (lat >= 20.0 && lat <= 22.0 && lon >= 89.15) {
+    return {
+      latitude: lat,
+      longitude: lon,
+      nearestBorderName: "Bangladesh Maritime Boundary (Bay of Bengal)",
+      distanceKm: 0.0,
+      distanceNM: 0.0,
+      threatLevel: 'CRITICAL_BREACH',
+      alertMessage: `🚨 CRITICAL BANGLADESH IMBL BREACH! Vessel has crossed the International Maritime Boundary Line into Bangladesh waters. Turn 180° West immediately!`,
+      isBreach: true,
+      isCaution: true
+    };
+  }
+
+  // 3. Calculate distance to nearest IMBL boundary line
   let minDistanceKm = 999999;
   let closestBorderName = "International Maritime Boundary";
 
@@ -140,15 +213,16 @@ export function evaluateOfflineGeofence(lat: number, lon: number): GeofenceProxi
   let isBreach = false;
   let isCaution = false;
 
-  if (distanceNM <= 1.5) {
+  if (distanceNM <= 2.5) {
     threatLevel = 'CRITICAL_BREACH';
     isBreach = true;
+    isCaution = true;
     alertMessage = `🚨 CRITICAL BORDER WARNING: Vessel is only ${distanceNM} NM from ${closestBorderName}! Turn 180° immediately to avoid foreign arrest.`;
-  } else if (distanceNM <= 3.5) {
+  } else if (distanceNM <= 6.0) {
     threatLevel = 'CAUTION';
     isCaution = true;
     alertMessage = `⚠️ BORDER PROXIMITY ALERT: ${distanceNM} NM from ${closestBorderName}. Alter course away from boundary line.`;
-  } else if (distanceNM <= 8.0) {
+  } else if (distanceNM <= 12.0) {
     threatLevel = 'ADVISORY';
     alertMessage = `ℹ️ Outer Border Zone: ${distanceNM} NM from ${closestBorderName}. Maintain GPS awareness.`;
   }
