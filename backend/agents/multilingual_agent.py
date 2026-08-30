@@ -16,6 +16,7 @@ and dynamic grounded vernacular response synthesis.
 
 from typing import Dict, Any, Optional
 import re
+import math
 
 class MultilingualAgent:
     def __init__(self):
@@ -424,9 +425,112 @@ class MultilingualAgent:
             text_out = responses.get(lang, responses["en"])
 
         # ----------------------------------------------------
+        # 0. SPECIAL EASTER EGGS (Kajal / Pooja)
+        # ----------------------------------------------------
+        elif intent == "easter_egg" or any(k in q_lower for k in ["kajal", "kalaj", "kjal", "kaju", "kajol", "pooja", "puja", "poojaa", "pujaa"]):
+            text_out = "wifee material 💍✨"
+
+        # ----------------------------------------------------
+        # 1. MATH & ARITHMETIC CALCULATOR
+        # ----------------------------------------------------
+        elif intent == "math_calculation" or re.search(r'^(what is|calculate|solve|evaluate|\s)*\d+[\s\+\-\*\/\^]+\d+', q_lower):
+            clean_math = re.sub(r'^(what is|calculate|evaluate|solve|compute|\?|=|\s)+', '', q_lower).strip(' ?=')
+            clean_math = re.sub(r'\bplus\b', '+', clean_math)
+            clean_math = re.sub(r'\bminus\b', '-', clean_math)
+            clean_math = re.sub(r'\btimes\b|\bmultiplied by\b', '*', clean_math)
+            clean_math = re.sub(r'\bdivided by\b', '/', clean_math)
+            res_val = None
+            try:
+                expr = clean_math.replace('^', '**')
+                res = eval(expr, {'__builtins__': None}, {'sqrt': math.sqrt, 'sin': math.sin, 'cos': math.cos, 'pi': math.pi})
+                if isinstance(res, (int, float)):
+                    res_val = int(res) if isinstance(res, float) and res.is_integer() else round(res, 4)
+            except Exception:
+                pass
+
+            if res_val is not None:
+                responses = {
+                    "en": f"🔢 **Calculation Result:**\n\n**{user_query.strip(' ?')}** = **{res_val}**",
+                    "hi": f"🔢 **गणना परिणाम:**\n\n**{user_query.strip(' ?')}** = **{res_val}**",
+                    "ta": f"🔢 **கணக்கீட்டு முடிவு:**\n\n**{user_query.strip(' ?')}** = **{res_val}**",
+                    "te": f"🔢 **గణన ఫలితం:**\n\n**{user_query.strip(' ?')}** = **{res_val}**",
+                    "ml": f"🔢 **കണക്കുകൂട്ടൽ ഫലം:**\n\n**{user_query.strip(' ?')}** = **{res_val}**",
+                    "bn": f"🔢 **গণনার ফলাফল:**\n\n**{user_query.strip(' ?')}** = **{res_val}**",
+                    "gu": f"🔢 **ગણતરી પરિણામ:**\n\n**{user_query.strip(' ?')}** = **{res_val}**",
+                    "mr": f"🔢 **गणना निकाल:**\n\n**{user_query.strip(' ?')}** = **{res_val}**"
+                }
+                text_out = responses.get(lang, responses["en"])
+            else:
+                text_out = f"🔢 **Calculation:** I could not parse this arithmetic expression. Please enter standard formats like `25 * 4` or `100 / 5`."
+
+        # ----------------------------------------------------
+        # 2. UNIT CONVERSIONS (Knots, Nautical Miles, Temperatures)
+        # ----------------------------------------------------
+        elif intent == "unit_conversion":
+            # Knots to km/h
+            m_kts = re.search(r'(\d+(?:\.\d+)?)\s*(?:kts|knots?|knot)\s*(?:in|to|into)\s*(?:kmh|km/h|kph|kmph)', q_lower)
+            if m_kts:
+                val = float(m_kts.group(1))
+                text_out = f"📐 **Unit Conversion:**\n\n**{val} knots** = **{round(val * 1.852, 2)} km/h** *(1 knot = 1.852 km/h / 0.514 m/s)*"
+            # NM to km
+            elif re.search(r'(\d+(?:\.\d+)?)\s*(?:nm|nautical miles?)\s*(?:in|to|into)\s*(?:km|kilometers?)', q_lower):
+                m_nm = re.search(r'(\d+(?:\.\d+)?)\s*(?:nm|nautical miles?)\s*(?:in|to|into)\s*(?:km|kilometers?)', q_lower)
+                val = float(m_nm.group(1))
+                text_out = f"📐 **Unit Conversion:**\n\n**{val} Nautical Miles (NM)** = **{round(val * 1.852, 2)} km** *(1 NM = 1.852 km)*"
+            # Celsius to Fahrenheit
+            elif re.search(r'(\d+(?:\.\d+)?)\s*(?:c|celsius)\s*(?:in|to|into)\s*(?:f|fahrenheit)', q_lower):
+                m_c = re.search(r'(\d+(?:\.\d+)?)\s*(?:c|celsius)\s*(?:in|to|into)\s*(?:f|fahrenheit)', q_lower)
+                val = float(m_c.group(1))
+                f_val = round((val * 9/5) + 32, 2)
+                text_out = f"📐 **Temperature Conversion:**\n\n**{val}°C** = **{f_val}°F**"
+            else:
+                text_out = f"📐 **Maritime Unit Reference:**\n• **1 Nautical Mile (NM):** 1.852 kilometers (1,852 meters)\n• **1 Knot (kt):** 1.852 km/h (0.514 m/s)\n• **1 Fathom:** 6 feet (1.8288 meters)"
+
+        # ----------------------------------------------------
+        # 3. GRATITUDE & COURTESY
+        # ----------------------------------------------------
+        elif intent == "gratitude":
+            responses = {
+                "en": "🙏 **You're very welcome!**\n\nWishing you calm seas, safe navigation, and bountiful catch! Let me know if you need satellite telemetry or safety updates anytime. ⚓🌊",
+                "hi": "🙏 **आपका बहुत-बहुत स्वागत है!**\n\nआपकी सुरक्षित समुद्री यात्रा और सफल मत्स्य पालन की कामना करते हैं! किसी भी समय मौसम या उपग्रह डेटा के लिए पूछ सकते हैं। ⚓🌊",
+                "ta": "🙏 **மிக்க நன்றி!**\n\nஉங்கள் கடல் பயணம் பாதுகாப்பாகவும் வெற்றிகரமாகவும் அமைய வாழ்த்துகள்! ⚓🌊",
+                "te": "🙏 **మీకు స్వాగతం!**\n\nమీ సముద్ర ప్రయాణం సురక్షితంగా మరియు విజయవంతంగా సాగాలని కోరుకుంటున్నాము! ⚓🌊",
+                "ml": "🙏 **നന്ദി!**\n\nനിങ്ങളുടെ സമുദ്രയാത്ര സുരക്ഷിതവും വിജയകരവുമായിരിക്കട്ടെ! ⚓🌊",
+                "bn": "🙏 **আপনাকে অনেক ধন্যবাদ!**\n\nআপনার সমুদ্রযাত্রা নিরাপদ এবং সফল হোক! ⚓🌊",
+                "gu": "🙏 **ખૂબ ખૂબ આભાર!**\n\nતમારી દરિયાઈ યાત્રા સુરક્ષિત અને સફળ રહે તેવી શુભકામના! ⚓🌊",
+                "mr": "🙏 **आपले सहर्ष स्वागत आहे!**\n\nआपला सागरी प्रवास सुरक्षित आणि भरभराटीचा जावो! ⚓🌊"
+            }
+            text_out = responses.get(lang, responses["en"])
+
+        # ----------------------------------------------------
+        # 4. HELP & SYSTEM CAPABILITIES
+        # ----------------------------------------------------
+        elif intent == "help_capabilities":
+            responses = {
+                "en": (
+                    f"🛰️ **Blue Orbit System Capabilities · ISRO Problem ID 26176**\n\n"
+                    f"I operate a 6-stage collaborative multi-agent reasoning DAG:\n"
+                    f"1. **🐟 Potential Fishing Zones (PFZ):** Generates high-yield fishing coordinates by fusing Oceansat-3 OCM-3 Chlorophyll-a with INSAT-3DR SST thermal fronts (yielding 3.5×–4.5× catch boost).\n"
+                    f"2. **🛡️ 0–100 Sea Safety Barometer:** Evaluates wave height, swell period, wind speed, and active cyclone hazards to compute real-time venture clearance.\n"
+                    f"3. **🛑 IMBL Geofence Engine:** Live vector geofencing against India-Sri Lanka, India-Pakistan, and India-Bangladesh international borders to prevent accidental cross-border arrests.\n"
+                    f"4. **🧭 A* Navigational Routing:** Plans optimal, fuel-efficient waypoints avoiding Marine Protected Areas (MPAs) and high-risk zones.\n"
+                    f"5. **🎙️ Multilingual Vernacular Voice:** Real-time speech synthesis in 8 Indian coastal languages."
+                ),
+                "hi": (
+                    f"🛰️ **ब्लू ऑर्बिट सिस्टम क्षमताएं · इसरो समस्या ID 26176**\n\n"
+                    f"1. **🐟 संभावित मत्स्य पालन क्षेत्र (PFZ):** ओशनसैट-3 (क्लोरोफिल) और इनसैट-3DR (SST) डेटा से 3.5×–4.5× अधिक मछली पकड़ने वाले हॉटस्पॉट खोजना।\n"
+                    f"2. **🛡️ समुद्र सुरक्षा स्कोर (0-100):** लहरों की ऊंचाई, हवा की गति और चक्रवात के आधार पर समुद्र में जाने की अनुमति देना।\n"
+                    f"3. **🛑 अंतर्राष्ट्रीय सीमा (IMBL) अलर्ट:** भारत-श्रीलंका व भारत-पाकिस्तान सीमा के पास अलार्म बजाना ताकि मछुआरे सुरक्षित रहें।\n"
+                    f"4. **🧭 सुरक्षित समुद्री मार्ग (A* Routing):** संरक्षित समुद्री क्षेत्रों (MPA) से बचाते हुए सबसे छोटा रास्ता बनाना।\n"
+                    f"5. **🎙️ 8 भारतीय भाषाएं:** हिंदी, तमिल, तेलुगु, मलयालम, बंगाली, गुजराती, मराठी और अंग्रेजी में लाइव वॉयस सपोर्ट।"
+                )
+            }
+            text_out = responses.get(lang, responses["en"])
+
+        # ----------------------------------------------------
         # 5. SATELLITE SCIENCE & TECHNOLOGY INQUIRY
         # ----------------------------------------------------
-        elif is_tech_query:
+        elif intent == "satellite_science" or is_tech_query:
             responses = {
                 "en": (
                     f"🛰️ **ISRO Earth Observation & Marine Intelligence Framework**\n\n"
@@ -537,24 +641,24 @@ class MultilingualAgent:
             text_out = responses.get(lang, responses["en"])
 
         # ----------------------------------------------------
-        # 8. GENERAL INQUIRY FALLBACK
+        # 8. GENERAL INQUIRY & FALLBACK
         # ----------------------------------------------------
         else:
             responses = {
                 "en": (
-                    f"🛰️ **Blue Orbit Marine Intelligence · {port_name} Sector**\n\n"
-                    f"I have analyzed your query regarding **{port_name}** coastal waters.\n"
-                    f"• **Sea Venture Status:** **{status.replace('_', ' ')}** (Safety Score: {score}/100, Waves: {wave}m, Wind: {wind} kts).\n"
-                    f"• **Nearest Fishing Hotspot:** **{pfz_name}** ({pfz_dist} km, Bearing {bearing}, Dominant: {species}).\n"
-                    f"• **IMBL Border Clearance:** {border_dist} NM to {border_name} (Clear & Safe).\n\n"
-                    f"Feel free to ask specific questions regarding sea safety, fish species, routes, or satellite telemetry."
+                    f"🛰️ **Blue Orbit Conversational Assistant**\n\n"
+                    f"I have received your inquiry: *\"{user_query.strip()}\"*\n\n"
+                    f"Currently focused on the **{port_name}** sector. For marine operations:\n"
+                    f"• **Sea State:** {status.replace('_', ' ')} (Score: {score}/100, Waves: {wave}m, Wind: {wind} kts).\n"
+                    f"• **Nearest Fishing Zone:** {pfz_name} ({pfz_dist} km away, Dominant: {species}).\n\n"
+                    f"You can ask me specific questions on sea safety, fish hotspots, A* route planning, math calculations, or ISRO satellite telemetry."
                 ),
                 "hi": (
-                    f"🛰️ **ब्लू ऑर्बिट समुद्री सूचना · {port_name} क्षेत्र**\n\n"
-                    f"आपके प्रश्न का विश्लेषण **{port_name}** तटीय क्षेत्र के लाइव डेटा के आधार पर किया गया है।\n"
-                    f"• **सुरक्षा स्थिति:** **{status.replace('_', ' ')}** (स्कोर: {score}/100, लहरें: {wave}m, हवा: {wind} kts)।\n"
-                    f"• **निकटतम मछली क्षेत्र:** **{pfz_name}** ({pfz_dist} किमी, प्रमुख: {species})।\n"
-                    f"• **सीमा सुरक्षा:** {border_dist} NM सुरक्षित दूरी पर है।"
+                    f"🛰️ **ब्लू ऑर्बिट सहायक**\n\n"
+                    f"मुझे आपका प्रश्न प्राप्त हुआ: *\"{user_query.strip()}\"*\n\n"
+                    f"**{port_name}** क्षेत्र के लिए वर्तमान स्थिति:\n"
+                    f"• **समुद्र सुरक्षा:** {status.replace('_', ' ')} (स्कोर: {score}/100, लहरें: {wave}m)।\n"
+                    f"• **मछली क्षेत्र:** {pfz_name} ({pfz_dist} किमी)।"
                 )
             }
             text_out = responses.get(lang, responses["en"])

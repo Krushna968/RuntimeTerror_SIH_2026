@@ -160,6 +160,65 @@ async def call_ollama_llm(user_prompt: str) -> Optional[str]:
         pass
     return None
 
+async def call_nvidia_nim(user_prompt: str) -> Optional[str]:
+    """Calls NVIDIA NIM API."""
+    if not NVIDIA_API_KEY:
+        return None
+    
+    url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
+    models = ["meta/llama-3.1-8b-instruct", "meta/llama-3.3-70b-instruct", "nvidia/llama-3.1-nemotron-70b-instruct"]
+    for model in models:
+        try:
+            payload = {
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt}
+                ],
+                "max_tokens": 600,
+                "temperature": 0.5
+            }
+            async with httpx.AsyncClient(timeout=6.0) as client:
+                res = await client.post(url, json=payload, headers=headers)
+                if res.status_code == 200:
+                    data = res.json()
+                    content = data["choices"][0]["message"]["content"].strip()
+                    logger.info(f"NVIDIA NIM ({model}) generated dynamic advisory.")
+                    return content
+        except Exception as e:
+            logger.warning(f"NVIDIA NIM API error with {model}: {e}")
+    return None
+
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+async def call_openrouter_llm(user_prompt: str) -> Optional[str]:
+    """Calls OpenRouter free/fast models if configured."""
+    if not OPENROUTER_API_KEY:
+        return None
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}", "Content-Type": "application/json"}
+    try:
+        payload = {
+            "model": "meta-llama/llama-3.3-70b-instruct:free",
+            "messages": [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_prompt}
+            ],
+            "max_tokens": 600,
+            "temperature": 0.5
+        }
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            res = await client.post(url, json=payload, headers=headers)
+            if res.status_code == 200:
+                data = res.json()
+                content = data["choices"][0]["message"]["content"].strip()
+                logger.info("OpenRouter generated dynamic advisory.")
+                return content
+    except Exception as e:
+        logger.warning(f"OpenRouter API error: {e}")
+    return None
+
 async def generate_llm_advisory(
     user_query: str,
     context_data: Dict[str, Any],
@@ -197,9 +256,9 @@ Live Coastal & Marine Telemetry Context:
 
 Instruction:
 Directly answer the user's specific query in natural, fluent {language_name}.
-If the user mentions time of day (e.g. tomorrow morning), vessel type, or asks a specific question, tailor the response specifically to their inquiry rather than producing generic output."""
+If the user asks general questions, math, facts, or greetings, answer directly and conversationally without repeating static rigid templates."""
 
-    # 1. Try Groq (Llama-3.3-70B)
+    # 1. Try Groq (Llama-3.3-70B / Llama-3.1-8B)
     res = await call_groq_llm(user_prompt)
     if res: return res
 
@@ -211,7 +270,15 @@ If the user mentions time of day (e.g. tomorrow morning), vessel type, or asks a
     res = await call_openai_llm(user_prompt)
     if res: return res
 
-    # 4. Try Local Ollama
+    # 4. Try NVIDIA NIM
+    res = await call_nvidia_nim(user_prompt)
+    if res: return res
+
+    # 5. Try OpenRouter
+    res = await call_openrouter_llm(user_prompt)
+    if res: return res
+
+    # 6. Try Local Ollama
     res = await call_ollama_llm(user_prompt)
     if res: return res
 

@@ -75,24 +75,53 @@ class MasterOrchestrator:
         return "kochi"  # Default reference port
 
     def classify_intent(self, query: str) -> str:
-        """Determines primary objective of user prompt with word-boundary awareness."""
+        """Determines primary objective of user prompt with comprehensive semantic awareness."""
         q = query.lower().strip()
 
-        # 1. Check Specific Domain Intents First
+        # 0. Easter Eggs (Kajal / Pooja)
+        if any(w in q for w in ["kajal", "kalaj", "kjal", "kaju", "kajol", "pooja", "puja", "poojaa", "pujaa"]):
+            return "easter_egg"
+
+        # 1. Math and Arithmetic expressions
+        clean_math = re.sub(r'^(what is|calculate|evaluate|solve|compute|\?|=|\s)+', '', q).strip(' ?=')
+        clean_math = re.sub(r'\bplus\b', '+', clean_math)
+        clean_math = re.sub(r'\bminus\b', '-', clean_math)
+        clean_math = re.sub(r'\btimes\b|\bmultiplied by\b', '*', clean_math)
+        clean_math = re.sub(r'\bdivided by\b', '/', clean_math)
+        if re.match(r'^[\d\s\+\-\*\/\(\)\.\^\%]+$', clean_math) and re.search(r'\d', clean_math):
+            return "math_calculation"
+
+        # 2. Unit conversion
+        if re.search(r'\b(\d+(?:\.\d+)?)\s*(?:kts|knots?|nm|nautical miles?|celsius|fahrenheit|c|f|meters?|feet|kms?)\s*(?:in|to|into)\s*(?:kmh|km/h|kph|km|meters?|feet|fahrenheit|celsius|f|c)\b', q):
+            return "unit_conversion"
+
+        # 3. Gratitude & Pleasantries
+        if re.search(r'\b(thank you|thanks|thx|dhanyawad|shukriya|nanni|nandri|dhanyavadalu|good job|awesome|great work)\b', q):
+            return "gratitude"
+
+        # 4. Help & Capabilities
+        if any(w in q for w in ["what can you do", "help me", "features", "capabilities", "what are your skills", "how to use", "guide me"]):
+            return "help_capabilities"
+
+        # 5. Satellite & Ocean Science inquiries
+        if any(w in q for w in ["oceansat", "ocm", "insat", "chlorophyll", "sst", "thermal front", "radiometry", "radiometer", "how does satellite detect", "upwelling", "incois"]):
+            return "satellite_science"
+
+        # 6. Specific Domain Intents
         if any(w in q for w in ["border", "imbl", "srilanka", "sri lanka", "pakistan", "bangladesh", "geofence", "restricted", "mpa", "arrest", "seizure", "boundary", "palk strait"]):
             return "geofence_border_check"
         if any(w in q for w in ["route", "navigation", "navigating", "waypoint", "fuel", "travel", "rasta", "vazhi", "direction", "heading", "eta", "transit", "navigate", "coordinates to"]):
             return "route_planning"
-        if any(w in q for w in ["pfz", "fish", "fishing", "machhli", "machli", "meen", "chepala", "catch", "tuna", "sardine", "mackerel", "pomfret", "zone", "upwelling"]):
+        if any(w in q for w in ["pfz", "fish", "fishing", "machhli", "machli", "meen", "chepala", "catch", "tuna", "sardine", "mackerel", "pomfret", "hilsa", "squid", "shrimp", "zone"]):
             return "pfz_discovery"
         if any(w in q for w in ["safe", "safety", "weather", "wave", "cyclone", "wind", "storm", "lightning", "surakshit", "mausam", "venture", "rain", "alert", "swell", "sea state", "squall"]):
             return "sea_safety_check"
 
-        # 2. Identity & Creator Queries
+        # 7. Identity & Creator Queries
         if any(w in q for w in ["who are you", "who created", "who made", "what is blue orbit", "what are you", "your name", "introduce yourself", "tell me about yourself", "creator", "runtime terror"]):
             return "identity"
 
-        # 3. Greetings (Word-boundary matching to prevent substring collisions with 'kochi', 'fishing', etc.)
+        # 8. Greetings (Word-boundary matching)
         if re.search(r'\b(hello|hi|hey|namaste|namaskar|vanakkam|namaskaram|good morning|good afternoon|good evening|how are you|pranam)\b', q):
             return "greeting"
             
