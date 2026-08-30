@@ -27,6 +27,7 @@ import HolographicBeams from './ui/beams-background';
 import DotMatrixText from './ui/dot-text';
 import { SatelliteTelemetry, ChatResponsePayload } from '../types';
 import { speakText, stopSpeech } from '../utils/speechUtils';
+import { FormattedMarkdown } from './FormattedMarkdown';
 
 interface AgentDAGStudioProps {
   satellites: SatelliteTelemetry[];
@@ -136,38 +137,7 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
     );
   };
 
-  const renderFormattedMarkdown = (text: string) => {
-    return text.split('\n').map((line, lineIdx) => {
-      if (!line.trim()) return <div key={lineIdx} className="h-1.5" />;
-      
-      const parts = line.split(/(\*\*.*?\*\*)/g);
-      const formattedLine = parts.map((part, partIdx) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
-          return (
-            <strong key={partIdx} className="font-bold text-slate-900">
-              {part.slice(2, -2)}
-            </strong>
-          );
-        }
-        return part;
-      });
 
-      if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
-        return (
-          <div key={lineIdx} className="flex items-start space-x-2 pl-2 py-0.5">
-            <span className="text-blue-500 font-bold">•</span>
-            <span className="text-slate-800">{formattedLine}</span>
-          </div>
-        );
-      }
-
-      return (
-        <p key={lineIdx} className="text-slate-800 py-0.5">
-          {formattedLine}
-        </p>
-      );
-    });
-  };
 
   return (
     <div className="relative w-full min-h-screen font-['Outfit',sans-serif] bg-[#fcfbf8] text-slate-900 scroll-smooth flex flex-col justify-between select-none">
@@ -323,9 +293,12 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
                 </div>
               </div>
 
-              <div className="text-sm text-slate-800 leading-relaxed font-normal pt-1">
-                {renderFormattedMarkdown(latestResponse.response.markdown)}
-              </div>
+              <FormattedMarkdown 
+                content={latestResponse.response.markdown} 
+                className="text-sm text-slate-800 leading-relaxed font-normal pt-1" 
+                strongClassName="font-bold text-slate-900"
+                bulletClassName="text-blue-600"
+              />
             </div>
 
             {/* Collapsible DAG Execution Trace & Step-by-Step Chain */}

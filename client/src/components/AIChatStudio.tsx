@@ -16,6 +16,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatResponsePayload } from '../types';
 import { speakText, stopSpeech, getBcp47LangTag } from '../utils/speechUtils';
+import { FormattedMarkdown } from './FormattedMarkdown';
 
 interface Message {
   id: string;
@@ -294,9 +295,12 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
                         <span>Blue Orbit AI Advisory</span>
                       </div>
 
-                      <div className="text-sm leading-relaxed text-zinc-800 whitespace-pre-line font-normal">
-                        {msg.text}
-                      </div>
+                      <FormattedMarkdown 
+                        content={msg.text} 
+                        className="text-sm leading-relaxed text-zinc-800 font-normal" 
+                        strongClassName="font-bold text-zinc-950"
+                        bulletClassName="text-blue-600"
+                      />
 
                       {/* Tool actions: Audio speaker + Copy */}
                       <div className="flex items-center space-x-2 pt-2 border-t border-zinc-100">

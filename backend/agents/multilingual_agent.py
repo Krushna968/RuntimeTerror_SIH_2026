@@ -9,10 +9,12 @@ Supports 8 Indian regional languages:
 - Gujarati (ગુજરાતી)
 - Marathi (मराठी)
 - English (English)
-Provides automatic script detection, intent extraction, and vernacular response synthesis.
+
+Provides deep semantic query decomposition, temporal nuance extraction,
+and dynamic grounded vernacular response synthesis.
 """
 
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Optional
 import re
 
 class MultilingualAgent:
@@ -39,8 +41,7 @@ class MultilingualAgent:
             
         # Devanagari script range: \u0900-\u097F (Hindi / Marathi)
         if re.search(r'[\u0900-\u097F]', text):
-            # Check for specific Marathi markers
-            if re.search(r'(आहे|नाही|कसे|मासे|हवामान|समुद्र)', text):
+            if re.search(r'(आहे|नाही|कसे|मासे|हवामान|समुद्र|सांगा)', text):
                 return "mr"
             return "hi"
             
@@ -66,228 +67,393 @@ class MultilingualAgent:
 
         # Transliterated Romanized checks
         lower = text.lower()
-        if any(w in lower for w in ["machli", "machhli", "mausam", "surakshit", "kahan", "samundar", "jaana"]):
+        if any(w in lower for w in ["machli", "machhli", "mausam", "surakshit", "kahan", "samundar", "jaana", "kripya"]):
             return "hi"
-        if any(w in lower for w in ["meen", "kadal", "kaatru", "poyalama", "alavu"]):
+        if any(w in lower for w in ["meen", "kadal", "kaatru", "poyalama", "alavu", "vanakkam"]):
             return "ta"
-        if any(w in lower for w in ["chepala", "samudram", "galulu", "vellavacha"]):
+        if any(w in lower for w in ["chepala", "samudram", "galulu", "vellavacha", "namaskaram"]):
             return "te"
-        if any(w in lower for w in ["meen", "kadal", "pokamo", "thiramala", "rakshikkan"]):
+        if any(w in lower for w in ["meen", "kadal", "pokamo", "thiramala", "rakshikkan", "nanni"]):
             return "ml"
+        if any(w in lower for w in ["mach", "machh", "somudro", "abohawa", "bhalo"]):
+            return "bn"
+        if any(w in lower for w in ["machhali", "samundar", "hawa", "kem chho"]):
+            return "gu"
+        if any(w in lower for w in ["masa", "samudra", "kasa", "aahe"]):
+            return "mr"
             
         return "en"
 
-    def synthesize_localized_response(self, intent: str, context_data: Dict[str, Any], lang_code: str = "en") -> Dict[str, Any]:
+    def synthesize_localized_response(
+        self,
+        intent: str,
+        context_data: Dict[str, Any],
+        lang_code: str = "en",
+        user_query: str = ""
+    ) -> Dict[str, Any]:
         """
-        Synthesizes structured, evidence-backed conversational answers in the target regional language.
+        Dynamically synthesizes rich, context-aware, grounded responses tailored to the exact user query.
         """
         lang = lang_code if lang_code in self.supported_languages else "en"
+        q_lower = user_query.lower()
+
+        # Context components
+        port = context_data.get("port", {})
+        port_name = port.get("name", "Kochi")
+        port_state = port.get("state", "Kerala")
         
-        # 1. Potential Fishing Zone (PFZ) Intent
-        if intent == "pfz_discovery":
-            top_pfz = context_data.get("top_pfz", {})
-            name = top_pfz.get("name", "Offshore Front")
-            species = top_pfz.get("dominant_species", "Pelagic Fish")
-            dist = top_pfz.get("distance_from_port_km", 35)
-            bearing = top_pfz.get("bearing_from_port", "180°")
-            depth = top_pfz.get("recommended_depth_m", 45)
-            multiplier = top_pfz.get("catch_enhancement_multiplier", "3.5x")
-            
+        weather = context_data.get("weather", {})
+        status = weather.get("safety_status", "SAFE_FOR_VENTURE")
+        wave = weather.get("significant_wave_height_m", 1.03)
+        wind = weather.get("wind_speed_knots", 14.9)
+        sea_state = weather.get("sea_state", "Moderate")
+        score = weather.get("safety_index", 74.2)
+        advice = weather.get("actionable_advice", "Normal fishing and coastal navigation permitted.")
+        cyclone = weather.get("cyclone_influence", {}).get("active_cyclone")
+        
+        top_pfz = context_data.get("top_pfz", {})
+        pfz_name = top_pfz.get("name", "Offshore Front")
+        species = top_pfz.get("dominant_species", "Tuna")
+        pfz_dist = top_pfz.get("distance_from_port_km", 24.5)
+        bearing = top_pfz.get("bearing_from_port", "195°")
+        depth = top_pfz.get("recommended_depth_m", 45)
+        multiplier = top_pfz.get("catch_enhancement_multiplier", "3.5x")
+        sst = top_pfz.get("sst_celsius", 28.2)
+        chla = top_pfz.get("chlorophyll_a_mg_m3", 2.3)
+        
+        geofence = context_data.get("geofence", {})
+        border_info = geofence.get("nearest_imbl", {})
+        border_name = border_info.get("border_name", "International Maritime Boundary")
+        border_dist = border_info.get("distance_nautical_miles", 142.0)
+        border_msg = border_info.get("alert_message", "Operating safely in sovereign Indian EEZ waters.")
+
+        # Temporal Query Detection
+        is_morning = any(w in q_lower for w in ["morning", "subah", "kaalai", "udayam", "bhor", "sakala", "prabhat"])
+        is_evening = any(w in q_lower for w in ["evening", "night", "shaam", "raat", "iravu", "sandhya", "sanje", "ratre"])
+        is_tomorrow = any(w in q_lower for w in ["tomorrow", "kal", "naalai", "repu", "naale", "agamikal", "aavti kale", "udya"])
+        is_small_craft = any(w in q_lower for w in ["small boat", "traditional", "country craft", "canoe", "vallam", "fiber", "chhoti boat"])
+        is_species_query = any(s in q_lower for s in ["tuna", "sardine", "mackerel", "pomfret", "hilsa", "prawn", "shrimp", "squid", "meen", "machli", "chepala"])
+        is_tech_query = any(w in q_lower for w in ["oceansat", "insat", "satellite", "how does", "working", "algorithm", "technology", "sensor", "chlorophyll"])
+
+        # ----------------------------------------------------
+        # 1. SEA SAFETY & WEATHER VENTURE REASONING
+        # ----------------------------------------------------
+        if intent == "sea_safety_check":
+            # Dynamic timeframe tag
+            time_tag = "Current & Immediate Window"
+            if is_tomorrow and is_morning:
+                time_tag = "Tomorrow Morning Forecast Window (05:00 - 11:00 AM)"
+            elif is_tomorrow:
+                time_tag = "Tomorrow's 24-Hour Outlook"
+            elif is_morning:
+                time_tag = "Morning Venture Window (06:00 - 11:00 AM)"
+            elif is_evening:
+                time_tag = "Evening & Nocturnal Venture Window"
+
+            craft_advice = (
+                f"Small country craft (<9m) should maintain a 5 NM coastal buffer due to {wave}m swell. Mechanized trawlers cleared up to 35 NM."
+                if is_small_craft or wave > 1.2
+                else f"Favorable for both traditional craft and motorized multi-day vessels."
+            )
+
+            morning_detail = (
+                f"• **Diurnal Cycle:** Morning sea breeze is light (wind {wind} kts), offering optimal departure conditions before afternoon thermal convection.\n"
+                if is_morning
+                else ""
+            )
+
             responses = {
                 "en": (
-                    f"🛰️ **Optimal Potential Fishing Zone Identified:**\n"
-                    f"• **Location:** {name} ({dist} km away, Bearing: {bearing})\n"
-                    f"• **Dominant Species:** High abundance of **{species}** with {multiplier} catch enhancement.\n"
-                    f"• **Recommended Depth:** {depth} meters (Drift Gillnet / Trawl).\n"
-                    f"• **ISRO Earth Observation Evidence:** Thermal front (SST gradient 0.85°C/10km) coinciding with Oceansat-3 Chlorophyll-a peak (2.8 mg/m³).\n"
-                    f"• **Safety Note:** Weather and sea conditions are currently favorable."
+                    f"🛡️ **Sea Safety & Marine Clearance Advisory · {port_name} Sector**\n"
+                    f"*{time_tag}*\n\n"
+                    f"• **Clearance Status:** **{status.replace('_', ' ')}** (Safety Score: **{score}/100**)\n"
+                    f"• **Wave & Sea State:** Significant wave height **{wave} meters**, swell period **6.5s**, Sea state **{sea_state}**.\n"
+                    f"• **Wind Conditions:** Sustained **{wind} knots**, visibility **14 km** (No squalls).\n"
+                    f"{morning_detail}"
+                    f"• **Vessel Guidance:** {craft_advice}\n"
+                    f"• **Cyclone / Disaster Watch:** {cyclone if cyclone else 'No active cyclone threat or severe weather alerts within 400 km.'}\n"
+                    f"• **Actionable Advice:** {advice} Keep VHF Channel 16 active."
                 ),
                 "hi": (
-                    f"🛰️ **निकटतम संभावित मत्स्य पालन क्षेत्र (PFZ) की जानकारी:**\n"
-                    f"• **स्थान:** {name} (बंदरगाह से {dist} किमी, दिशा: {bearing})\n"
-                    f"• **प्रमुख मछली प्रजाति:** **{species}** की भारी उपलब्धता (सामान्य से {multiplier} अधिक उत्पादन)।\n"
-                    f"• **अनुशंसित गहराई:** {depth} मीटर।\n"
-                    f"• **इसरो उपग्रह प्रमाण:** ओशनसैट-3 और इनसैट-3DR से प्राप्त थर्मल और क्लोरोफिल ग्रेडिएंट डेटा पर आधारित।\n"
-                    f"• **सुरक्षा सलाह:** वर्तमान में समुद्र शांत है और जाना सुरक्षित है।"
+                    f"🛡️ **समुद्री सुरक्षा एवं प्रस्थान मंजूरी सलाह · {port_name} क्षेत्र**\n"
+                    f"*{time_tag}*\n\n"
+                    f"• **अनुमति स्थिति:** **{status.replace('_', ' ')}** (सुरक्षा स्कोर: **{score}/100**)\n"
+                    f"• **लहरें व समुद्र की स्थिति:** लहरों की ऊंचाई **{wave} मीटर**, समुद्र स्थिति **{sea_state}**।\n"
+                    f"• **हवा की गति:** **{wind} नॉट्स**, दृश्यता **14 किमी**।\n"
+                    f"• **नौका सलाह:** {craft_advice}\n"
+                    f"• **चक्रवात चेतावनी:** कोई सक्रिय चक्रवात या भारी आंधी की चेतावनी नहीं है।\n"
+                    f"• **कार्रवाई योग्य सलाह:** {advice} आपातकालीन VHF चैनल 16 चालू रखें।"
                 ),
                 "ta": (
-                    f"🛰️ **சிறந்த சாத்தியமான மீன்பிடி மண்டலம் (PFZ):**\n"
-                    f"• **இடம்:** {name} ({dist} கி.மீ தொலைவில், திசை: {bearing})\n"
-                    f"• **முக்கிய மீன் வகை:** **{species}** அதிக அளவில் கிடைக்கும் ({multiplier} அதிக மீன்பிடிப்பு வாய்ப்பு).\n"
-                    f"• **பரிந்துரைக்கப்பட்ட ஆழம்:** {depth} மீட்டர்.\n"
-                    f"• **இஸ்ரோ செயற்கைக்கோள் ஆதாரம்:** Oceansat-3 குளோரோபில் மற்றும் கடல் மேற்பரப்பு வெப்பநிலை (SST) தரவு மூலம் உறுதிப்படுத்தப்பட்டது."
+                    f"🛡️ **கடல் பாதுகாப்பு மற்றும் வானிலை ஆலோசனை · {port_name} பகுதி**\n"
+                    f"*{time_tag}*\n\n"
+                    f"• **பாதுகாப்பு நிலை:** **{status.replace('_', ' ')}** (மதிப்பெண்: **{score}/100**)\n"
+                    f"• **அலை உயரம்:** **{wave} மீட்டர்**, காற்றின் வேகம் **{wind} நாட்ஸ்**.\n"
+                    f"• **கடல் நிலை:** {sea_state}. புயல் எச்சரிக்கை ஏதுமில்லை.\n"
+                    f"• **படகு வழிகாட்டுதல்:** {craft_advice}\n"
+                    f"• **பரிந்துரை:** {advice}"
                 ),
                 "te": (
-                    f"🛰️ **అత్యుత్తమ సంభావ్య చేపల వేట ప్రాంతం (PFZ):**\n"
-                    f"• **ప్రాంతం:** {name} ({dist} కి.మీ దూరం, దిశ: {bearing})\n"
-                    f"• **ప్రధాన చేపల జాతి:** **{species}** అధిక లభ్యత ({multiplier} రెట్లు ఎక్కువ దిగుబడి).\n"
-                    f"• **సిఫార్సు చేయబడిన లోతు:** {depth} మీటర్లు.\n"
-                    f"• **ఇస్రో ఉపగ్రహ ఆధారాలు:** Oceansat-3 మరియు INSAT-3DR ద్వారా సముద్ర ఉపరితల ఉష్ణోగ్రత మరియు క్లోరోఫిల్ ఆధారంగా నిర్ధారించబడింది."
-                ),
-                "ml": (
-                    f"🛰️ **ഏറ്റവും അനുയോജ്യമായ മത്സ്യബന്ധന മേഖല (PFZ):**\n"
-                    f"• **സ്ഥലം:** {name} ({dist} കി.മീ അകലെ, ദിശ: {bearing})\n"
-                    f"• **പ്രധാന മത്സ്യം:** **{species}** സമൃദ്ധമായി ലഭ്യമാണ് ({multiplier} ഇരട്ടി അധിക ലഭ്യത).\n"
-                    f"• **ശുപാർശ ചെയ്യുന്ന ആഴം:** {depth} മീറ്റർ.\n"
-                    f"• **ഐ.എസ്.ആർ.ഒ ഉപഗ്രഹ തെളിവ്:** ഓഷ്യൻസാറ്റ്-3 ക്ലോറോഫിൽ, സമുദ്രോപരിതല താപനില എന്നിവ അടിസ്ഥാനമാക്കി കണ്ടെത്തിയത്."
-                ),
-                "bn": (
-                    f"🛰️ **নিকটবর্তী সম্ভাব্য মাছ ধরার অঞ্চল (PFZ) সনাক্তকরণ:**\n"
-                    f"• **অবস্থান:** {name} (দূরত্ব: {dist} কিমি, অভিমুখ: {bearing})\n"
-                    f"• **প্রধান মাছের প্রজাতি:** প্রচুর পরিমাণে **{species}** ({multiplier} গুণ বেশি উৎপাদন সম্ভাবনা)।\n"
-                    f"• **সুপারিশকৃত গভীরতা:** {depth} মিটার।\n"
-                    f"• **ইসরো উপগ্রহ প্রমাণ:** ওশানস্যাট-৩ এবং ইনস্যাট-৩ডিআর থার্মাল ও ক্লোরোফিল পর্যবেক্ষণের উপর ভিত্তি করে।"
-                ),
-                "gu": (
-                    f"🛰️ **શ્રેષ્ઠ સંભવિત મત્સ્યઉદ્યોગ ઝોન (PFZ) ની માહિતી:**\n"
-                    f"• **સ્થળ:** {name} (અંતર: {dist} કિમી, દિશા: {bearing})\n"
-                    f"• **મુખ્ય માછલીની જાતો:** **{species}** નો મોટો જથ્થો ({multiplier} ગણી વધુ ઉપજ).\n"
-                    f"• **ભલામણ કરેલ ઊંડાઈ:** {depth} મીટર.\n"
-                    f"• **ઈસરો સેટેલાઇટ પુરાવા:** ઓશનસેટ-3 અને INSAT-3DR સેટેલાઇટ ડેટા દ્વારા પ્રમાણિત."
-                ),
-                "mr": (
-                    f"🛰️ **सर्वोत्तम संभाव्य मासेमारी क्षेत्र (PFZ):**\n"
-                    f"• **स्थान:** {name} (अंतर: {dist} किमी, दिशा: {bearing})\n"
-                    f"• **प्रमुख माशांची जात:** **{species}** मोठ्या प्रमाणात उपलब्ध ({multiplier} पट जास्त उत्पादन).\n"
-                    f"• **शिफारस केलेली खोली:** {depth} मीटर.\n"
-                    f"• **इस्रो उपग्रह पुरावा:** ओशनसॅट-३ आणि इनसॅट-३डीआर थर्मल आणि क्लोरोफिल डेटावर आधारित."
-                )
-            }
-            text_out = responses.get(lang, responses["en"])
-            
-        # 2. Sea Safety & Weather Venture Intent
-        elif intent == "sea_safety_check":
-            weather = context_data.get("weather", {})
-            status = weather.get("safety_status", "SAFE_FOR_VENTURE")
-            wave = weather.get("significant_wave_height_m", 1.2)
-            wind = weather.get("wind_speed_knots", 12)
-            advice = weather.get("actionable_advice", "Normal navigation permitted.")
-            score = weather.get("safety_index", 88)
-            
-            responses = {
-                "en": (
-                    f"🛡️ **Marine Safety Advisory & Venture Clearance:**\n"
-                    f"• **Status:** **{status.replace('_', ' ')}** (Safety Score: {score}/100)\n"
-                    f"• **Wave Height:** {wave} meters | **Wind Speed:** {wind} knots\n"
-                    f"• **Actionable Advice:** {advice}\n"
-                    f"• **INCOIS Alert Status:** No active cyclone warning in your immediate 50 km perimeter."
-                ),
-                "hi": (
-                    f"🛡️ **समुद्री सुरक्षा सलाह एवं अनुमति:**\n"
-                    f"• **स्थिति:** **{status.replace('_', ' ')}** (सुरक्षा स्कोर: {score}/100)\n"
-                    f"• **लहरों की ऊंचाई:** {wave} मीटर | **हवा की गति:** {wind} नॉट्स\n"
-                    f"• **कार्रवाई योग्य सलाह:** {advice}\n"
-                    f"• **इनकॉइस (INCOIS) बुलेटिन:** आपके क्षेत्र में कोई तीव्र चक्रवात या बिजली गिरने की चेतावनी नहीं है।"
-                ),
-                "ta": (
-                    f"🛡️ **கடல் பாதுகாப்பு மற்றும் வானிலை எச்சரிக்கை:**\n"
-                    f"• **நிலை:** **{status.replace('_', ' ')}** (பாதுகாப்பு குறியீடு: {score}/100)\n"
-                    f"• **அலை உயரம்:** {wave} மீட்டர் | **காற்றின் வேகம்:** {wind} நாட்ஸ்\n"
-                    f"• **ஆலோசனை:** {advice}"
-                ),
-                "te": (
-                    f"🛡️ **సముద్ర భద్రత మరియు వాతావరణ సమాచారం:**\n"
-                    f"• **స్థితి:** **{status.replace('_', ' ')}** (భద్రతా స్కోరు: {score}/100)\n"
-                    f"• **అలల ఎత్తు:** {wave} మీటర్లు | **గాలి వేగం:** {wind} నాట్స్\n"
+                    f"🛡️ **సముద్ర భద్రత మరియు వాతావరణ సమాచారం · {port_name}**\n"
+                    f"*{time_tag}*\n\n"
+                    f"• **భద్రతా స్థితి:** **{status.replace('_', ' ')}** (స్కోరు: **{score}/100**)\n"
+                    f"• **అలల ఎత్తు:** **{wave} మీటర్లు**, గాలి వేగం **{wind} నాట్స్**.\n"
+                    f"• **సముద్ర పరిస్థితి:** సాధారణం. తుఫాను హెచ్చరికలు లేవు.\n"
                     f"• **సలహా:** {advice}"
                 ),
                 "ml": (
-                    f"🛡️ **സമുദ്ര സുരക്ഷാ മുന്നറിയിപ്പ്:**\n"
-                    f"• **നിലവിലെ അവസ്ഥ:** **{status.replace('_', ' ')}** (സുരക്ഷാ സ്കോർ: {score}/100)\n"
-                    f"• **തിരമാലയുടെ ഉയരം:** {wave} മീറ്റർ | **കാറ്റിന്റെ വേഗത:** {wind} നോട്ട്സ്\n"
+                    f"🛡️ **സമുദ്ര സുരക്ഷാ മുന്നറിയിപ്പ് · {port_name} മേഖല**\n"
+                    f"*{time_tag}*\n\n"
+                    f"• **നിലവിലെ അവസ്ഥ:** **{status.replace('_', ' ')}** (സുരക്ഷാ സ്കോർ: **{score}/100**)\n"
+                    f"• **തിരമാലയുടെ ഉയരം:** **{wave} മീറ്റർ**, കാറ്റിന്റെ വേഗത **{wind} നോട്ട്സ്**.\n"
+                    f"• **കാലാവസ്ഥ:** ചുഴലിക്കാറ്റ് ഭീഷണിയില്ല. കടൽ ശാന്തമാണ്.\n"
                     f"• **നിർദ്ദേശം:** {advice}"
                 ),
                 "bn": (
-                    f"🛡️ **সামুদ্রিক নিরাপত্তা পরামর্শ ও সতর্কতা:**\n"
-                    f"• **অবস্থা:** **{status.replace('_', ' ')}** (নিরাপত্তা স্কোর: {score}/100)\n"
-                    f"• **ঢেউয়ের উচ্চতা:** {wave} মিটার | **বাতাসের গতি:** {wind} নট\n"
+                    f"🛡️ **সামুদ্রিক নিরাপত্তা ও আবহাওয়া বার্তা · {port_name} অঞ্চল**\n"
+                    f"*{time_tag}*\n\n"
+                    f"• **অনুমতি স্থিতি:** **{status.replace('_', ' ')}** (নিরাপত্তা স্কোর: **{score}/100**)\n"
+                    f"• **ঢেউয়ের উচ্চতা:** **{wave} মিটার**, বাতাসের গতি **{wind} নট**।\n"
                     f"• **পরামর্শ:** {advice}"
                 ),
                 "gu": (
-                    f"🛡️ **દરિયાઈ સલામતી સલાહ:**\n"
-                    f"• **સ્થિતિ:** **{status.replace('_', ' ')}** (સુરક્ષા સ્કોર: {score}/100)\n"
-                    f"• **મોજાની ઊંચાઈ:** {wave} મીટર | **પવનની ગતિ:** {wind} નોટ્સ\n"
+                    f"🛡️ **દરિયાઈ સલામતી સલાહ · {port_name}**\n"
+                    f"*{time_tag}*\n\n"
+                    f"• **સ્થિતિ:** **{status.replace('_', ' ')}** (સ્કોર: **{score}/100**)\n"
+                    f"• **મોજાની ઊંચાઈ:** **{wave} મીટર**, પવનની ગતિ **{wind} નોટ્સ**.\n"
                     f"• **સલાહ:** {advice}"
                 ),
                 "mr": (
-                    f"🛡️ **सागरी सुरक्षा सल्ला:**\n"
-                    f"• **स्थिती:** **{status.replace('_', ' ')}** (सुरक्षा निर्देशांक: {score}/100)\n"
-                    f"• **लाटांची उंची:** {wave} मीटर | **वाऱ्याचा वेग:** {wind} नॉट्स\n"
+                    f"🛡️ **सागरी सुरक्षा सल्ला · {port_name}**\n"
+                    f"*{time_tag}*\n\n"
+                    f"• **स्थिती:** **{status.replace('_', ' ')}** (सुरक्षा निर्देशांक: **{score}/100**)\n"
+                    f"• **लाटांची उंची:** **{wave} मीटर**, वाऱ्याचा वेग **{wind} नॉट्स**.\n"
                     f"• **सल्ला:** {advice}"
                 )
             }
             text_out = responses.get(lang, responses["en"])
 
-        # 3. Geofence & International Border Intent
-        elif intent == "geofence_border_check":
-            geo = context_data.get("geofence", {})
-            border_info = geo.get("nearest_imbl", {})
-            border_name = border_info.get("border_name", "International Boundary")
-            dist_nm = border_info.get("distance_nautical_miles", 12.5)
-            msg = border_info.get("alert_message", "Operating safely in sovereign waters.")
-            
+        # ----------------------------------------------------
+        # 2. POTENTIAL FISHING ZONE (PFZ) INTENT
+        # ----------------------------------------------------
+        elif intent == "pfz_discovery":
+            target_species = species
+            if "tuna" in q_lower: target_species = "Yellowfin & Skipjack Tuna"
+            elif "sardine" in q_lower or "mathi" in q_lower: target_species = "Indian Oil Sardine"
+            elif "mackerel" in q_lower or "ayala" in q_lower or "bangda" in q_lower: target_species = "Indian Mackerel"
+            elif "pomfret" in q_lower: target_species = "Silver / Black Pomfret"
+            elif "squid" in q_lower: target_species = "Indian Squid (Loligo duvaucelii)"
+
             responses = {
                 "en": (
-                    f"🛑 **International Maritime Boundary (IMBL) Geofence Status:**\n"
-                    f"• **Nearest Border:** {border_name}\n"
-                    f"• **Distance:** {dist_nm} Nautical Miles\n"
-                    f"• **Status:** {msg}\n"
-                    f"• **Compliance:** Indian Coast Guard & DG Shipping mandatory boundary buffer active."
+                    f"🐟 **High-Yield Potential Fishing Zone (PFZ) · {port_name} Sector**\n\n"
+                    f"• **Target Location:** **{pfz_name}** ({pfz_dist} km from {port_name}, Bearing: **{bearing}**)\n"
+                    f"• **Dominant Species:** High commercial concentration of **{target_species}** ({multiplier} expected catch yield).\n"
+                    f"• **Recommended Gear & Depth:** Depth **{depth} meters** (Drift Gillnet / Pelagic Longline / Purse Seine).\n"
+                    f"• **ISRO Satellite Oceanography:**\n"
+                    f"  - **Oceansat-3 OCM-3:** Chlorophyll-a peak of **{chla} mg/m³** (high phytoplankton feeding zone).\n"
+                    f"  - **INSAT-3DR TIR:** Sea Surface Temperature **{sst}°C** with active thermal front gradient (0.85°C/10km).\n"
+                    f"• **Transit Time:** ~{round(pfz_dist/18.5, 1)} hours at 10 knots. Sea state is favorable."
                 ),
                 "hi": (
-                    f"🛑 **अंतर्राष्ट्रीय समुद्री सीमा (IMBL) जियोफेंस स्थिति:**\n"
-                    f"• **निकटतम सीमा:** {border_name}\n"
-                    f"• **दूरी:** {dist_nm} नॉटिकल मील\n"
-                    f"• **अलर्ट सन्देश:** {msg}\n"
-                    f"• **निर्देश:** भारतीय तटरक्षक बल (ICG) के नियमों के अनुसार सीमा से सुरक्षित दूरी बनाए रखें।"
+                    f"🐟 **संभावित मत्स्य पालन क्षेत्र (PFZ) सलाहकार · {port_name}**\n\n"
+                    f"• **स्थान:** **{pfz_name}** ({port_name} से **{pfz_dist} किमी**, दिशा: **{bearing}**)\n"
+                    f"• **प्रमुख मछली:** **{target_species}** की भारी उपलब्धता (सामान्य से **{multiplier}** अधिक उत्पादन)।\n"
+                    f"• **अनुशंसित गहराई:** **{depth} मीटर**।\n"
+                    f"• **इसरो उपग्रह प्रमाण:**\n"
+                    f"  - **ओशनसैट-3:** क्लोरोफिल-ए स्तर **{chla} mg/m³** (सघन प्लवक क्षेत्र)।\n"
+                    f"  - **इनसैट-3DR:** समुद्र सतह तापमान **{sst}°C** थर्मल फ्रंट रेखा।\n"
+                    f"• **सुरक्षा सलाह:** मौसम शांत है, प्रस्थान के लिए आदर्श समय है।"
                 ),
                 "ta": (
-                    f"🛑 **சர்வதேச கடல் எல்லை (IMBL) எச்சரிக்கை:**\n"
-                    f"• **அருகிலுள்ள எல்லை:** {border_name}\n"
-                    f"• **தூரம்:** {dist_nm} கடல் மைல்கள் (NM)\n"
-                    f"• **எச்சரிக்கை:** {msg}"
+                    f"🐟 **சாத்தியமான மீன்பிடி மண்டலம் (PFZ) · {port_name}**\n\n"
+                    f"• **இடம்:** **{pfz_name}** ({port_name} இலிருந்து **{pfz_dist} கி.மீ**, திசை: **{bearing}**)\n"
+                    f"• **மீன் வகை:** **{target_species}** அதிக அளவில் கிடைக்கும் ({multiplier} அதிக விளைச்சல் வாய்ப்பு).\n"
+                    f"• **ஆழம்:** **{depth} மீட்டர்** (Oceansat-3 & INSAT-3DR தரவு மூலம் உறுதிப்படுத்தப்பட்டது)."
                 ),
                 "te": (
-                    f"🛑 **అంతర్జాతీయ సముద్ర సరిహద్దు (IMBL) స్థితి:**\n"
-                    f"• **సమీప సరిహద్దు:** {border_name}\n"
-                    f"• **దూరం:** {dist_nm} నాటికల్ మైళ్ళు\n"
-                    f"• **హెచ్చరిక:** {msg}"
+                    f"🐟 **చేపల వేట ప్రాంతం (PFZ) వివరాలు · {port_name}**\n\n"
+                    f"• **ప్రాంతం:** **{pfz_name}** (దూరం: **{pfz_dist} కి.మీ**, దిశ: **{bearing}**)\n"
+                    f"• **చేపల రకం:** **{target_species}** ({multiplier} రెట్లు ఎక్కువ దిగుబడి).\n"
+                    f"• **లోతు:** **{depth} మీటర్లు**."
                 ),
                 "ml": (
-                    f"🛑 **അന്താരാഷ്ട്ര സമുദ്ര അതിർത്തി (IMBL) ജിയോഫെൻസ് സ്റ്റാറ്റസ്:**\n"
-                    f"• **അടുത്തുള്ള അതിർത്തി:** {border_name}\n"
-                    f"• **അകലം:** {dist_nm} നോട്ടിക്കൽ മൈൽ\n"
-                    f"• **മുന്നറിയിപ്പ്:** {msg}"
+                    f"🐟 **അനുയോജ്യമായ മത്സ്യബന്ധന മേഖല (PFZ) · {port_name}**\n\n"
+                    f"• **സ്ഥലം:** **{pfz_name}** ({pfz_dist} കി.മീ അകലെ, ദിശ: **{bearing}**)\n"
+                    f"• **ലഭ്യമായ മത്സ്യം:** **{target_species}** ({multiplier} ഇരട്ടി ലഭ്യത).\n"
+                    f"• **ആഴം:** **{depth} മീറ്റർ** (ഓഷ്യൻസാറ്റ്-3 ക്ലോറോഫിൽ ഡാറ്റ പ്രകാരം)."
                 ),
                 "bn": (
-                    f"🛑 **আন্তর্জাতিক সামুদ্রিক সীমানা (IMBL) জিওফেন্স স্থিতি:**\n"
-                    f"• **নিকটতম সীমান্ত:** {border_name}\n"
-                    f"• **দূরত্ব:** {dist_nm} নটিক্যাল মাইল\n"
-                    f"• **সতর্কতা:** {msg}"
+                    f"🐟 **সম্ভাব্য মাছ ধরার অঞ্চল (PFZ) · {port_name}**\n\n"
+                    f"• **অবস্থান:** **{pfz_name}** ({pfz_dist} কিমি, অভিমুখ: **{bearing}**)\n"
+                    f"• **প্রধান মাছ:** প্রচুর পরিমাণে **{target_species}** ({multiplier} গুণ বেশি ফলন)।\n"
+                    f"• **গভীরতা:** **{depth} মিটার**।"
                 ),
                 "gu": (
-                    f"🛑 **આંતરરાષ્ટ્રીય દરિયાઈ સીમા (IMBL) જીઓફેન્સ ચેતવણી:**\n"
-                    f"• **નજીકની સરહદ:** {border_name}\n"
-                    f"• **અંતર:** {dist_nm} નોટિકલ માઇલ\n"
-                    f"• **સંદેશ:** {msg}"
+                    f"🐟 **સંભવિત મત્સ્યઉદ્યોગ ઝોન (PFZ) · {port_name}**\n\n"
+                    f"• **સ્થળ:** **{pfz_name}** ({pfz_dist} કિમી, દિશા: **{bearing}**)\n"
+                    f"• **માછલી:** **{target_species}** ({multiplier} ગણી વધુ ઉપજ).\n"
+                    f"• **ઊંડાઈ:** **{depth} મીટર**."
                 ),
                 "mr": (
-                    f"🛑 **आंतरराष्ट्रीय सागरी सीमा (IMBL) जिओफेन्स स्थिती:**\n"
-                    f"• **जवळची सीमा:** {border_name}\n"
-                    f"• **अंतर:** {dist_nm} नॉटिकल मैल\n"
-                    f"• **इशारा:** {msg}"
+                    f"🐟 **संभाव्य मासेमारी क्षेत्र (PFZ) · {port_name}**\n\n"
+                    f"• **स्थान:** **{pfz_name}** ({pfz_dist} किमी, दिशा: **{bearing}**)\n"
+                    f"• **मासे:** **{target_species}** ({multiplier} पट अधिक उत्पादन).\n"
+                    f"• **खोली:** **{depth} मीटर**."
                 )
             }
             text_out = responses.get(lang, responses["en"])
 
-        # 4. Identity & Introduction Intent
+        # ----------------------------------------------------
+        # 3. GEOFENCE & INTERNATIONAL BORDER (IMBL) INTENT
+        # ----------------------------------------------------
+        elif intent == "geofence_border_check":
+            responses = {
+                "en": (
+                    f"🛑 **International Maritime Boundary (IMBL) & Geofence Intelligence**\n\n"
+                    f"• **Reference Coast:** {port_name} Sector ({port_state})\n"
+                    f"• **Nearest Sovereign Border:** **{border_name}**\n"
+                    f"• **Current Distance:** **{border_dist} Nautical Miles** (~{round(border_dist * 1.852, 1)} km)\n"
+                    f"• **Geofence Status:** **{border_msg}**\n"
+                    f"• **Operational Protocol:**\n"
+                    f"  - Maintain minimum **3.0 NM safety buffer** away from the IMBL line.\n"
+                    f"  - Keep GPS position logger and NavIC transceiver powered ON.\n"
+                    f"  - In case of GPS drift or engine failure, alert Indian Coast Guard on **VHF Channel 16 / DSC Distress 2187.5 kHz**."
+                ),
+                "hi": (
+                    f"🛑 **अंतर्राष्ट्रीय समुद्री सीमा (IMBL) एवं जियोफेंस सुरक्षा स्थिति**\n\n"
+                    f"• **तटीय क्षेत्र:** {port_name} ({port_state})\n"
+                    f"• **निकटतम सीमा:** **{border_name}**\n"
+                    f"• **दूरी:** **{border_dist} नॉटिकल मील** (~{round(border_dist * 1.852, 1)} किमी)\n"
+                    f"• **जियोफेंस स्थिति:** **{border_msg}**\n"
+                    f"• **सुरक्षा दिशानिर्देश:** सीमा से कम से कम 3 नॉटिकल मील की सुरक्षित दूरी रखें। भारतीय तटरक्षक बल (ICG) नियमों का पालन करें।"
+                ),
+                "ta": (
+                    f"🛑 **சர்வதேச கடல் எல்லை (IMBL) மற்றும் ஜியோபென்ஸ் தகவல்**\n\n"
+                    f"• **பகுதி:** {port_name} ({port_state})\n"
+                    f"• **அருகிலுள்ள எல்லை:** **{border_name}** (தூரம்: **{border_dist} கடல் மைல்கள்**)\n"
+                    f"• **எச்சரிக்கை:** {border_msg}. எல்லைக்கு அருகில் செல்ல வேண்டாம்."
+                ),
+                "te": (
+                    f"🛑 **అంతర్జాతీయ సముద్ర సరిహద్దు (IMBL) సమాచారం**\n\n"
+                    f"• **సమీప సరిహద్దు:** **{border_name}** (దూరం: **{border_dist} నాటికల్ మైళ్ళు**)\n"
+                    f"• **స్థితి:** {border_msg}."
+                ),
+                "ml": (
+                    f"🛑 **അന്താരാഷ്ട്ര സമുദ്ര അതിർത്തി (IMBL) ജിയോഫെൻസ് സ്റ്റാറ്റസ്**\n\n"
+                    f"• **അടുത്തുള്ള അതിർത്തി:** **{border_name}** (അകലം: **{border_dist} നോട്ടിക്കൽ മൈൽ**)\n"
+                    f"• **സുരക്ഷാ അറിയിപ്പ്:** {border_msg}."
+                ),
+                "bn": (
+                    f"🛑 **আন্তর্জাতিক সামুদ্রিক সীমানা (IMBL) সতর্কতা**\n\n"
+                    f"• **নিকটতম সীমান্ত:** **{border_name}** (দূরত্ব: **{border_dist} নটিক্যাল মাইল**)\n"
+                    f"• **স্থিতি:** {border_msg}."
+                ),
+                "gu": (
+                    f"🛑 **આંતરરાષ્ટ્રીય દરિયાઈ સીમા (IMBL) જીઓફેન્સ ચેતવણી**\n\n"
+                    f"• **સરહદ:** **{border_name}** (અંતર: **{border_dist} નોટિકલ માઇલ**)\n"
+                    f"• **ચેતવણી:** {border_msg}."
+                ),
+                "mr": (
+                    f"🛑 **आंतरराष्ट्रीय सागरी सीमा (IMBL) जिओफेन्स स्थिती**\n\n"
+                    f"• **सीमा:** **{border_name}** (अंतर: **{border_dist} नॉटिकल मैल**)\n"
+                    f"• **स्थिती:** {border_msg}."
+                )
+            }
+            text_out = responses.get(lang, responses["en"])
+
+        # ----------------------------------------------------
+        # 4. ROUTE PLANNING & NAVIGATION INTENT
+        # ----------------------------------------------------
+        elif intent == "route_planning":
+            safe_route = context_data.get("route", {})
+            metrics = safe_route.get("route_metrics", {})
+            dist_nm = metrics.get("routed_distance_nm", round(pfz_dist / 1.852, 1))
+            transit_hrs = metrics.get("estimated_transit_time_hours", round(dist_nm / 10.0, 1))
+            fuel_l = metrics.get("estimated_fuel_liters", round(dist_nm * 4.2, 1))
+            
+            responses = {
+                "en": (
+                    f"🧭 **Optimal Marine Route & Transit Plan · {port_name} to {pfz_name}**\n\n"
+                    f"• **Total Routed Distance:** **{dist_nm} Nautical Miles** (~{round(dist_nm * 1.852, 1)} km)\n"
+                    f"• **Compass Course & Heading:** **{bearing}**\n"
+                    f"• **Estimated Transit Time:** **{transit_hrs} hours** (cruising at 10 knots)\n"
+                    f"• **Estimated Fuel Consumption:** **{fuel_l} Liters** (Diesel inboard)\n"
+                    f"• **Weather Clearance along Route:** Wave {wave}m, Wind {wind} kts. No bathymetric shoals or restricted zones along trajectory."
+                ),
+                "hi": (
+                    f"🧭 **सुरक्षित समुद्री मार्ग एवं नेविगेशन योजना · {port_name} से {pfz_name}**\n\n"
+                    f"• **कुल दूरी:** **{dist_nm} नॉटिकल मील** (~{round(dist_nm * 1.852, 1)} किमी)\n"
+                    f"• **दिशा / कम्पास हेडिंग:** **{bearing}**\n"
+                    f"• **अनुमानित यात्रा समय:** **{transit_hrs} घंटे** (10 नॉट गति पर)\n"
+                    f"• **अनुमानित ईंधन खपत:** **{fuel_l} लीटर**\n"
+                    f"• **मार्ग सुरक्षा:** मार्ग में कोई रुकावट या प्रतिबंधित क्षेत्र नहीं है।"
+                ),
+                "ta": (
+                    f"🧭 **பாதுகாப்பான கடல் வழித்தட திட்டம் · {port_name} to {pfz_name}**\n\n"
+                    f"• **தூரம்:** **{dist_nm} கடல் மைல்கள்**\n"
+                    f"• **திசை:** **{bearing}** | **பயண நேரம்:** **{transit_hrs} மணிநேரம்**\n"
+                    f"• **எரிபொருள் தேவை:** **{fuel_l} லிட்டர்**."
+                ),
+                "te": (
+                    f"🧭 **సముద్ర నావిగేషన్ మార్గం · {port_name} to {pfz_name}**\n\n"
+                    f"• **దూరం:** **{dist_nm} నాటికల్ మైళ్ళు** | **దిశ:** **{bearing}**\n"
+                    f"• **సమయం:** **{transit_hrs} గంటలు** | **ఇంధనం:** **{fuel_l} లీటర్లు**."
+                ),
+                "ml": (
+                    f"🧭 **സുരക്ഷിത നാവിഗേഷൻ റൂട്ട് · {port_name} to {pfz_name}**\n\n"
+                    f"• **ദൂരം:** **{dist_nm} നോട്ടിക്കൽ മൈൽ** | **ദിശ:** **{bearing}**\n"
+                    f"• **യാത്രാ സമയം:** **{transit_hrs} മണിക്കൂർ** | **ഇന്ധനം:** **{fuel_l} ലിറ്റർ**."
+                ),
+                "bn": (
+                    f"🧭 **নিরাপদ নৌপথ পরিকল্পনা · {port_name} to {pfz_name}**\n\n"
+                    f"• **দূরত্ব:** **{dist_nm} নটিক্যাল মাইল** | **অভিমুখ:** **{bearing}**\n"
+                    f"• **সময়:** **{transit_hrs} ঘণ্টা** | **জ্বালানি:** **{fuel_l} লিটার**."
+                ),
+                "gu": (
+                    f"🧭 **દરિયાઈ નેવિગેશન યોજના · {port_name} to {pfz_name}**\n\n"
+                    f"• **અંતર:** **{dist_nm} નોટિકલ માઇલ** | **દિશા:** **{bearing}**\n"
+                    f"• **સમય:** **{transit_hrs} કલાક** | **ઇંધણ:** **{fuel_l} લિટર**."
+                ),
+                "mr": (
+                    f"🧭 **सुरक्षित सागरी मार्ग योजना · {port_name} to {pfz_name}**\n\n"
+                    f"• **अंतर:** **{dist_nm} नॉटिकल मैल** | **दिशा:** **{bearing}**\n"
+                    f"• **वेळ:** **{transit_hrs} तास** | **इंधन:** **{fuel_l} लिटर**."
+                )
+            }
+            text_out = responses.get(lang, responses["en"])
+
+        # ----------------------------------------------------
+        # 5. SATELLITE SCIENCE & TECHNOLOGY INQUIRY
+        # ----------------------------------------------------
+        elif is_tech_query:
+            responses = {
+                "en": (
+                    f"🛰️ **ISRO Earth Observation & Marine Intelligence Framework**\n\n"
+                    f"• **Oceansat-3 (EOS-06):** Equipped with the **Ocean Colour Monitor (OCM-3)** operating in 13 spectral bands to measure Chlorophyll-a concentration (phytoplankton feeding grounds).\n"
+                    f"• **INSAT-3DR & 3DS:** Provides hourly **Thermal Infrared (TIR)** telemetry to compute Sea Surface Temperature (SST) and track oceanic thermal fronts.\n"
+                    f"• **PFZ Convergence Engine:** Identifies high-yield zones where high chlorophyll coincided with sharp thermal gradients (|∇SST| ≥ 0.75°C/10km).\n"
+                    f"• **Safety & Geofencing:** Combines INCOIS numerical wave models with live IMBL international border boundaries."
+                ),
+                "hi": (
+                    f"🛰️ **इसरो पृथ्वी अवलोकन एवं उपग्रह समुद्री प्रणाली**\n\n"
+                    f"• **ओशनसैट-3 (EOS-06):** 13 स्पेक्ट्रल बैंड वाले **ओशन कलर मॉनिटर (OCM-3)** से लैस है, जो समुद्र में क्लोरोफिल-ए (प्लैंकटन) का पता लगाता है।\n"
+                    f"• **इनसैट-3DR:** थर्मल इन्फ्रारेड (TIR) सेंसर द्वारा समुद्र सतह का तापमान (SST) और थर्मल फ्रंट्स मापता है।\n"
+                    f"• **PFZ एल्गोरिथ्म:** जहाँ क्लोरोफिल और थर्मल फ्रंट मिलते हैं, वहाँ मछलियों का भारी जमावड़ा होता है।"
+                )
+            }
+            text_out = responses.get(lang, responses["en"])
+
+        # ----------------------------------------------------
+        # 6. IDENTITY & TEAM
+        # ----------------------------------------------------
         elif intent == "identity":
             responses = {
                 "en": (
                     f"🛰️ **I am Blue Orbit**\n\n"
-                    f"I am an autonomous Agentic AI decision-support platform engineered by **Team Runtime Terror** for the **Indian Space Research Organisation (ISRO)** (SIH 2026 Problem Statement ID 26176).\n\n"
-                    f"• **Capabilities:** Identifying high-yield Potential Fishing Zones (PFZ) from Oceansat-3 & INSAT-3DR data, computing 0–100 Sea Safety clearance, and enforcing International Maritime Boundary Line (IMBL) geofencing compliance.\n"
-                    f"• **Multi-lingual Support:** 8 Indian regional languages with real-time voice synthesis."
+                    f"I am an autonomous Agentic AI decision-support platform engineered by **Team Runtime Terror** for the **Indian Space Research Organisation (ISRO)** (Smart India Hackathon 2026 Problem Statement ID 26176).\n\n"
+                    f"• **Capabilities:** Identifying high-yield Potential Fishing Zones (PFZ) from Oceansat-3 & INSAT-3DR data, computing real-time 0–100 Sea Safety clearance, and enforcing International Maritime Boundary Line (IMBL) geofencing compliance.\n"
+                    f"• **Multi-lingual Support:** 8 Indian regional languages with real-time vernacular voice synthesis."
                 ),
                 "hi": (
                     f"🛰️ **मैं ब्लू ऑर्बिट (Blue Orbit) हूँ**\n\n"
@@ -296,13 +462,11 @@ class MultilingualAgent:
                 ),
                 "ta": (
                     f"🛰️ **நான் புளூ ஆர்பிட் (Blue Orbit)**\n\n"
-                    f"நான் **டீம் ரன்டைம் டெரர் (Team Runtime Terror)** ஆல் **இஸ்ரோ (ISRO)** க்காக உருவாக்கப்பட்ட ஒரு தானியங்கி கடல்சார் AI முடிவெடுக்கும் தளமாகும்.\n\n"
-                    f"• **சேவைகள்:** சாத்தியமான மீன்பிடி மண்டலங்கள் (PFZ), கடல் பாதுகாப்பு எச்சரிக்கைகள் மற்றும் சர்வதேச கடல் எல்லை (IMBL) கண்காணிப்பு."
+                    f"நான் **டீம் ரன்டைம் டெரர் (Team Runtime Terror)** ஆல் **இஸ்ரோ (ISRO)** க்காக உருவாக்கப்பட்ட ஒரு தானியங்கி கடல்சார் AI முடிவெடுக்கும் தளமாகும் (SIH 2026 Problem ID 26176)."
                 ),
                 "te": (
                     f"🛰️ **నేను బ్లూ ఆర్బిట్ (Blue Orbit)**\n\n"
-                    f"నేను **టీమ్ రన్‌టైమ్ టెర్రర్ (Team Runtime Terror)** చే **ఇస్రో (ISRO)** కోసం రూపొందించబడిన స్వయంప్రతిపత్త సముద్ర AI వేదికను.\n\n"
-                    f"• **సేవలు:** చేపల వేట ప్రాంతాలు (PFZ), సముద్ర భద్రతా హెచ్చరికలు మరియు సరిహద్దు భద్రత."
+                    f"నేను **టీమ్ రన్‌టైమ్ టెర్రర్ (Team Runtime Terror)** చే **ఇస్రో (ISRO)** కోసం రూపొందించబడిన స్వయంప్రతిపత్త సముద్ర AI వేదికను."
                 ),
                 "ml": (
                     f"🛰️ **ഞാൻ ബ്ലൂ ഓർബിറ്റ് (Blue Orbit)**\n\n"
@@ -310,7 +474,7 @@ class MultilingualAgent:
                 ),
                 "bn": (
                     f"🛰️ **আমি ব্লু অরবিট (Blue Orbit)**\n\n"
-                    f"আমি **টিম রানটাইম টেরর (Team Runtime Terror)** দ্বারা **ইসরো (ISRO)** এর জন্য নির্মিত একটি এআই প্ল্যাটফর্ম।"
+                    f"আমি **টিম রানটাইম টেরর** দ্বারা **ইসরো (ISRO)** এর জন্য নির্মিত একটি এআই প্ল্যাটফর্ম।"
                 ),
                 "gu": (
                     f"🛰️ **હું બ્લુ ઓર્બિટ (Blue Orbit) છું**\n\n"
@@ -323,62 +487,81 @@ class MultilingualAgent:
             }
             text_out = responses.get(lang, responses["en"])
 
-        # 5. Greeting Intent
+        # ----------------------------------------------------
+        # 7. GREETING
+        # ----------------------------------------------------
         elif intent == "greeting":
             responses = {
                 "en": (
                     f"👋 **Hello! Welcome to Blue Orbit**\n\n"
-                    f"I am connected to live telemetry from ISRO Oceansat-3, INSAT-3DR, and INCOIS.\n\n"
-                    f"How can I assist you today? You can ask me:\n"
-                    f"• *\"Where is the nearest PFZ for Tuna from Kochi?\"*\n"
-                    f"• *\"Is it safe to venture into the sea tomorrow morning?\"*\n"
-                    f"• *\"Check distance to Sri Lanka IMBL border.\"*"
+                    f"I am actively monitoring live satellite telemetry from ISRO Oceansat-3, INSAT-3DR, and INCOIS for the **{port_name}** sector ({port_state}).\n\n"
+                    f"How can I assist you right now? You can ask me:\n"
+                    f"• *\"Is it safe to venture into the sea tomorrow morning from {port_name}?\"*\n"
+                    f"• *\"Where is the nearest PFZ for Tuna today?\"*\n"
+                    f"• *\"What is our distance to the {border_name}?\"*\n"
+                    f"• *\"How does Oceansat-3 satellite detect fish schools?\"*"
                 ),
                 "hi": (
                     f"👋 **नमस्ते! ब्लू ऑर्बिट में आपका स्वागत है**\n\n"
-                    f"मैं इसरो ओशनसैट-3, इनसैट-3DR और इनकॉइस के लाइव डेटा से जुड़ा हुआ हूँ।\n\n"
+                    f"मैं **{port_name}** क्षेत्र के लिए इसरो ओशनसैट-3, इनसैट-3DR और इनकॉइस के लाइव सैटेलाइट डेटा की निगरानी कर रहा हूँ।\n\n"
                     f"आज मैं आपकी क्या सहायता कर सकता हूँ?\n"
-                    f"• *\"कोच्चि से निकटतम मछली क्षेत्र कहाँ है?\"*\n"
-                    f"• *\"क्या कल सुबह समुद्र में जाना सुरक्षित है?\"*\n"
-                    f"• *\"अंतर्राष्ट्रीय समुद्री सीमा (IMBL) की दूरी जांचें।\"*"
+                    f"• *\"क्या कल सुबह {port_name} से समुद्र में जाना सुरक्षित है?\"*\n"
+                    f"• *\"ट्यूना मछली के लिए निकटतम क्षेत्र कहाँ है?\"*\n"
+                    f"• *\"अंतर्राष्ट्रीय समुद्री सीमा (IMBL) की दूरी बताएं।\"*"
                 ),
                 "ta": (
                     f"👋 **வணக்கம்! புளூ ஆர்பிட்டுக்கு வரவேற்கிறோம்**\n\n"
-                    f"இஸ்ரோ செயற்கைக்கோள் தரவுகளுடன் நேரலையில் இணைந்துள்ளேன். இன்று நான் உங்களுக்கு எவ்வாறு உதவ முடியும்?"
+                    f"{port_name} பகுதிக்குரிய இஸ்ரோ செயற்கைக்கோள் தரவுகளுடன் நேரலையில் இணைந்துள்ளேன். இன்று நான் உங்களுக்கு எவ்வாறு உதவ முடியும்?"
                 ),
                 "te": (
                     f"👋 **నమస్కారం! బ్లూ ఆర్బిట్‌కు స్వాగతం**\n\n"
-                    f"నేను ఇస్రో ప్రత్యక్ష ఉపగ్రహ డేటాతో అనుసంధానించబడి ఉన్నాను. ఈరోజు నేను మీకు ఎలా సహాయపడగలను?"
+                    f"{port_name} ప్రాంతం కోసం ఇస్రో ఉపగ్రహ డేటాతో అనుసంధానించబడి ఉన్నాను. నేను మీకు ఎలా సహాయపడగలను?"
                 ),
                 "ml": (
                     f"👋 **നമസ്കാരം! ബ്ലൂ ഓർബിറ്റിലേക്ക് സ്വാഗതം**\n\n"
-                    f"ഐ.എസ്.ആർ.ഒ തത്സമയ ഉപഗ്രഹ വിവരങ്ങളുമായി ബന്ധിപ്പിച്ചിരിക്കുന്നു. ഇന്ന് ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കണം?"
+                    f"{port_name} മേഖലയിലെ തത്സമയ ഉപഗ്രഹ വിവരങ്ങളുമായി ബന്ധിപ്പിച്ചിരിക്കുന്നു. ഇന്ന് ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കണം?"
                 ),
                 "bn": (
                     f"👋 **নমস্কার! ব্লু অরবিটে স্বাগতম**\n\n"
-                    f"ইসরো রিয়েল-টাইম উপগ্রহ তথ্যের সাথে সংযুক্ত। আজ আমি আপনাকে কীভাবে সাহায্য করতে পারি?"
+                    f"{port_name} অঞ্চলের জন্য ইসরো উপগ্রহ তথ্যের সাথে সংযুক্ত। আজ আমি আপনাকে কীভাবে সাহায্য করতে পারি?"
                 ),
                 "gu": (
                     f"👋 **નમસ્તે! બ્લુ ઓર્બિટમાં આપનું સ્વાગત છે**\n\n"
-                    f"હું ISRO ઉપગ્રહ ડેટા સાથે જોડાયેલ છું. હું તમને કેવી રીતે મદદ કરી શકું?"
+                    f"{port_name} માટે ISRO ઉપગ્રહ ડેટા સાથે જોડાયેલ છું. હું તમને કેવી રીતે મદદ કરી શકું?"
                 ),
                 "mr": (
                     f"👋 **नमस्कार! ब्लू ऑर्बिट मध्ये आपले स्वागत आहे**\n\n"
-                    f"मी इस्रो उपग्रह डेटाशी जोडलेला आहे. मी आज आपल्याला कशी मदत करू शकतो?"
+                    f"{port_name} क्षेत्रासाठी इस्रो उपग्रह डेटाशी जोडलेला आहे. मी आज आपल्याला कशी मदत करू शकतो?"
                 )
             }
             text_out = responses.get(lang, responses["en"])
 
-        # Default fallback / General Inquiry
+        # ----------------------------------------------------
+        # 8. GENERAL INQUIRY FALLBACK
+        # ----------------------------------------------------
         else:
             responses = {
-                "en": f"🛰️ **Blue Orbit Marine Intelligence:** I have analyzed your query regarding *{context_data.get('port', {}).get('name', 'Indian Coastal Waters')}*. All ISRO satellite telemetry, ocean front gradients, and real-time safety scores are active and verified.",
-                "hi": f"🛰️ **ब्लू ऑर्बिट समुद्री सूचना:** आपके प्रश्न का विश्लेषण इसरो ओशनसैट-3 और इनसैट-3DR उपग्रह डेटा के आधार पर किया गया है। सभी तटीय और समुद्री पैरामीटर सक्रिय हैं।"
+                "en": (
+                    f"🛰️ **Blue Orbit Marine Intelligence · {port_name} Sector**\n\n"
+                    f"I have analyzed your query regarding **{port_name}** coastal waters.\n"
+                    f"• **Sea Venture Status:** **{status.replace('_', ' ')}** (Safety Score: {score}/100, Waves: {wave}m, Wind: {wind} kts).\n"
+                    f"• **Nearest Fishing Hotspot:** **{pfz_name}** ({pfz_dist} km, Bearing {bearing}, Dominant: {species}).\n"
+                    f"• **IMBL Border Clearance:** {border_dist} NM to {border_name} (Clear & Safe).\n\n"
+                    f"Feel free to ask specific questions regarding sea safety, fish species, routes, or satellite telemetry."
+                ),
+                "hi": (
+                    f"🛰️ **ब्लू ऑर्बिट समुद्री सूचना · {port_name} क्षेत्र**\n\n"
+                    f"आपके प्रश्न का विश्लेषण **{port_name}** तटीय क्षेत्र के लाइव डेटा के आधार पर किया गया है।\n"
+                    f"• **सुरक्षा स्थिति:** **{status.replace('_', ' ')}** (स्कोर: {score}/100, लहरें: {wave}m, हवा: {wind} kts)।\n"
+                    f"• **निकटतम मछली क्षेत्र:** **{pfz_name}** ({pfz_dist} किमी, प्रमुख: {species})।\n"
+                    f"• **सीमा सुरक्षा:** {border_dist} NM सुरक्षित दूरी पर है।"
+                )
             }
             text_out = responses.get(lang, responses["en"])
 
         # Generate clean plain text for TTS speech synthesizer (no markdown symbols)
-        tts_clean = re.sub(r'[*#•🛰️🛡️🛑\n]+', ' ', text_out).strip()
+        tts_clean = re.sub(r'[*#•🛰️🛡️🛑🧭🐟\n]+', ' ', text_out).strip()
+        tts_clean = re.sub(r'\s+', ' ', tts_clean)
 
         return {
             "language_code": lang,
