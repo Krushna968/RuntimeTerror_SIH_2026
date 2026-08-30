@@ -15,7 +15,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { PFZHotspot, NavigationRoute, WeatherObservation } from '../types';
-import { OFFICIAL_INDIA_NORTHERN_SOVEREIGN_BORDER } from '../utils/indiaBoundary';
+import { INDIAN_EEZ_BOUNDARY } from '../utils/indiaBoundary';
 
 interface MapViewportProps {
   pfzHotspots: PFZHotspot[];
@@ -41,7 +41,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
 
   // Layer toggles
   const [showPFZ, setShowPFZ] = useState(true);
-  const [showSOIBorder, setShowSOIBorder] = useState(true);
+  const [showEEZ, setShowEEZ] = useState(true);
   const [showSST, setShowSST] = useState(true);
   const [showChl, setShowChl] = useState(false);
   const [showIMBL, setShowIMBL] = useState(true);
@@ -53,7 +53,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
 
   // Layer groups refs
   const pfzLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
-  const soiBorderLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
+  const eezLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const sstLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const chlLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const imblLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
@@ -87,7 +87,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
 
     // Add all layer groups to map
     pfzLayerGroup.current.addTo(map);
-    soiBorderLayerGroup.current.addTo(map);
+    eezLayerGroup.current.addTo(map);
     sstLayerGroup.current.addTo(map);
     chlLayerGroup.current.addTo(map);
     imblLayerGroup.current.addTo(map);
@@ -142,27 +142,25 @@ export const MapViewport: React.FC<MapViewportProps> = ({
     }
   }, [pfzHotspots, activeRoute]);
 
-  // Static Layers (Survey of India Sovereign Border, IMBL & MPA)
+  // Static Layers (200 NM Indian EEZ, IMBL & MPA)
   useEffect(() => {
     if (!mapInstanceRef.current) return;
 
-    // Official Survey of India (SOI) Sovereign Border
-    soiBorderLayerGroup.current.clearLayers();
-    if (showSOIBorder) {
-      const soiBorder = L.polyline(OFFICIAL_INDIA_NORTHERN_SOVEREIGN_BORDER, {
-        color: '#EA580C',
-        weight: 3.5,
-        opacity: 0.95,
-        lineCap: 'round',
-        lineJoin: 'round'
+    // 200 NM Indian Exclusive Economic Zone
+    eezLayerGroup.current.clearLayers();
+    if (showEEZ) {
+      const eezBorder = L.polyline(INDIAN_EEZ_BOUNDARY, {
+        color: '#0284C7',
+        weight: 2.5,
+        dashArray: '8, 6',
+        opacity: 0.85
       }).bindPopup(`
         <div class="p-2 text-slate-900 font-['Outfit',sans-serif]">
-          <div class="text-xs font-black text-orange-600">🇮🇳 Official Sovereign Boundary of India</div>
-          <div class="text-[11px] text-slate-600 mt-1">Survey of India (SOI) & ISRO Bhuvan Compliant.</div>
-          <div class="text-[10px] text-emerald-700 font-bold mt-0.5">Includes complete Union Territories of J&K, Ladakh & Arunachal Pradesh.</div>
+          <div class="text-xs font-bold text-sky-700">🌊 200 NM Indian Exclusive Economic Zone (EEZ)</div>
+          <div class="text-[11px] text-slate-600 mt-1">UNCLOS Sovereign Maritime Exploitation Boundary.</div>
         </div>
       `);
-      soiBorderLayerGroup.current.addLayer(soiBorder);
+      eezLayerGroup.current.addLayer(eezBorder);
     }
 
     imblLayerGroup.current.clearLayers();
@@ -240,7 +238,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       `);
       mpaLayerGroup.current.addLayer(gmCircle);
     }
-  }, [showSOIBorder, showIMBL, showMPA]);
+  }, [showEEZ, showIMBL, showMPA]);
 
   // Render Cyclone Layer
   useEffect(() => {

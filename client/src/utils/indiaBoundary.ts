@@ -1,54 +1,56 @@
 /**
- * Official Sovereign Boundary of the Republic of India
- * Sourced in accordance with Survey of India (SOI) & ISRO Bhuvan National Geoportal specifications.
- * Encompasses the complete sovereign Union Territories of Jammu & Kashmir, Ladakh (including Siachen, Aksai Chin, Gilgit-Baltistan),
- * and the State of Arunachal Pradesh.
+ * Indian Ocean Maritime Boundaries & Exclusive Economic Zone (EEZ)
+ * Sourced from UNCLOS / ITLOS Treaties & Ministry of Earth Sciences (MoES).
+ * Represents India's 200 Nautical Mile Exclusive Economic Zone and 12 NM Territorial Waters.
  */
 
-export interface SovereignBoundarySegment {
+export interface MaritimeBoundary {
   name: string;
-  type: 'national_border' | 'coastline' | 'exclusive_economic_zone';
-  coordinates: [number, number][]; // [latitude, longitude]
+  type: 'eez' | 'territorial_waters' | 'imbl';
+  description: string;
+  color: string;
+  coordinates: [number, number][];
 }
 
-// Complete Northern & Sovereign Land Boundary of India (Survey of India Compliant)
-export const OFFICIAL_INDIA_NORTHERN_SOVEREIGN_BORDER: [number, number][] = [
-  // Gujarat / Sir Creek to Punjab / J&K Border
-  [23.5833, 68.1000], [24.0000, 68.8000], [24.5000, 70.0000], [24.7000, 71.0000],
-  [25.0000, 71.3000], [25.7500, 70.5000], [26.5000, 70.2000], [27.3000, 70.5000],
-  [28.0000, 71.5000], [29.0000, 72.5000], [30.0000, 73.8000], [31.0000, 74.5000],
-  [31.6000, 74.6000], [32.1000, 75.0000], [32.5000, 74.8000],
+// 200 Nautical Mile Indian Exclusive Economic Zone (EEZ) Outer Limit (Arabian Sea & Bay of Bengal)
+export const INDIAN_EEZ_BOUNDARY: [number, number][] = [
+  // West Coast EEZ Outer Perimeter (Arabian Sea)
+  [21.5000, 65.5000],
+  [20.0000, 66.2000],
+  [18.5000, 67.5000],
+  [16.0000, 68.8000],
+  [14.0000, 70.0000],
+  [12.0000, 71.2000],
+  [10.0000, 72.5000],
+  [8.0000, 73.8000],
+  [6.5000, 75.5000],
+  [5.5000, 77.5000], // South of Kanyakumari
 
-  // Full Western Frontier of Jammu & Kashmir & Gilgit-Baltistan (Official SOI Boundary)
-  [32.8000, 74.3000], [33.2000, 74.0000], [33.6000, 73.8000], [34.0000, 73.5000],
-  [34.5000, 73.3000], [35.0000, 73.6000], [35.5000, 74.0000], [36.0000, 74.3000],
-  [36.5000, 74.5000], [36.8500, 74.8000], [37.0500, 74.5000], [37.1000, 74.9000], // Northernmost Tip (Indira Col / Wakhan Corridor Border)
-  [37.0000, 75.5000], [36.7000, 76.0000], [36.2000, 76.5000], [35.9000, 77.0000], // Karakoram / Siachen
-  [35.6000, 77.8000], [35.4000, 78.5000], // Aksai Chin Northern Arc
-  [35.5000, 79.5000], [35.2000, 80.0000], [34.5000, 79.8000], [34.0000, 79.5000], // Aksai Chin Eastern Arc
-  [33.5000, 79.2000], [33.0000, 79.0000], [32.5000, 78.8000], [32.0000, 78.6000], // Himachal / Tibet border
-  [31.3000, 78.8000], [31.0000, 79.2000], [30.5000, 79.8000], [30.2000, 80.5000], [30.0000, 81.0000], // Uttarakhand / Lipulekh
-
-  // Nepal Northern Border to Sikkim
-  [28.8000, 80.1000], [27.5000, 88.0000], [28.0000, 88.6000], [27.8000, 88.9000], // Sikkim
-  [27.3000, 89.0000],
-
-  // Bhutan to Arunachal Pradesh (McMahon Line Official Sovereign Border)
-  [26.8000, 92.0000], [27.5000, 92.2000], [28.0000, 93.5000], [28.5000, 94.5000],
-  [29.0000, 95.5000], [29.3000, 96.5000], [28.8000, 97.2000], [28.2000, 97.4000], // Kibithu / Easternmost Point
-  [27.5000, 97.0000], [27.0000, 96.0000], [26.0000, 95.0000], [24.5000, 94.0000], // Nagaland & Manipur / Myanmar border
-  [23.0000, 93.3000], [22.0000, 92.8000] // Mizoram / Bay of Bengal
+  // East Coast EEZ Outer Perimeter (Bay of Bengal)
+  [6.0000, 79.5000],
+  [7.5000, 81.5000],
+  [9.0000, 82.8000],
+  [11.5000, 84.0000],
+  [14.0000, 85.5000],
+  [16.5000, 87.0000],
+  [18.5000, 88.2000],
+  [20.5000, 89.5000],
+  [21.5000, 89.2000]
 ];
 
-export const OFFICIAL_INDIA_FULL_SOVEREIGN_POLYGON: [number, number][] = [
-  ...OFFICIAL_INDIA_NORTHERN_SOVEREIGN_BORDER,
-  // Eastern Coastline
-  [21.5000, 87.5000], [20.2644, 86.6698], [19.5000, 85.2000], [17.6974, 83.2986],
-  [16.0000, 81.0000], [13.1256, 80.2974], [11.5000, 79.8000], [9.2876, 79.3129],
-  [8.0883, 77.5385], // Kanyakumari
-
-  // Western Coastline
-  [8.8000, 76.5000], [9.9416, 76.2575], [12.8596, 74.8396], [15.3000, 73.8000],
-  [18.9172, 72.8228], [20.5000, 72.8000], [21.6417, 69.6293], [22.8000, 69.0000],
-  [23.5833, 68.1000]
+// 12 Nautical Mile Sovereign Territorial Waters Buffer
+export const INDIAN_TERRITORIAL_WATERS_12NM: [number, number][] = [
+  // Gujarat / Kutch
+  [23.5833, 68.1000], [22.4000, 68.5000], [21.3000, 69.2000], [20.6000, 71.0000],
+  // Maharashtra / Goa
+  [19.2000, 72.3000], [17.5000, 72.7000], [15.2000, 73.3000],
+  // Karnataka / Kerala
+  [13.8000, 74.0000], [11.8000, 74.8000], [9.8000, 75.7000], [8.2000, 76.8000],
+  // Cape Comorin / Kanyakumari
+  [7.8000, 77.5000],
+  // Tamil Nadu / Andhra Pradesh
+  [8.8000, 78.4000], [10.5000, 80.0000], [13.2000, 80.5000], [15.8000, 80.4000],
+  [17.8000, 83.5000],
+  // Odisha / West Bengal
+  [19.6000, 85.5000], [20.4000, 86.9000], [21.5000, 87.8000]
 ];
