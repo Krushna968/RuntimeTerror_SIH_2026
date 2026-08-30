@@ -173,34 +173,61 @@ export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
   const isCaution = geofenceState.isCaution;
 
   return (
-    <div className="fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-[60] max-w-[calc(100vw-2rem)] sm:max-w-sm w-auto font-['Outfit',sans-serif] pointer-events-auto">
-      {/* Full Danger Breach Warning Banner overlay */}
+    <>
+      {/* 1. Full-Screen Red Flashing Emergency Strobe, Perimeter Border & Top Banner */}
       <AnimatePresence>
         {isBreach && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="mb-2 p-3.5 rounded-2xl bg-red-600/95 text-white border-2 border-red-300 shadow-2xl backdrop-blur-md animate-bounce"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[1000] pointer-events-none flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 font-black text-xs uppercase tracking-wider">
-                <AlertOctagon className="w-5 h-5 text-white" />
-                <span>IMBL Border Violation Alert!</span>
+            {/* Screen Perimeter Pulsing Red Border & Glow */}
+            <div className="absolute inset-0 border-[8px] sm:border-[16px] border-red-600/90 shadow-[inset_0_0_120px_rgba(239,68,68,0.75)] animate-pulse" />
+
+            {/* Top Red Strobe Emergency Header Bar */}
+            <div className="relative z-10 w-full bg-gradient-to-r from-red-700 via-red-600 to-red-700 text-white px-4 py-2.5 shadow-2xl flex items-center justify-between pointer-events-auto border-b-2 border-red-400">
+              <div className="flex items-center space-x-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-white text-red-600 flex items-center justify-center animate-bounce font-black shrink-0 shadow-md">
+                  <AlertOctagon className="w-5 h-5 stroke-[2.5]" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs sm:text-sm font-black uppercase tracking-widest flex items-center space-x-2">
+                    <span className="truncate">🚨 CRITICAL IMBL BORDER VIOLATION!</span>
+                    <span className="hidden md:inline text-[10px] font-mono px-2 py-0.5 rounded bg-black/40 border border-white/30 text-yellow-300">
+                      FOREIGN WATERS BREACH
+                    </span>
+                  </div>
+                  <div className="text-[11px] font-bold text-red-100 truncate mt-0.5">
+                    {geofenceState.alertMessage}
+                  </div>
+                </div>
               </div>
-              <button
-                onClick={toggleMute}
-                className="px-2.5 py-1 rounded-full bg-white/20 hover:bg-white/30 text-[10px] font-bold cursor-pointer transition-all"
-              >
-                {isSirenMuted ? "Unmute Siren" : "Mute Siren"}
-              </button>
+
+              <div className="flex items-center space-x-2 shrink-0 ml-3">
+                <button
+                  onClick={toggleMute}
+                  className="px-3 py-1.5 rounded-full bg-black/40 hover:bg-black/60 text-white text-xs font-bold border border-white/20 transition-all cursor-pointer flex items-center space-x-1"
+                >
+                  {isSirenMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 animate-pulse text-yellow-300" />}
+                  <span className="hidden sm:inline">{isSirenMuted ? "Unmute" : "Mute Siren"}</span>
+                </button>
+
+                <button
+                  onClick={handleSimulateSafe}
+                  className="px-3.5 py-1.5 rounded-full bg-white hover:bg-zinc-100 text-red-700 text-xs font-black shadow-lg active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+                  title="Simulate 180 degree return into safe Indian waters"
+                >
+                  ↩️ Return Course (180°)
+                </button>
+              </div>
             </div>
-            <p className="text-[11px] font-bold mt-1.5 leading-snug">
-              🚨 Vessel is {geofenceState.distanceNM} NM from {geofenceState.nearestBorderName}. Turn 180° immediately!
-            </p>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <div className="fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-[60] max-w-[calc(100vw-2rem)] sm:max-w-sm w-auto font-['Outfit',sans-serif] pointer-events-auto">
 
       {/* Minimized Pill Badge */}
       {isMinimized ? (
@@ -333,6 +360,7 @@ export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
           )}
         </motion.div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
