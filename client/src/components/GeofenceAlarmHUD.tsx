@@ -162,7 +162,7 @@ export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
   const isCaution = geofenceState.isCaution;
 
   return (
-    <div className="fixed bottom-6 left-6 z-[1000] max-w-sm w-full font-['Outfit',sans-serif]">
+    <div className="fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-[60] max-w-[calc(100vw-2rem)] sm:max-w-sm w-auto font-['Outfit',sans-serif] pointer-events-auto">
       {/* Full Danger Breach Warning Banner overlay */}
       <AnimatePresence>
         {isBreach && (
