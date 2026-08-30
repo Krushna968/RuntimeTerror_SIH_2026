@@ -377,7 +377,6 @@ export function App() {
           }
         }}
         onSOSClick={() => setIsSOSModalOpen(true)}
-        onVoiceSetupClick={() => setIsVoiceModalOpen(true)}
       />
 
       {/* Tab 0: Home Landing Page */}
@@ -395,7 +394,6 @@ export function App() {
           latestResponse={chatResponse}
           currentLang={currentLang}
           setCurrentLang={setCurrentLang}
-          onVoiceSetupClick={() => setIsVoiceModalOpen(true)}
         />
       )}
 
@@ -610,12 +608,6 @@ export function App() {
         bulletin={latestResponse?.official_bulletin || null}
         isOpen={isBulletinModalOpen}
         onClose={() => setIsBulletinModalOpen(false)}
-      />
-
-      {/* Regional Voice Packs & Speech Setup Modal */}
-      <VoicePacksModal
-        isOpen={isVoiceModalOpen}
-        onClose={() => setIsVoiceModalOpen(false)}
       />
 
       {/* Emergency SOS Modal */}

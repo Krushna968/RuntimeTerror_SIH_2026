@@ -12,11 +12,12 @@ import {
   ArrowUp,
   Fish,
   ShieldCheck,
-  Download
+  Download,
+  Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatResponsePayload } from '../types';
-import { speakText, stopSpeech, getBcp47LangTag } from '../utils/speechUtils';
+import { speakText, stopSpeech, getBcp47LangTag, isAudioCachePreloaded, preloadAllRegionalAudioPacks } from '../utils/speechUtils';
 import { FormattedMarkdown } from './FormattedMarkdown';
 
 interface Message {
@@ -41,16 +42,31 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
   isLoading,
   latestResponse,
   currentLang,
-  setCurrentLang,
-  onVoiceSetupClick
+  setCurrentLang
 }) => {
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isListening, setIsListening] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isAudioCached, setIsAudioCached] = useState(() => isAudioCachePreloaded());
+  const [isCaching, setIsCaching] = useState(false);
+  const [cacheProgress, setCacheProgress] = useState(0);
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleDirectCache = async () => {
+    if (isCaching) return;
+    setIsCaching(true);
+    setCacheProgress(5);
+    const success = await preloadAllRegionalAudioPacks((pct) => {
+      setCacheProgress(pct);
+    });
+    if (success) {
+      setIsAudioCached(true);
+    }
+    setIsCaching(false);
+  };
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -237,16 +253,21 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
               🛡️ Sea Safety Clearance
             </button>
 
-            {onVoiceSetupClick && (
-              <button
-                onClick={onVoiceSetupClick}
-                className="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 shadow-sm transition-all active:scale-98 cursor-pointer flex items-center space-x-1.5"
-                title="Preload 8 Regional Indian Audio Packs into Local Device Cache"
-              >
+            <button
+              onClick={handleDirectCache}
+              disabled={isCaching}
+              className="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 shadow-sm transition-all active:scale-98 cursor-pointer flex items-center space-x-1.5"
+              title="Preload 8 Regional Indian Audio Packs into Local Device Cache"
+            >
+              {isCaching ? (
+                <Loader2 className="w-3.5 h-3.5 text-emerald-600 animate-spin" />
+              ) : isAudioCached ? (
+                <Check className="w-3.5 h-3.5 text-emerald-600 stroke-[2.5]" />
+              ) : (
                 <Download className="w-3.5 h-3.5 text-emerald-600" />
-                <span>📥 Cache Audio Packs</span>
-              </button>
-            )}
+              )}
+              <span>{isCaching ? `Caching ${cacheProgress}%` : (isAudioCached ? "✓ Audio Cached" : "📥 Cache Audio Packs")}</span>
+            </button>
           </motion.div>
 
           {/* Center Chat Box Capsule */}
