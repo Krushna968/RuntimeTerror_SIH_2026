@@ -128,13 +128,15 @@ export const Header: React.FC<HeaderProps> = ({
               </svg>
             </div>
 
-            <div className="flex items-baseline space-x-1">
+            <div className="flex items-center space-x-1.5">
               <span className={`text-sm sm:text-base md:text-lg font-black tracking-wider transition-colors ${
                 !isDark ? 'text-zinc-950' : 'text-white'
               }`}>
                 BLUE ORBIT
               </span>
-              <span className="text-[8px] sm:text-[9px] font-mono font-bold tracking-wider text-cyan-400">
+              <span className={`text-[9px] sm:text-[10px] font-mono font-black tracking-widest px-1.5 py-0.5 rounded-md ${
+                !isDark ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-cyan-950 text-cyan-400 border border-cyan-500/30'
+              }`}>
                 ISRO
               </span>
             </div>
