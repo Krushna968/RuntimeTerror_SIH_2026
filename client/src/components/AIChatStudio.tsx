@@ -274,7 +274,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
 
       {/* STATE 2: Active Chat Conversation Stream */}
       {hasMessages && (
-        <div className="relative z-10 flex-1 flex flex-col max-w-3xl w-full mx-auto px-4 pt-24 pb-28">
+        <div className="relative z-10 flex-1 flex flex-col max-w-3xl w-full mx-auto px-4 pt-24 pb-36 sm:pb-32">
           <div className="space-y-6">
             <AnimatePresence>
               {messages.map((msg) => (
@@ -304,22 +304,24 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
 
                       {/* Tool actions: Audio speaker + Copy */}
                       <div className="flex items-center space-x-2 pt-2 border-t border-zinc-100">
-                        {msg.data && (
-                          <button
-                            onClick={() => handleSpeak(msg.id, msg.data!.response.tts_speech_text, msg.data!.language.voice_code)}
-                            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                              speakingId === msg.id 
-                                ? 'text-blue-600 animate-pulse' 
-                                : 'text-zinc-400 hover:text-zinc-700'
-                            }`}
-                            title="Read aloud"
-                          >
-                            {speakingId === msg.id ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleSpeak(
+                            msg.id, 
+                            msg.data?.response?.tts_speech_text || msg.text, 
+                            msg.data?.language?.voice_code || currentLang
+                          )}
+                          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                            speakingId === msg.id 
+                              ? 'text-blue-600 bg-blue-50 animate-pulse' 
+                              : 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50'
+                          }`}
+                          title={speakingId === msg.id ? "Stop voice" : "Read aloud"}
+                        >
+                          {speakingId === msg.id ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                        </button>
                         <button
                           onClick={() => handleCopy(msg.id, msg.text)}
-                          className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50 transition-colors cursor-pointer"
                           title="Copy response"
                         >
                           {copiedId === msg.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
