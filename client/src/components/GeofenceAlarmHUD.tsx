@@ -35,7 +35,7 @@ export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
   const [geofenceState, setGeofenceState] = useState<GeofenceProximityResult>(() =>
     evaluateOfflineGeofence(currentCoords.lat, currentCoords.lon)
   );
-  const [isSirenMuted, setIsSirenMuted] = useState<boolean>(false);
+  const [isSirenMuted, setIsSirenMuted] = useState<boolean>(true);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [isMinimized, setIsMinimized] = useState<boolean>(true);
   const [isSimulatingBreach, setIsSimulatingBreach] = useState<boolean>(false);
@@ -140,6 +140,7 @@ export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
   const toggleMute = () => {
     setIsSirenMuted((prev) => {
       const next = !prev;
+      geofenceAudioSiren.isSirenDisabled = next;
       if (next) geofenceAudioSiren.stopSiren();
       return next;
     });
