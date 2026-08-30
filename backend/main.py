@@ -54,6 +54,8 @@ class ChatQueryRequest(BaseModel):
     query: str
     language: Optional[str] = None
     reference_port: Optional[str] = None
+    user_lat: Optional[float] = None
+    user_lon: Optional[float] = None
 
 class RouteRequest(BaseModel):
     start_port: str
@@ -86,7 +88,10 @@ async def chat_endpoint(payload: ChatQueryRequest):
     
     result = await orchestrator.execute_query_pipeline(
         query=payload.query, 
-        requested_lang=payload.language
+        requested_lang=payload.language,
+        user_lat=payload.user_lat,
+        user_lon=payload.user_lon,
+        reference_port_override=payload.reference_port
     )
     return result
 
