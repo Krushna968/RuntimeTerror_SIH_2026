@@ -20,7 +20,7 @@ import {
 import { PFZHotspot, NavigationRoute, WeatherObservation, SatelliteTelemetry, ChatResponsePayload } from '../types';
 import { speakText, stopSpeech, getBcp47LangTag } from '../utils/speechUtils';
 import { FormattedMarkdown } from './FormattedMarkdown';
-import { OFFICIAL_INDIA_NORTHERN_SOVEREIGN_BORDER } from '../utils/indiaBoundary';
+import { INDIAN_EEZ_BOUNDARY, INDIAN_TERRITORIAL_WATERS_12NM } from '../utils/indiaBoundary';
 
 interface GisCommandViewProps {
   pfzHotspots: PFZHotspot[];
@@ -68,7 +68,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
 
   // Layer Toggles
   const [showPFZ, setShowPFZ] = useState(true);
-  const [showSOIBorder, setShowSOIBorder] = useState(true);
+  const [showEEZ, setShowEEZ] = useState(true);
   const [showIMBL, setShowIMBL] = useState(true);
   const [showMPA, setShowMPA] = useState(true);
   const [showCyclone, setShowCyclone] = useState(true);
@@ -96,7 +96,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
 
   // Layer Groups
   const pfzLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
-  const soiBorderLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
+  const eezLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const imblLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const mpaLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const portsLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
@@ -128,7 +128,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
 
     // Add all layers
     pfzLayerGroup.current.addTo(map);
-    soiBorderLayerGroup.current.addTo(map);
+    eezLayerGroup.current.addTo(map);
     imblLayerGroup.current.addTo(map);
     mpaLayerGroup.current.addTo(map);
     portsLayerGroup.current.addTo(map);
@@ -221,33 +221,32 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
     }
   }, [showPorts]);
 
-  // Render Static GIS Layers (SOI Sovereign Border, IMBL, MPA, Cyclone)
+  // Render Static GIS Layers (200 NM Indian EEZ, IMBL, MPA, Cyclone)
   useEffect(() => {
     if (!mapInstanceRef.current) return;
 
-    // 0. Official Survey of India (SOI) Sovereign India Boundary
-    soiBorderLayerGroup.current.clearLayers();
-    if (showSOIBorder) {
-      const soiBorder = L.polyline(OFFICIAL_INDIA_NORTHERN_SOVEREIGN_BORDER, {
-        color: '#EA580C', // Official saffron/orange
-        weight: 3.5,
-        opacity: 0.95,
-        lineCap: 'round',
-        lineJoin: 'round'
+    // 0. 200 Nautical Mile Indian Exclusive Economic Zone (EEZ)
+    eezLayerGroup.current.clearLayers();
+    if (showEEZ) {
+      const eezPoly = L.polyline(INDIAN_EEZ_BOUNDARY, {
+        color: '#0284C7', // Maritime Sky/Cyan Blue
+        weight: 2.5,
+        dashArray: '8, 6',
+        opacity: 0.85
       }).bindPopup(`
         <div class="p-2 text-slate-900 font-['Outfit',sans-serif]">
-          <div class="text-xs font-black text-orange-600 flex items-center space-x-1">
-            <span>🇮🇳 Official Sovereign Boundary of India</span>
+          <div class="text-xs font-bold text-sky-700 flex items-center space-x-1">
+            <span>🌊 200 NM Indian Exclusive Economic Zone (EEZ)</span>
           </div>
           <div class="text-[11px] text-slate-600 mt-1">
-            Survey of India (SOI) & ISRO Bhuvan National Geoportal Compliant.
+            UNCLOS Sovereign Maritime Exploitation Boundary (Arabian Sea & Bay of Bengal).
           </div>
-          <div class="text-[10px] text-emerald-700 font-bold mt-0.5">
-            Includes complete Union Territories of J&K, Ladakh & Arunachal Pradesh.
+          <div class="text-[10px] text-emerald-700 font-semibold mt-0.5">
+            Authorized for Indian registered mechanized & motorized fishing vessels.
           </div>
         </div>
       `);
-      soiBorderLayerGroup.current.addLayer(soiBorder);
+      eezLayerGroup.current.addLayer(eezPoly);
     }
 
     // 1. IMBL Polylines
@@ -351,7 +350,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       cycloneLayerGroup.current.addLayer(eyeCircle);
       cycloneLayerGroup.current.addLayer(eyeCore);
     }
-  }, [showSOIBorder, showIMBL, showMPA, showCyclone]);
+  }, [showEEZ, showIMBL, showMPA, showCyclone]);
 
   // Render PFZ Hotspots
   useEffect(() => {
@@ -548,15 +547,15 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
             {/* Toggle Rows */}
             <div className="space-y-1.5">
               <div 
-                onClick={() => setShowSOIBorder(!showSOIBorder)}
+                onClick={() => setShowEEZ(!showEEZ)}
                 className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors"
               >
                 <span className="flex items-center space-x-2 text-zinc-700">
-                  <span className={`w-2 h-2 rounded-full ${showSOIBorder ? 'bg-orange-500' : 'bg-zinc-300'}`} />
-                  <span className="text-[11px] font-medium">🇮🇳 Official SOI Border</span>
+                  <span className={`w-2 h-2 rounded-full ${showEEZ ? 'bg-sky-500' : 'bg-zinc-300'}`} />
+                  <span className="text-[11px] font-medium">200 NM Indian EEZ</span>
                 </span>
-                <span className={`text-[10px] font-mono font-semibold ${showSOIBorder ? 'text-orange-700' : 'text-zinc-400'}`}>
-                  {showSOIBorder ? 'ON' : 'OFF'}
+                <span className={`text-[10px] font-mono font-semibold ${showEEZ ? 'text-sky-700' : 'text-zinc-400'}`}>
+                  {showEEZ ? 'ON' : 'OFF'}
                 </span>
               </div>
 
