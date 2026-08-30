@@ -20,6 +20,7 @@ import {
 import { PFZHotspot, NavigationRoute, WeatherObservation, SatelliteTelemetry, ChatResponsePayload } from '../types';
 import { speakText, stopSpeech, getBcp47LangTag } from '../utils/speechUtils';
 import { FormattedMarkdown } from './FormattedMarkdown';
+import { OFFICIAL_INDIA_NORTHERN_SOVEREIGN_BORDER } from '../utils/indiaBoundary';
 
 interface GisCommandViewProps {
   pfzHotspots: PFZHotspot[];
@@ -67,6 +68,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
 
   // Layer Toggles
   const [showPFZ, setShowPFZ] = useState(true);
+  const [showSOIBorder, setShowSOIBorder] = useState(true);
   const [showIMBL, setShowIMBL] = useState(true);
   const [showMPA, setShowMPA] = useState(true);
   const [showCyclone, setShowCyclone] = useState(true);
@@ -94,6 +96,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
 
   // Layer Groups
   const pfzLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
+  const soiBorderLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const imblLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const mpaLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const portsLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
@@ -125,6 +128,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
 
     // Add all layers
     pfzLayerGroup.current.addTo(map);
+    soiBorderLayerGroup.current.addTo(map);
     imblLayerGroup.current.addTo(map);
     mpaLayerGroup.current.addTo(map);
     portsLayerGroup.current.addTo(map);
@@ -217,9 +221,34 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
     }
   }, [showPorts]);
 
-  // Render Static GIS Layers (IMBL, MPA, Cyclone)
+  // Render Static GIS Layers (SOI Sovereign Border, IMBL, MPA, Cyclone)
   useEffect(() => {
     if (!mapInstanceRef.current) return;
+
+    // 0. Official Survey of India (SOI) Sovereign India Boundary
+    soiBorderLayerGroup.current.clearLayers();
+    if (showSOIBorder) {
+      const soiBorder = L.polyline(OFFICIAL_INDIA_NORTHERN_SOVEREIGN_BORDER, {
+        color: '#EA580C', // Official saffron/orange
+        weight: 3.5,
+        opacity: 0.95,
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).bindPopup(`
+        <div class="p-2 text-slate-900 font-['Outfit',sans-serif]">
+          <div class="text-xs font-black text-orange-600 flex items-center space-x-1">
+            <span>🇮🇳 Official Sovereign Boundary of India</span>
+          </div>
+          <div class="text-[11px] text-slate-600 mt-1">
+            Survey of India (SOI) & ISRO Bhuvan National Geoportal Compliant.
+          </div>
+          <div class="text-[10px] text-emerald-700 font-bold mt-0.5">
+            Includes complete Union Territories of J&K, Ladakh & Arunachal Pradesh.
+          </div>
+        </div>
+      `);
+      soiBorderLayerGroup.current.addLayer(soiBorder);
+    }
 
     // 1. IMBL Polylines
     imblLayerGroup.current.clearLayers();
@@ -322,7 +351,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       cycloneLayerGroup.current.addLayer(eyeCircle);
       cycloneLayerGroup.current.addLayer(eyeCore);
     }
-  }, [showIMBL, showMPA, showCyclone]);
+  }, [showSOIBorder, showIMBL, showMPA, showCyclone]);
 
   // Render PFZ Hotspots
   useEffect(() => {
@@ -518,6 +547,19 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
           <div className="p-3 space-y-2 text-xs">
             {/* Toggle Rows */}
             <div className="space-y-1.5">
+              <div 
+                onClick={() => setShowSOIBorder(!showSOIBorder)}
+                className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors"
+              >
+                <span className="flex items-center space-x-2 text-zinc-700">
+                  <span className={`w-2 h-2 rounded-full ${showSOIBorder ? 'bg-orange-500' : 'bg-zinc-300'}`} />
+                  <span className="text-[11px] font-medium">🇮🇳 Official SOI Border</span>
+                </span>
+                <span className={`text-[10px] font-mono font-semibold ${showSOIBorder ? 'text-orange-700' : 'text-zinc-400'}`}>
+                  {showSOIBorder ? 'ON' : 'OFF'}
+                </span>
+              </div>
+
               <div 
                 onClick={() => setShowPFZ(!showPFZ)}
                 className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors"
