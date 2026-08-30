@@ -36,7 +36,7 @@ export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
   );
   const [isSirenMuted, setIsSirenMuted] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const [isMinimized, setIsMinimized] = useState<boolean>(false);
+  const [isMinimized, setIsMinimized] = useState<boolean>(true);
   const [isSimulatingBreach, setIsSimulatingBreach] = useState<boolean>(false);
 
   // Sync coords from parent or GPS

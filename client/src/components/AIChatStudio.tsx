@@ -56,6 +56,28 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
+  // When language is switched from Header dropdown or parent, dynamically sync the last AI response
+  useEffect(() => {
+    if (latestResponse && latestResponse.response?.markdown) {
+      setMessages(prev => {
+        if (prev.length === 0) return prev;
+        const lastIdx = prev.length - 1;
+        if (prev[lastIdx].sender === 'blueorbit' || prev[lastIdx].sender === 'orca') {
+          if (prev[lastIdx].text !== latestResponse.response.markdown) {
+            const updated = [...prev];
+            updated[lastIdx] = {
+              ...updated[lastIdx],
+              text: latestResponse.response.markdown,
+              data: latestResponse
+            };
+            return updated;
+          }
+        }
+        return prev;
+      });
+    }
+  }, [latestResponse]);
+
   const handleSend = async (queryText?: string) => {
     const textToSend = queryText || inputText;
     if (!textToSend.trim() || isLoading) return;
@@ -70,7 +92,7 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
 
-    const res = await onSendMessage(textToSend);
+    const res = await onSendMessage(textToSend, currentLang);
     if (res && res.response?.markdown) {
       const newMsgId = `msg-${Date.now()}`;
       setMessages(prev => [
