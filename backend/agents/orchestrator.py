@@ -121,8 +121,8 @@ class MasterOrchestrator:
         if any(w in q for w in ["who are you", "who created", "who made", "what is blue orbit", "what are you", "your name", "introduce yourself", "tell me about yourself", "creator", "runtime terror"]):
             return "identity"
 
-        # 8. Greetings (Word-boundary matching)
-        if re.search(r'\b(hello|hi|hey|namaste|namaskar|vanakkam|namaskaram|good morning|good afternoon|good evening|how are you|pranam)\b', q):
+        # 8. Greetings (Flexible word matching for hello, helloo, hi, hiii, hey, etc.)
+        if re.search(r'\b(hello+|hi+|hey+|namaste+|namaskar+|vanakkam+|namaskaram+|good\s*morning|good\s*afternoon|good\s*evening|how\s*are\s*you|pranam|kemon\s*acho|kem\s*cho|ki\s*khobor)\b', q):
             return "greeting"
             
         return "general_inquiry"
