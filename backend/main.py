@@ -6,9 +6,11 @@ Modular Agentic AI Marine Intelligence & Decision Support Platform
 
 import asyncio
 import json
+import urllib.request
+import urllib.parse
 from typing import Optional, List, Dict, Any
 from dotenv import load_dotenv
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -99,6 +101,50 @@ async def chat_endpoint(payload: ChatQueryRequest):
 async def query_alias(payload: ChatQueryRequest):
     """Alias for /api/chat."""
     return await chat_endpoint(payload)
+
+@app.get("/api/tts")
+async def text_to_speech_stream(
+    text: str = Query(..., description="Text to synthesize"),
+    lang: str = Query("en", description="Language code")
+):
+    """
+    Streams native vernacular speech audio for all 8 Indian languages (en, hi, ta, te, ml, bn, gu, mr).
+    Bypasses browser CORS / hotlink restrictions on Windows/macOS/Linux/Android/iOS.
+    """
+    if not text or not text.strip():
+        raise HTTPException(status_code=400, detail="Text cannot be empty")
+    
+    clean_lang = lang.lower().strip()
+    prefix = clean_lang.split("-")[0] if "-" in clean_lang else clean_lang
+    if prefix not in ["en", "hi", "ta", "te", "ml", "bn", "gu", "mr"]:
+        prefix = "en"
+        
+    encoded_text = urllib.parse.quote(text[:350])
+    tts_url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl={prefix}&client=tw-ob&q={encoded_text}"
+    
+    req = urllib.request.Request(tts_url, headers={
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Referer": "https://translate.google.com/"
+    })
+    
+    try:
+        loop = asyncio.get_event_loop()
+        def fetch_audio():
+            with urllib.request.urlopen(req, timeout=12) as response:
+                return response.read()
+        
+        audio_data = await loop.run_in_executor(None, fetch_audio)
+        return Response(
+            content=audio_data,
+            media_type="audio/mpeg",
+            headers={
+                "Cache-Control": "public, max-age=86400",
+                "Access-Control-Allow-Origin": "*"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"TTS synthesis error: {str(e)}")
+
 
 @app.get("/api/pfz")
 def get_pfz_hotspots(port: Optional[str] = None):

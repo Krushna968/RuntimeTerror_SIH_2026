@@ -1,7 +1,7 @@
 /**
  * Multilingual Speech Synthesis (TTS) & Speech Recognition (STT) Engine
  * Provides complete BCP-47 voice tag resolution, text sanitization,
- * and system voice matching for all 8 supported Indian regional languages.
+ * and high-fidelity native vernacular audio streaming for all 8 supported Indian regional languages.
  */
 
 export interface SupportedLanguageInfo {
@@ -130,7 +130,7 @@ export function cleanTextForSpeech(rawText: string): string {
     // Remove common symbol abbreviations
     .replace(/\bkts\b/gi, 'knots')
     .replace(/\bnm\b/gi, 'nautical miles')
-    // Remove emojis (preserve vernacular unicode characters like Tamil, Telugu, Hindi, Gujarati, Bengali, etc.)
+    // Remove emojis (preserve vernacular unicode characters)
     .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
     // Clean multiple whitespace / newlines
     .replace(/\n+/g, '. ')
@@ -155,18 +155,18 @@ export function getBestVoiceForLanguage(langCode: string): SpeechSynthesisVoice 
   const langKey = langCode.toLowerCase().trim();
   const langInfo = SUPPORTED_LANGUAGES[langKey] || Object.values(SUPPORTED_LANGUAGES).find(l => l.bcp47.toLowerCase() === bcp47);
 
-  // 1. Direct match on BCP-47 (e.g. "ta-in", "hi-in", "te-in", "ml-in", "bn-in", "gu-in", "mr-in")
+  // 1. Direct match on BCP-47
   let match = voices.find(v => v.lang.toLowerCase().replace('_', '-') === bcp47);
   if (match) return match;
 
-  // 2. Exact language prefix match (e.g. "ta", "hi", "te", "ml", "bn", "gu", "mr")
+  // 2. Exact language prefix match
   match = voices.find(v => {
     const vLang = v.lang.toLowerCase().replace('_', '-');
     return vLang.startsWith(`${prefix}-`) || vLang === prefix;
   });
   if (match) return match;
 
-  // 3. Name alias match (e.g. "Google தமிழ்", "Microsoft Mohan - Telugu", "Google हिन्दी")
+  // 3. Name alias match
   if (langInfo) {
     for (const alias of langInfo.speechAliases) {
       match = voices.find(v => 
@@ -186,7 +186,18 @@ export function getBestVoiceForLanguage(langCode: string): SpeechSynthesisVoice 
   return null;
 }
 
-const AUDIO_CACHE_NAME = 'blue-orbit-marine-audio-v1';
+const PROD_API_URL = 'https://orca-backend-0dxj.onrender.com';
+const getApiBase = (): string => {
+  if (typeof window !== 'undefined' && (window as any).VITE_API_URL) {
+    return (window as any).VITE_API_URL;
+  }
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:8000';
+  }
+  return PROD_API_URL;
+};
+
+const AUDIO_CACHE_NAME = 'blue-orbit-marine-audio-v2';
 
 /**
  * Splits long text into natural sentence chunks for smooth streaming audio
@@ -204,7 +215,6 @@ function splitIntoAudioChunks(text: string, maxChunkLen: number = 180): string[]
     } else {
       if (current) chunks.push(current);
       if (part.length > maxChunkLen) {
-        // Break long clause by commas or spaces
         const words = part.split(/\s+/);
         let sub = '';
         for (const w of words) {
@@ -226,37 +236,38 @@ function splitIntoAudioChunks(text: string, maxChunkLen: number = 180): string[]
 }
 
 /**
- * Resolves or fetches audio blob from local Cache Storage for offline reliability
+ * Resolves or fetches audio blob from local Cache Storage / backend TTS for 100% cross-platform reliability on Windows, Mac, Android, iOS
  */
 async function getCachedAudioSrc(langPrefix: string, textChunk: string): Promise<string> {
   const encoded = encodeURIComponent(textChunk);
-  const directUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${langPrefix}&client=tw-ob&q=${encoded}`;
+  const apiBase = getApiBase();
+  const serverTtsUrl = `${apiBase}/api/tts?text=${encoded}&lang=${langPrefix}`;
 
   if (typeof window === 'undefined' || !('caches' in window)) {
-    return directUrl;
+    return serverTtsUrl;
   }
 
   try {
     const cache = await caches.open(AUDIO_CACHE_NAME);
-    const cachedResponse = await cache.match(directUrl);
+    const cachedResponse = await cache.match(serverTtsUrl);
 
     if (cachedResponse) {
       const blob = await cachedResponse.blob();
       return URL.createObjectURL(blob);
     }
 
-    // If online, fetch and auto-save into offline cache for future instant plays
-    const netResponse = await fetch(directUrl);
+    // Fetch from backend TTS proxy (CORS and Hotlink Safe)
+    const netResponse = await fetch(serverTtsUrl);
     if (netResponse.ok) {
-      cache.put(directUrl, netResponse.clone()).catch(() => {});
+      cache.put(serverTtsUrl, netResponse.clone()).catch(() => {});
       const blob = await netResponse.blob();
       return URL.createObjectURL(blob);
     }
   } catch (err) {
-    console.warn('[Cache Storage Read Error, fallback to direct URL]', err);
+    console.warn('[Cache Storage Read/Fetch Error, fallback to server URL]', err);
   }
 
-  return directUrl;
+  return serverTtsUrl;
 }
 
 /**
@@ -277,7 +288,9 @@ async function playNextAudioChunk(
   const chunk = audioQueue.shift()!;
   try {
     const audioSrc = await getCachedAudioSrc(langPrefix, chunk);
-    const audio = new Audio(audioSrc);
+    const audio = new Audio();
+    audio.src = audioSrc;
+    audio.crossOrigin = 'anonymous';
     activeAudio = audio;
     isAudioPlaying = true;
 
@@ -286,15 +299,13 @@ async function playNextAudioChunk(
     };
 
     audio.onerror = (err) => {
-      console.warn('[Audio chunk error, proceeding to next]', err);
+      console.warn('[Audio chunk playback error, proceeding to next]', err);
       playNextAudioChunk(langPrefix, onEnd, onError);
     };
 
     audio.play().catch((err) => {
-      console.warn('[Audio play interrupted]', err);
-      isAudioPlaying = false;
-      activeAudio = null;
-      if (onEnd) onEnd();
+      console.warn('[Audio play interrupted/blocked]', err);
+      playNextAudioChunk(langPrefix, onEnd, onError);
     });
   } catch (err) {
     console.warn('[Chunk resolution error]', err);
@@ -374,7 +385,7 @@ export const CORE_MARINE_AUDIO_PACK: Record<string, string[]> = {
     "ઇમરજન્સી એસઓએસ એલર્ટ સક્રિય કરવામાં આવ્યું છે.",
     "આંતરરાષ્ટ્રીય સરહદ ઉલ્લંઘન ચેતવણી! તરત જ ૧૮૦ ડિગ્રી પાછા ફરો.",
     "નજીકનો મચ્છીમારી સંભવિત વિસ્તાર શોધાયો.",
-    "સુરક્ષિત નેવિગેશન માર્ગ તૈયાર કરવામાં આવ્યો છે."
+    "સુરક્ષિત નેવિગેશન માર્ગ तैयार કરવામાં આવ્યો છે."
   ],
   mr: [
     "नमस्कार! ब्लू ऑर्बिट सागरी सहाय्यकामध्ये आपले स्वागत आहे.",
@@ -382,7 +393,7 @@ export const CORE_MARINE_AUDIO_PACK: Record<string, string[]> = {
     "सावधगिरी बाळगा. मध्यम लाटा आहेत.",
     "धोकादायक समुद्राची स्थिती. समुद्रात जाऊ नका.",
     "आपत्कालीन एसओएस अलर्ट सक्रिय करण्यात आला आहे.",
-    "आंतरराष्ट्रीय सागरी सीमा उल्लंघन इशारा! त्वरित १८০ अंश मागे वळा.",
+    "आंतरराष्ट्रीय सागरी सीमा उल्लंघन इशारा! त्वरित १८० अंश मागे वळा.",
     "जवळचे उच्च उत्पादन मासेमारी क्षेत्र आढळले.",
     "सुरक्षित नेव्हिगेशन मार्ग तयार केला गेला आहे."
   ]
@@ -403,19 +414,20 @@ export async function preloadAllRegionalAudioPacks(
     languages.forEach(([_, phrases]) => { totalItems += phrases.length; });
 
     let completed = 0;
+    const apiBase = getApiBase();
 
     for (const [code, phrases] of languages) {
       const langName = SUPPORTED_LANGUAGES[code]?.name || code;
       for (const phrase of phrases) {
         const encoded = encodeURIComponent(phrase);
-        const directUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${code}&client=tw-ob&q=${encoded}`;
+        const serverTtsUrl = `${apiBase}/api/tts?text=${encoded}&lang=${code}`;
 
         try {
-          const match = await cache.match(directUrl);
+          const match = await cache.match(serverTtsUrl);
           if (!match) {
-            const res = await fetch(directUrl);
+            const res = await fetch(serverTtsUrl);
             if (res.ok) {
-              await cache.put(directUrl, res);
+              await cache.put(serverTtsUrl, res);
             }
           }
         } catch (e) {
@@ -449,9 +461,34 @@ export function isAudioCachePreloaded(): boolean {
 }
 
 /**
+ * Fallback to streaming high-fidelity audio chunks
+ */
+function fallbackToAudioStream(
+  cleaned: string,
+  prefix: string,
+  onStart?: () => void,
+  onEnd?: () => void,
+  onError?: (e: any) => void
+): HTMLAudioElement | null {
+  try {
+    const chunks = splitIntoAudioChunks(cleaned, 180);
+    audioQueue = [...chunks];
+
+    if (onStart) onStart();
+    playNextAudioChunk(prefix, onEnd, onError);
+    return activeAudio;
+  } catch (err) {
+    console.warn('[TTS Streaming Init Error]', err);
+    if (onError) onError(err);
+    if (onEnd) onEnd();
+    return null;
+  }
+}
+
+/**
  * Speaks text in the specified language.
- * Uses local SpeechSynthesis if a native regional voice is present;
- * otherwise automatically streams high-fidelity native vernacular audio.
+ * Uses local SpeechSynthesis if a genuine native regional voice is present on the OS,
+ * or immediately streams crystal clear native vernacular audio through the backend TTS engine.
  */
 export function speakText(
   text: string,
@@ -467,52 +504,47 @@ export function speakText(
     return null;
   }
 
-  const bcp47 = getBcp47LangTag(langCode).toLowerCase();
-  const prefix = bcp47.split('-')[0];
+  const bcp47 = getBcp47LangTag(langCode);
+  const prefix = langCode.toLowerCase().trim().split('-')[0];
   const bestVoice = getBestVoiceForLanguage(langCode);
 
-  // 1. If English OR if a genuine native voice matching the language prefix is installed in OS
+  // 1. If English or if a genuine matching native voice is installed in OS
   if (bestVoice && (prefix === 'en' || bestVoice.lang.toLowerCase().replace('_', '-').startsWith(prefix))) {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(cleaned);
-      utterance.lang = bcp47;
-      utterance.rate = 0.95;
-      utterance.pitch = 1.0;
-      utterance.voice = bestVoice;
-      activeUtterance = utterance;
+      try {
+        window.speechSynthesis.cancel();
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
 
-      if (onStart) utterance.onstart = onStart;
-      utterance.onend = () => {
-        activeUtterance = null;
-        if (onEnd) onEnd();
-      };
-      utterance.onerror = (e) => {
-        console.warn('[SpeechSynthesis Error]', e);
-        activeUtterance = null;
-        if (onError) onError(e);
-        if (onEnd) onEnd();
-      };
+        const utterance = new SpeechSynthesisUtterance(cleaned);
+        utterance.lang = bcp47;
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
+        utterance.voice = bestVoice;
+        activeUtterance = utterance;
 
-      window.speechSynthesis.speak(utterance);
-      return utterance;
+        if (onStart) utterance.onstart = onStart;
+        utterance.onend = () => {
+          activeUtterance = null;
+          if (onEnd) onEnd();
+        };
+        utterance.onerror = (e) => {
+          console.warn('[SpeechSynthesis Error, fallback to high-fidelity stream]', e);
+          activeUtterance = null;
+          fallbackToAudioStream(cleaned, prefix, onStart, onEnd, onError);
+        };
+
+        window.speechSynthesis.speak(utterance);
+        return utterance;
+      } catch (e) {
+        console.warn('[SpeechSynthesis speak error]', e);
+      }
     }
   }
 
-  // 2. High-Fidelity Vernacular Streaming for Indian Languages without an OS voice pack
-  try {
-    const chunks = splitIntoAudioChunks(cleaned, 180);
-    audioQueue = [...chunks];
-
-    if (onStart) onStart();
-    playNextAudioChunk(prefix, onEnd, onError);
-    return activeAudio;
-  } catch (err) {
-    console.warn('[TTS Streaming Init Error]', err);
-    if (onError) onError(err);
-    if (onEnd) onEnd();
-    return null;
-  }
+  // 2. High-Fidelity Audio Streaming for Vernacular Languages (Malayalam, Tamil, Telugu, Hindi, Bengali, Gujarati, Marathi)
+  return fallbackToAudioStream(cleaned, prefix, onStart, onEnd, onError);
 }
 
 /**
@@ -531,4 +563,3 @@ export function stopSpeech() {
     activeUtterance = null;
   }
 }
-
