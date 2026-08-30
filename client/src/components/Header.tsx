@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Compass, 
   AlertTriangle,
@@ -12,9 +12,12 @@ import {
   FileText,
   Home,
   Radio,
-  Volume2
+  Volume2,
+  Download,
+  Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { isAudioCachePreloaded } from '../utils/speechUtils';
 
 interface HeaderProps {
   activeTab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin';
@@ -45,6 +48,11 @@ export const Header: React.FC<HeaderProps> = ({
   onVoiceSetupClick
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAudioCached, setIsAudioCached] = useState(false);
+
+  useEffect(() => {
+    setIsAudioCached(isAudioCachePreloaded());
+  }, []);
 
   const handleLogoClick = () => {
     setActiveTab('home');
@@ -158,19 +166,29 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right Action Group: Voice Packs + Language Switcher + SOS */}
         <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
-          {/* Offline Regional Voice Packs Button */}
+          {/* Offline Regional Audio Cache Button */}
           {onVoiceSetupClick && (
             <button
               onClick={onVoiceSetupClick}
-              className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-full flex items-center space-x-1 backdrop-blur-md shadow-sm transition-all border cursor-pointer ${
-                !isDark 
-                  ? 'bg-white border-zinc-200 text-zinc-800 hover:bg-zinc-100 hover:border-zinc-300' 
-                  : 'bg-zinc-900/80 border-zinc-700/80 text-zinc-200 hover:bg-zinc-800'
+              className={`p-1.5 sm:px-3 sm:py-1.5 rounded-full flex items-center space-x-1.5 backdrop-blur-md shadow-sm transition-all border cursor-pointer ${
+                isAudioCached
+                  ? (!isDark 
+                      ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100' 
+                      : 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/80')
+                  : (!isDark 
+                      ? 'bg-white border-zinc-200 text-zinc-800 hover:bg-zinc-100 hover:border-zinc-300' 
+                      : 'bg-zinc-900/80 border-zinc-700/80 text-zinc-200 hover:bg-zinc-800')
               }`}
-              title="Regional Voice Packs & Offline Speech Setup"
+              title="Preload or Manage 8 Regional Language Audio Packs in Local Cache"
             >
-              <Volume2 className={`w-3.5 h-3.5 ${!isDark ? 'text-blue-600' : 'text-cyan-400'}`} />
-              <span className="hidden lg:inline text-[11px] font-bold">Voice Packs</span>
+              {isAudioCached ? (
+                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
+              ) : (
+                <Download className={`w-3.5 h-3.5 ${!isDark ? 'text-blue-600' : 'text-cyan-400'}`} />
+              )}
+              <span className="hidden sm:inline text-[11px] font-bold">
+                {isAudioCached ? "Audio Cached" : "Cache Audio"}
+              </span>
             </button>
           )}
 

@@ -186,6 +186,8 @@ export function getBestVoiceForLanguage(langCode: string): SpeechSynthesisVoice 
   return null;
 }
 
+const AUDIO_CACHE_NAME = 'blue-orbit-marine-audio-v1';
+
 /**
  * Splits long text into natural sentence chunks for smooth streaming audio
  */
@@ -224,9 +226,43 @@ function splitIntoAudioChunks(text: string, maxChunkLen: number = 180): string[]
 }
 
 /**
- * Plays queued audio chunks sequentially
+ * Resolves or fetches audio blob from local Cache Storage for offline reliability
  */
-function playNextAudioChunk(
+async function getCachedAudioSrc(langPrefix: string, textChunk: string): Promise<string> {
+  const encoded = encodeURIComponent(textChunk);
+  const directUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${langPrefix}&client=tw-ob&q=${encoded}`;
+
+  if (typeof window === 'undefined' || !('caches' in window)) {
+    return directUrl;
+  }
+
+  try {
+    const cache = await caches.open(AUDIO_CACHE_NAME);
+    const cachedResponse = await cache.match(directUrl);
+
+    if (cachedResponse) {
+      const blob = await cachedResponse.blob();
+      return URL.createObjectURL(blob);
+    }
+
+    // If online, fetch and auto-save into offline cache for future instant plays
+    const netResponse = await fetch(directUrl);
+    if (netResponse.ok) {
+      cache.put(directUrl, netResponse.clone()).catch(() => {});
+      const blob = await netResponse.blob();
+      return URL.createObjectURL(blob);
+    }
+  } catch (err) {
+    console.warn('[Cache Storage Read Error, fallback to direct URL]', err);
+  }
+
+  return directUrl;
+}
+
+/**
+ * Plays queued audio chunks sequentially with offline cache resolution
+ */
+async function playNextAudioChunk(
   langPrefix: string,
   onEnd?: () => void,
   onError?: (e: any) => void
@@ -239,28 +275,177 @@ function playNextAudioChunk(
   }
 
   const chunk = audioQueue.shift()!;
-  const encoded = encodeURIComponent(chunk);
-  const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${langPrefix}&client=tw-ob&q=${encoded}`;
+  try {
+    const audioSrc = await getCachedAudioSrc(langPrefix, chunk);
+    const audio = new Audio(audioSrc);
+    activeAudio = audio;
+    isAudioPlaying = true;
 
-  const audio = new Audio(audioUrl);
-  activeAudio = audio;
-  isAudioPlaying = true;
+    audio.onended = () => {
+      playNextAudioChunk(langPrefix, onEnd, onError);
+    };
 
-  audio.onended = () => {
+    audio.onerror = (err) => {
+      console.warn('[Audio chunk error, proceeding to next]', err);
+      playNextAudioChunk(langPrefix, onEnd, onError);
+    };
+
+    audio.play().catch((err) => {
+      console.warn('[Audio play interrupted]', err);
+      isAudioPlaying = false;
+      activeAudio = null;
+      if (onEnd) onEnd();
+    });
+  } catch (err) {
+    console.warn('[Chunk resolution error]', err);
     playNextAudioChunk(langPrefix, onEnd, onError);
-  };
+  }
+}
 
-  audio.onerror = (err) => {
-    console.warn('[Audio chunk error, proceeding to next]', err);
-    playNextAudioChunk(langPrefix, onEnd, onError);
-  };
+/**
+ * Core Essential Marine Phrases for all 8 Indian Languages
+ */
+export const CORE_MARINE_AUDIO_PACK: Record<string, string[]> = {
+  en: [
+    "Hello! Welcome to Blue Orbit marine intelligence.",
+    "Sea State verdict: Safe for Venture.",
+    "Exercise caution. Wave swell is moderate.",
+    "Hazardous sea condition. Do not venture into the sea.",
+    "Emergency Distress SOS Activated. Coast Guard 1554 alerted.",
+    "IMBL Border Violation Alert! Turn 180 degrees immediately.",
+    "High confidence Potential Fishing Zone detected nearby.",
+    "Safe weather-optimized navigation route generated."
+  ],
+  hi: [
+    "नमस्ते! ब्लू ऑर्बिट समुद्री सहायक में आपका स्वागत है।",
+    "समुद्र स्थिति: समुद्र में जाना पूरी तरह सुरक्षित है।",
+    "सावधानी बरतें। समुद्र में मध्यम लहरें हैं।",
+    "खतरनाक समुद्री स्थिति। समुद्र में न जाएं।",
+    "आपातकालीन एसओएस संकेत सक्रिय। तटरक्षक 1554 को सूचित किया गया।",
+    "अंतर्राष्ट्रीय समुद्री सीमा उल्लंघन चेतावनी! तुरंत 180 डिग्री मुड़ें।",
+    "निकटतम उच्च-उत्पादक मछली पकड़ने का क्षेत्र खोजा गया।",
+    "सुरक्षित नेविगेशन मार्ग तैयार किया गया है।"
+  ],
+  ta: [
+    "வணக்கம்! புளூ ஆர்பிட் கடல்சார் உதவியாளருக்கு வரவேற்கிறோம்.",
+    "கடல் நிலை: கடலுக்குச் செல்ல பாதுகாப்பானது.",
+    "எச்சரிக்கையுடன் செயல்படவும். மிதமான அலைகள் உள்ளன.",
+    "ஆபத்தான கடல் நிலை. கடலுக்குச் செல்ல வேண்டாம்.",
+    "அவசர எஸ்ஓஎஸ் எச்சரிக்கை இயக்கப்பட்டது. கடலோரக் காவல் படைக்கு தெரிவிக்கப்பட்டது.",
+    "சர்வதேச எல்லை மீறல் எச்சரிக்கை! உடனடியாக 180 பாகை திரும்பவும்.",
+    "அருகிலுள்ள அதிக மீன்வள மண்டலம் கண்டறியப்பட்டது.",
+    "பாதுகாப்பான வழித்தட திட்டம் உருவாக்கப்பட்டுள்ளது."
+  ],
+  te: [
+    "నమస్కారం! బ్లూ ఆర్బిట్ సముద్ర సహాయకుడికి స్వాగతం.",
+    "సముద్ర స్థితి: సముద్రంలోకి వెళ్లడం సురక్షితం.",
+    "జాగ్రత్త వహించండి. మోస్తరు అలలు ఉన్నాయి.",
+    "ప్రమాదకరమైన సముద్ర పరిస్థితి. సముద్రంలోకి వెళ్లవద్దు.",
+    "అత్యవసర ఎస్ఓఎస్ సంకేతం ప్రారంభించబడింది.",
+    "అంతర్జాతీయ సరిహద్దు ఉల్లంఘన హెచ్చరిక! వెంటనే వెనక్కి తిరగండి.",
+    "సమీపంలో అధిక చేపల వేట ప్రాంతం కనుగొనబడింది.",
+    "సురక్షితమైన నావిగేషన్ మార్గం రూపొందించబడింది."
+  ],
+  ml: [
+    "നമസ്കാരം! ബ്ലൂ ഓർബിറ്റ് സമുദ്ര സഹായിയിലേക്ക് സ്വാഗതം.",
+    "കടൽ അവസ്ഥ: കടലിൽ പോകുന്നത് സുരക്ഷിതമാണ്.",
+    "ജാഗ്രത പാലിക്കുക. മിതമായ തിരമാലകൾ ഉണ്ട്.",
+    "അപകടകരമായ കടൽ അവസ്ഥ. കടലിൽ പോകരുത്.",
+    "അടിയന്തര എസ്ഒഎസ് സന്ദേശം സജീവമാക്കി.",
+    "അന്താരാഷ്ട്ര അതിർത്തി ലംഘന മുന്നറിയിപ്പ്! ഉടൻ 180 ഡിഗ്രി തിരിയുക.",
+    "ഉയർന്ന മത്സ്യസാധ്യതയുള്ള മേഖല കണ്ടെത്തി.",
+    "സുരക്ഷിതമായ യാത്രാ മാർഗ്ഗം തയ്യാറാക്കിയിട്ടുണ്ട്."
+  ],
+  bn: [
+    "নমস্কার! ব্লু অরবিট সামুদ্রিক সহকারীতে স্বাগতম।",
+    "সমুদ্রের অবস্থা: সমুদ্রে যাওয়া নিরাপদ।",
+    "সতর্কতা অবলম্বন করুন। মাঝারি ঢেউ রয়েছে।",
+    "বিপজ্জনক সমুদ্র অবস্থা। সমুদ্রে যাবেন না।",
+    "জরুরী এসওএস সংকেত সক্রিয় করা হয়েছে।",
+    "আন্তর্জাতিক জলসীমা লঙ্ঘন সতর্কতা! অবিলম্বে ১৮০ ডিগ্রি ঘুরুন।",
+    "নিকটবর্তী সম্ভাব্য মাছ ধরার অঞ্চল শনাক্ত করা হয়েছে।",
+    "নিরাপদ নেভিগেশন রুট তৈরি করা হয়েছে।"
+  ],
+  gu: [
+    "નમસ્તે! બ્લુ ઓર્બિટ દરિયાઈ સહાયકમાં આપનું સ્વાગત છે.",
+    "દરિયાઈ સ્થિતિ: દરિયામાં જવું સુરક્ષિત છે.",
+    "સાવધાની રાખો. મધ્યમ મોજાં છે.",
+    "જોખમી દરિયાઈ સ્થિતિ. દરિયામાં ન જવું.",
+    "ઇમરજન્સી એસઓએસ એલર્ટ સક્રિય કરવામાં આવ્યું છે.",
+    "આંતરરાષ્ટ્રીય સરહદ ઉલ્લંઘન ચેતવણી! તરત જ ૧૮૦ ડિગ્રી પાછા ફરો.",
+    "નજીકનો મચ્છીમારી સંભવિત વિસ્તાર શોધાયો.",
+    "સુરક્ષિત નેવિગેશન માર્ગ તૈયાર કરવામાં આવ્યો છે."
+  ],
+  mr: [
+    "नमस्कार! ब्लू ऑर्बिट सागरी सहाय्यकामध्ये आपले स्वागत आहे.",
+    "समुद्राची स्थिती: समुद्रात जाणे सुरक्षित आहे.",
+    "सावधगिरी बाळगा. मध्यम लाटा आहेत.",
+    "धोकादायक समुद्राची स्थिती. समुद्रात जाऊ नका.",
+    "आपत्कालीन एसओएस अलर्ट सक्रिय करण्यात आला आहे.",
+    "आंतरराष्ट्रीय सागरी सीमा उल्लंघन इशारा! त्वरित १८০ अंश मागे वळा.",
+    "जवळचे उच्च उत्पादन मासेमारी क्षेत्र आढळले.",
+    "सुरक्षित नेव्हिगेशन मार्ग तयार केला गेला आहे."
+  ]
+};
 
-  audio.play().catch((err) => {
-    console.warn('[Audio play interrupted]', err);
-    isAudioPlaying = false;
-    activeAudio = null;
-    if (onEnd) onEnd();
-  });
+/**
+ * 1-Click Pre-Caches all 8 Regional Language Audio Packs into browser CacheStorage
+ */
+export async function preloadAllRegionalAudioPacks(
+  onProgress?: (progressPercent: number, currentLangName: string) => void
+): Promise<boolean> {
+  if (typeof window === 'undefined' || !('caches' in window)) return false;
+
+  try {
+    const cache = await caches.open(AUDIO_CACHE_NAME);
+    const languages = Object.entries(CORE_MARINE_AUDIO_PACK);
+    let totalItems = 0;
+    languages.forEach(([_, phrases]) => { totalItems += phrases.length; });
+
+    let completed = 0;
+
+    for (const [code, phrases] of languages) {
+      const langName = SUPPORTED_LANGUAGES[code]?.name || code;
+      for (const phrase of phrases) {
+        const encoded = encodeURIComponent(phrase);
+        const directUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${code}&client=tw-ob&q=${encoded}`;
+
+        try {
+          const match = await cache.match(directUrl);
+          if (!match) {
+            const res = await fetch(directUrl);
+            if (res.ok) {
+              await cache.put(directUrl, res);
+            }
+          }
+        } catch (e) {
+          // Continue caching remaining phrases
+        }
+
+        completed++;
+        if (onProgress) {
+          const pct = Math.round((completed / totalItems) * 100);
+          onProgress(pct, langName);
+        }
+      }
+    }
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('blue_orbit_audio_cached', 'true');
+    }
+    return true;
+  } catch (err) {
+    console.warn('[Audio Preload Error]', err);
+    return false;
+  }
+}
+
+/**
+ * Check if the offline audio cache has already been preloaded
+ */
+export function isAudioCachePreloaded(): boolean {
+  if (typeof localStorage === 'undefined') return false;
+  return localStorage.getItem('blue_orbit_audio_cached') === 'true';
 }
 
 /**
