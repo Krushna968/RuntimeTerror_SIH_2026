@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShieldAlert, 
   ShieldCheck, 
@@ -17,6 +17,7 @@ import {
   geofenceAudioSiren, 
   GeofenceProximityResult 
 } from '../utils/offlineGeofence';
+import { speakText } from '../utils/speechUtils';
 import { Geolocation } from '@capacitor/geolocation';
 
 interface GeofenceAlarmHUDProps {
@@ -38,20 +39,30 @@ export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [isMinimized, setIsMinimized] = useState<boolean>(true);
   const [isSimulatingBreach, setIsSimulatingBreach] = useState<boolean>(false);
+  const lastSpokenThreatRef = useRef<string | null>(null);
 
   // Sync coords from parent or GPS
   useEffect(() => {
     if (userCoords && !isSimulatingBreach) {
       setCurrentCoords(userCoords);
+      const res = evaluateOfflineGeofence(userCoords.lat, userCoords.lon);
+      setGeofenceState(res);
     }
   }, [userCoords, isSimulatingBreach]);
 
-  // If danger breach or caution occurs, auto-expand/un-minimize for safety
+  // If danger breach or caution occurs, auto-expand/un-minimize for safety and speak voice alert
   useEffect(() => {
     if (geofenceState.isBreach || geofenceState.isCaution) {
       setIsMinimized(false);
+
+      if (!isSirenMuted && lastSpokenThreatRef.current !== geofenceState.threatLevel) {
+        lastSpokenThreatRef.current = geofenceState.threatLevel;
+        speakText(geofenceState.alertMessage, 'en');
+      }
+    } else {
+      lastSpokenThreatRef.current = null;
     }
-  }, [geofenceState.isBreach, geofenceState.isCaution]);
+  }, [geofenceState.isBreach, geofenceState.isCaution, isSirenMuted, geofenceState.alertMessage, geofenceState.threatLevel]);
 
   // Continuous background GPS Watcher for on-device tracking
   useEffect(() => {
@@ -198,12 +209,20 @@ export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
           onClick={() => setIsMinimized(false)}
-          className="flex items-center space-x-2 px-3.5 py-2 rounded-full bg-zinc-900/95 hover:bg-zinc-800 border border-zinc-700/80 text-white backdrop-blur-xl shadow-2xl cursor-pointer transition-all hover:scale-105"
+          className={`flex items-center space-x-2 px-3.5 py-2 rounded-full border backdrop-blur-xl shadow-2xl cursor-pointer transition-all hover:scale-105 ${
+            isBreach 
+              ? 'bg-red-950/95 border-red-500 text-red-200 animate-pulse' 
+              : (isCaution 
+                  ? 'bg-amber-950/95 border-amber-500 text-amber-200' 
+                  : 'bg-zinc-900/95 hover:bg-zinc-800 border-zinc-700/80 text-white')
+          }`}
           title="Click to show Offline GPS IMBL Guard"
         >
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span className="text-[11px] font-mono font-bold">{geofenceState.distanceNM} NM to Border</span>
+          <span className={`w-2.5 h-2.5 rounded-full ${isBreach ? 'bg-red-500 animate-ping' : (isCaution ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500 animate-pulse')}`} />
+          {isBreach ? <AlertOctagon className="w-4 h-4 text-red-400" /> : <ShieldCheck className="w-4 h-4 text-emerald-400" />}
+          <span className="text-[11px] font-mono font-bold">
+            {isBreach ? "OUT OF BORDER (0.0 NM)" : `${geofenceState.distanceNM} NM to Border`}
+          </span>
           <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-zinc-800 text-zinc-400 font-semibold">Show</span>
         </motion.button>
       ) : (
@@ -213,7 +232,7 @@ export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
           animate={{ opacity: 1, y: 0 }}
           className={`p-3.5 rounded-3xl backdrop-blur-xl border shadow-xl transition-all ${
             isBreach
-              ? 'bg-red-950/90 border-red-500 text-white'
+              ? 'bg-red-950/95 border-red-500 text-white shadow-2xl shadow-red-900/50'
               : (isCaution
                   ? 'bg-amber-950/90 border-amber-500 text-white'
                   : 'bg-zinc-900/90 border-zinc-700/80 text-white')
@@ -223,7 +242,7 @@ export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
             <div className="flex items-center space-x-2.5 min-w-0">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                 isBreach
-                  ? 'bg-red-600 text-white animate-ping'
+                  ? 'bg-red-600 text-white animate-bounce'
                   : (isCaution ? 'bg-amber-500 text-white' : 'bg-emerald-600 text-white')
               }`}>
                 {isBreach ? <AlertOctagon className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
@@ -231,11 +250,11 @@ export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
 
               <div className="min-w-0">
                 <div className="flex items-center space-x-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-400">
-                  <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
-                  <span>Offline GPS IMBL Guard</span>
+                  <Radio className={`w-3 h-3 ${isBreach ? 'text-red-400 animate-ping' : 'text-emerald-400 animate-pulse'}`} />
+                  <span>{isBreach ? "🚨 BORDER BREACH ALERT" : "Offline GPS IMBL Guard"}</span>
                 </div>
-                <div className="text-xs font-black truncate font-mono">
-                  {geofenceState.distanceNM} NM to Border
+                <div className={`text-xs font-black truncate font-mono ${isBreach ? 'text-red-300' : 'text-white'}`}>
+                  {isBreach ? "OUT OF BORDER / FOREIGN WATERS" : `${geofenceState.distanceNM} NM to Border`}
                 </div>
               </div>
             </div>
