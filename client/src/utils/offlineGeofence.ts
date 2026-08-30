@@ -263,7 +263,11 @@ class GeofenceAudioSiren {
     }
   }
 
+  public isSirenDisabled = true; // Disabled per user request
+
   public startSiren(isCritical: boolean = true) {
+    // Siren sound playback disabled per user request
+    if (this.isSirenDisabled) return;
     if (this.isPlaying) return;
     this.initContext();
     if (!this.audioCtx) return;
