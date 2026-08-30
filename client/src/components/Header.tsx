@@ -14,10 +14,11 @@ import {
   Radio,
   Volume2,
   Download,
-  Check
+  Check,
+  Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { isAudioCachePreloaded } from '../utils/speechUtils';
+import { isAudioCachePreloaded, preloadAllRegionalAudioPacks } from '../utils/speechUtils';
 
 interface HeaderProps {
   activeTab: 'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin';
@@ -44,15 +45,37 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   currentLang = 'en',
   setCurrentLang,
-  onSOSClick,
-  onVoiceSetupClick
+  onSOSClick
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAudioCached, setIsAudioCached] = useState(false);
+  const [isCaching, setIsCaching] = useState(false);
+  const [cacheProgress, setCacheProgress] = useState(0);
+  const [cachingLangName, setCachingLangName] = useState('');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setIsAudioCached(isAudioCachePreloaded());
   }, []);
+
+  const handleDirectCacheAudio = async () => {
+    if (isCaching) return;
+    setIsCaching(true);
+    setCacheProgress(5);
+    setCachingLangName('Starting...');
+
+    const success = await preloadAllRegionalAudioPacks((pct, langName) => {
+      setCacheProgress(pct);
+      setCachingLangName(langName);
+    });
+
+    if (success) {
+      setIsAudioCached(true);
+      setToastMessage('✓ All 8 Regional Indian Voice Packs Successfully Cached for 100% Offline Deep-Sea Use');
+      setTimeout(() => setToastMessage(null), 4500);
+    }
+    setIsCaching(false);
+  };
 
   const handleLogoClick = () => {
     setActiveTab('home');
@@ -164,33 +187,36 @@ export const Header: React.FC<HeaderProps> = ({
           ))}
         </nav>
 
-        {/* Right Action Group: Voice Packs + Language Switcher + SOS */}
+        {/* Right Action Group: Cache Audio + Language Switcher + SOS */}
         <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
-          {/* Offline Regional Audio Cache Button */}
-          {onVoiceSetupClick && (
-            <button
-              onClick={onVoiceSetupClick}
-              className={`p-1.5 sm:px-3 sm:py-1.5 rounded-full flex items-center space-x-1.5 backdrop-blur-md shadow-sm transition-all border cursor-pointer ${
-                isAudioCached
+          {/* Offline Regional Audio Cache Direct Button */}
+          <button
+            onClick={handleDirectCacheAudio}
+            disabled={isCaching}
+            className={`p-1.5 sm:px-3 sm:py-1.5 rounded-full flex items-center space-x-1.5 backdrop-blur-md shadow-sm transition-all border cursor-pointer ${
+              isCaching
+                ? 'bg-blue-50/90 border-blue-400 text-blue-900'
+                : isAudioCached
                   ? (!isDark 
                       ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100' 
                       : 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/80')
                   : (!isDark 
                       ? 'bg-white border-zinc-200 text-zinc-800 hover:bg-zinc-100 hover:border-zinc-300' 
                       : 'bg-zinc-900/80 border-zinc-700/80 text-zinc-200 hover:bg-zinc-800')
-              }`}
-              title="Preload or Manage 8 Regional Language Audio Packs in Local Cache"
-            >
-              {isAudioCached ? (
-                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
-              ) : (
-                <Download className={`w-3.5 h-3.5 ${!isDark ? 'text-blue-600' : 'text-cyan-400'}`} />
-              )}
-              <span className="hidden sm:inline text-[11px] font-bold">
-                {isAudioCached ? "Audio Cached" : "Cache Audio"}
-              </span>
-            </button>
-          )}
+            }`}
+            title={isAudioCached ? "Click to refresh offline audio cache" : "Click to download and cache all 8 language voice packs"}
+          >
+            {isCaching ? (
+              <Loader2 className="w-3.5 h-3.5 text-blue-600 animate-spin" />
+            ) : isAudioCached ? (
+              <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
+            ) : (
+              <Download className={`w-3.5 h-3.5 ${!isDark ? 'text-blue-600' : 'text-cyan-400'}`} />
+            )}
+            <span className="hidden sm:inline text-[11px] font-bold">
+              {isCaching ? `Caching ${cacheProgress}%` : (isAudioCached ? "Audio Cached" : "Cache Audio")}
+            </span>
+          </button>
 
           {/* Regional Language Switcher */}
           {setCurrentLang && (
@@ -224,6 +250,21 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
       </header>
+
+      {/* Floating Success Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -40, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.9 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[1500] max-w-lg w-auto px-4 py-2.5 rounded-2xl bg-zinc-950 text-white border border-emerald-500/60 shadow-2xl backdrop-blur-xl flex items-center space-x-2 text-xs font-bold font-['Outfit',sans-serif]"
+          >
+            <Check className="w-4 h-4 text-emerald-400 shrink-0 stroke-[2.5]" />
+            <span className="text-emerald-300 leading-snug">{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile Slide-Down Navigation Overlay */}
       <AnimatePresence>
