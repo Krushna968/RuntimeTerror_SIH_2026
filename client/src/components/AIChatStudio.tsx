@@ -11,7 +11,8 @@ import {
   Check, 
   ArrowUp,
   Fish,
-  ShieldCheck
+  ShieldCheck,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatResponsePayload } from '../types';
@@ -239,11 +240,11 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             {onVoiceSetupClick && (
               <button
                 onClick={onVoiceSetupClick}
-                className="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 shadow-sm transition-all active:scale-98 cursor-pointer flex items-center space-x-1.5"
-                title="Install or Test Regional Voice Packs on your Device"
+                className="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 shadow-sm transition-all active:scale-98 cursor-pointer flex items-center space-x-1.5"
+                title="Preload 8 Regional Indian Audio Packs into Local Device Cache"
               >
-                <Volume2 className="w-3.5 h-3.5" />
-                <span>📥 Voice Packs Setup</span>
+                <Download className="w-3.5 h-3.5 text-emerald-600" />
+                <span>📥 Cache Audio Packs</span>
               </button>
             )}
           </motion.div>
