@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { PFZHotspot, NavigationRoute, WeatherObservation, SatelliteTelemetry, ChatResponsePayload } from '../types';
 import { speakText, stopSpeech, getBcp47LangTag } from '../utils/speechUtils';
+import { FormattedMarkdown } from './FormattedMarkdown';
 
 interface GisCommandViewProps {
   pfzHotspots: PFZHotspot[];
@@ -718,9 +719,12 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
                   </div>
                 </div>
 
-                <div className="text-xs text-zinc-800 leading-relaxed whitespace-pre-line">
-                  {latestResponse.response.markdown}
-                </div>
+                <FormattedMarkdown 
+                  content={latestResponse.response.markdown} 
+                  className="text-xs text-zinc-800 leading-relaxed"
+                  strongClassName="font-bold text-zinc-950"
+                  bulletClassName="text-blue-600"
+                />
 
                 {/* Minimal Metrics Grid */}
                 <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-zinc-200/60 text-[10px]">

@@ -177,7 +177,7 @@ class MasterOrchestrator:
         
         lang_info = self.lang_agent.supported_languages.get(detected_lang, self.lang_agent.supported_languages["en"])
         
-        # Call NVIDIA NIM LLM
+        # Call Multi-Provider LLM Engine
         llm_response_text = await generate_llm_advisory(
             user_query=query,
             context_data=context_bundle,
@@ -186,21 +186,27 @@ class MasterOrchestrator:
         )
 
         if llm_response_text:
-            tts_clean = re.sub(r'[*#•🛰️🛡️🛑\n]+', ' ', llm_response_text).strip()
+            tts_clean = re.sub(r'[*#•🛰️🛡️🛑🧭🐟\n]+', ' ', llm_response_text).strip()
+            tts_clean = re.sub(r'\s+', ' ', tts_clean)
             final_markdown = llm_response_text
-            model_used_name = "NVIDIA NIM (Meta Llama-3.1-8B)"
+            model_used_name = "Blue Orbit Neural LLM Engine"
         else:
-            localized_result = self.lang_agent.synthesize_localized_response(intent, context_bundle, lang_code=detected_lang)
+            localized_result = self.lang_agent.synthesize_localized_response(
+                intent=intent,
+                context_data=context_bundle,
+                lang_code=detected_lang,
+                user_query=query
+            )
             final_markdown = localized_result["formatted_markdown"]
             tts_clean = localized_result["tts_speech_text"]
-            model_used_name = "Blue Orbit Deterministic Rule Engine"
+            model_used_name = "Blue Orbit Autonomous Marine Reasoning Engine"
 
         evidence_pkg = self.explain_agent.generate_evidence_package(query, execution_trace, context_bundle)
         bulletin = self.explain_agent.generate_official_marine_bulletin(port_info["name"], pfz_list, weather, geofence)
         
         execution_trace.append({
-            "step_id": "STEP_06_NVIDIA_LLM_COGNITIVE_SYNTHESIS",
-            "agent": f"Neural Cognitive Agent ({model_used_name})",
+            "step_id": "STEP_06_COGNITIVE_SYNTHESIS",
+            "agent": f"Cognitive Synthesis Agent ({model_used_name})",
             "status": "COMPLETED",
             "duration_ms": round((time.time() - step6_start) * 1000, 2),
             "thought": f"Synthesized grounded natural language advisory using {model_used_name} in '{lang_info['name']}'. Generated official bulletin #{bulletin['bulletin_id']}.",

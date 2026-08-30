@@ -8,19 +8,24 @@ Provides:
 
 import math
 from typing import Dict, Any, List, Tuple, Optional
-from shapely.geometry import Point, LineString, Polygon
+try:
+    from shapely.geometry import Point, LineString, Polygon
+    HAS_SHAPELY = True
+except ImportError:
+    HAS_SHAPELY = False
+
 from backend.data.geodata import IMBL_BOUNDARIES, MARINE_PROTECTED_AREAS, INDIAN_PORTS, ACTIVE_CYCLONE
 
 class GeospatialAgent:
     def __init__(self):
         self.agent_name = "Geospatial & Geofencing Agent"
         
-        # Build Shapely LineStrings for IMBL boundaries
+        # Build Shapely LineStrings for IMBL boundaries if available
         self.imbl_lines = {}
-        for key, imbl in IMBL_BOUNDARIES.items():
-            # Coordinates are [lat, lon], Shapely uses (lon, lat)
-            coords_lonlat = [(pt[1], pt[0]) for pt in imbl["coordinates"]]
-            self.imbl_lines[key] = LineString(coords_lonlat)
+        if HAS_SHAPELY:
+            for key, imbl in IMBL_BOUNDARIES.items():
+                coords_lonlat = [(pt[1], pt[0]) for pt in imbl["coordinates"]]
+                self.imbl_lines[key] = LineString(coords_lonlat)
 
     def calculate_distance_km(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
         """Haversine distance in kilometers."""

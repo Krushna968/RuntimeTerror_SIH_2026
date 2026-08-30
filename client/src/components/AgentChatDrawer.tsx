@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { ChatResponsePayload, AgentExecutionStep } from '../types';
 import { speakText, stopSpeech, getBcp47LangTag } from '../utils/speechUtils';
+import { FormattedMarkdown } from './FormattedMarkdown';
 
 interface AgentChatDrawerProps {
   onSendMessage: (query: string) => void;
@@ -210,9 +211,12 @@ export const AgentChatDrawer: React.FC<AgentChatDrawerProps> = ({
               </div>
 
               {/* Formatted Markdown Content */}
-              <div className="text-xs leading-relaxed text-slate-800 whitespace-pre-line font-medium space-y-1.5">
-                {latestResponse.response.markdown}
-              </div>
+              <FormattedMarkdown 
+                content={latestResponse.response.markdown} 
+                className="text-xs leading-relaxed text-slate-800 font-medium"
+                strongClassName="font-bold text-slate-900"
+                bulletClassName="text-blue-600"
+              />
 
               {/* Quick Insight Badges */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2.5 border-t border-slate-100">
