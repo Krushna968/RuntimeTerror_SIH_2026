@@ -25,10 +25,17 @@ interface GeofenceAlarmHUDProps {
   onSelectCoord?: (lat: number, lon: number) => void;
 }
 
+// Temporary disable flag for Geofence Alarm & HUD feature
+const IS_ALERT_FEATURE_ENABLED = false;
+
 export const GeofenceAlarmHUD: React.FC<GeofenceAlarmHUDProps> = ({
   userCoords,
   onSelectCoord
 }) => {
+  if (!IS_ALERT_FEATURE_ENABLED) {
+    return null;
+  }
+
   const [currentCoords, setCurrentCoords] = useState<{ lat: number; lon: number }>(
     userCoords || { lat: 9.9416, lon: 76.2575 }
   );
