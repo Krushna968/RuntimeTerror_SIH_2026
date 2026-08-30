@@ -11,7 +11,8 @@ import {
   ShieldCheck,
   FileText,
   Home,
-  Radio
+  Radio,
+  Volume2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -21,6 +22,7 @@ interface HeaderProps {
   currentLang?: string;
   setCurrentLang?: (lang: string) => void;
   onSOSClick: () => void;
+  onVoiceSetupClick?: () => void;
 }
 
 export const LANGUAGES = [
@@ -39,7 +41,8 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   currentLang = 'en',
   setCurrentLang,
-  onSOSClick
+  onSOSClick,
+  onVoiceSetupClick
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -151,8 +154,24 @@ export const Header: React.FC<HeaderProps> = ({
           ))}
         </nav>
 
-        {/* Right Action Group: Language Switcher + SOS */}
+        {/* Right Action Group: Voice Packs + Language Switcher + SOS */}
         <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+          {/* Offline Regional Voice Packs Button */}
+          {onVoiceSetupClick && (
+            <button
+              onClick={onVoiceSetupClick}
+              className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-full flex items-center space-x-1 backdrop-blur-md shadow-sm transition-all border cursor-pointer ${
+                !isDark 
+                  ? 'bg-white border-zinc-200 text-zinc-800 hover:bg-zinc-100 hover:border-zinc-300' 
+                  : 'bg-zinc-900/80 border-zinc-700/80 text-zinc-200 hover:bg-zinc-800'
+              }`}
+              title="Regional Voice Packs & Offline Speech Setup"
+            >
+              <Volume2 className={`w-3.5 h-3.5 ${!isDark ? 'text-blue-600' : 'text-cyan-400'}`} />
+              <span className="hidden lg:inline text-[11px] font-bold">Voice Packs</span>
+            </button>
+          )}
+
           {/* Regional Language Switcher */}
           {setCurrentLang && (
             <div className={`relative flex items-center backdrop-blur-md px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm transition-all border ${

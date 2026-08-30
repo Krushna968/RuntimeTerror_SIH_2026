@@ -32,6 +32,7 @@ interface AIChatStudioProps {
   latestResponse: ChatResponsePayload | null;
   currentLang: string;
   setCurrentLang: (lang: string) => void;
+  onVoiceSetupClick?: () => void;
 }
 
 export const AIChatStudio: React.FC<AIChatStudioProps> = ({
@@ -39,7 +40,8 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
   isLoading,
   latestResponse,
   currentLang,
-  setCurrentLang
+  setCurrentLang,
+  onVoiceSetupClick
 }) => {
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -211,6 +213,17 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
             >
               🛡️ Sea Safety Clearance
             </button>
+
+            {onVoiceSetupClick && (
+              <button
+                onClick={onVoiceSetupClick}
+                className="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 shadow-sm transition-all active:scale-98 cursor-pointer flex items-center space-x-1.5"
+                title="Install or Test Regional Voice Packs on your Device"
+              >
+                <Volume2 className="w-3.5 h-3.5" />
+                <span>📥 Voice Packs Setup</span>
+              </button>
+            )}
           </motion.div>
 
           {/* Center Chat Box Capsule */}
