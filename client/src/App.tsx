@@ -440,6 +440,7 @@ export function App() {
                 <SeaSafetyBarometer 
                   weather={weather} 
                   portName={latestResponse?.reference_port.name || "Kochi Fishing Harbour"} 
+                  onPortSelect={(lat, lon) => handleMapClickCoord(lat, lon)}
                 />
               </div>
               <div className="lg:col-span-5 h-[680px] rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
