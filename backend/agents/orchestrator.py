@@ -27,8 +27,19 @@ class MasterOrchestrator:
         self.lang_agent = MultilingualAgent()
         self.explain_agent = ExplainabilityAgent()
 
-    def identify_port_from_query(self, query: str) -> str:
-        """Extracts coastal port or region mentioned in query, defaulting to kochi."""
+    def find_nearest_port(self, lat: float, lon: float) -> str:
+        """Finds the closest Indian fishing port key to given coordinates."""
+        closest_key = "kochi"
+        min_dist_sq = float('inf')
+        for key, p in INDIAN_PORTS.items():
+            d_sq = (p["lat"] - lat) ** 2 + (p["lon"] - lon) ** 2
+            if d_sq < min_dist_sq:
+                min_dist_sq = d_sq
+                closest_key = key
+        return closest_key
+
+    def identify_port_from_query(self, query: str, user_lat: Optional[float] = None, user_lon: Optional[float] = None) -> str:
+        """Extracts coastal port or region mentioned in query, defaulting to user's nearest port or kochi."""
         q = query.lower()
         
         # Direct key checks
@@ -57,6 +68,10 @@ class MasterOrchestrator:
             if port_key in q:
                 return port_key
             
+        # If user coordinates are provided, resolve closest port automatically
+        if user_lat is not None and user_lon is not None:
+            return self.find_nearest_port(user_lat, user_lon)
+
         return "kochi"  # Default reference port
 
     def classify_intent(self, query: str) -> str:
@@ -83,7 +98,14 @@ class MasterOrchestrator:
             
         return "general_inquiry"
 
-    async def execute_query_pipeline(self, query: str, requested_lang: Optional[str] = None) -> Dict[str, Any]:
+    async def execute_query_pipeline(
+        self, 
+        query: str, 
+        requested_lang: Optional[str] = None,
+        user_lat: Optional[float] = None,
+        user_lon: Optional[float] = None,
+        reference_port_override: Optional[str] = None
+    ) -> Dict[str, Any]:
         """
         Executes the full multi-agent collaborative reasoning workflow.
         Returns execution DAG, synthesized answers, GIS layers, and evidence citations.
@@ -95,21 +117,25 @@ class MasterOrchestrator:
         step1_start = time.time()
         detected_lang = requested_lang or self.lang_agent.detect_language(query)
         intent = self.classify_intent(query)
-        port_key = self.identify_port_from_query(query)
+        port_key = reference_port_override or self.identify_port_from_query(query, user_lat=user_lat, user_lon=user_lon)
         port_info = INDIAN_PORTS[port_key]
         
+        # Effective observation point: user's live coordinates if available, otherwise port reference point
+        obs_lat = user_lat if (user_lat is not None and abs(user_lat) > 0.1) else port_info["lat"]
+        obs_lon = user_lon if (user_lon is not None and abs(user_lon) > 0.1) else port_info["lon"]
+
         execution_trace.append({
             "step_id": "STEP_01_SUPERVISOR_PLANNING",
             "agent": "Blue Orbit Master Supervisor & DAG Planner",
             "status": "COMPLETED",
             "duration_ms": round((time.time() - step1_start) * 1000, 2),
-            "thought": f"Parsed query intent: '{intent}'. Reference port: '{port_info['name']}'. Language detected: '{detected_lang}'. Formulated 6-stage collaborative execution graph.",
+            "thought": f"Parsed query intent: '{intent}'. Reference port: '{port_info['name']}' ({obs_lat:.3f}°N, {obs_lon:.3f}°E). Language detected: '{detected_lang}'. Formulated 6-stage collaborative execution graph.",
             "output_summary": f"Decomposed into 5 parallel agent subtasks."
         })
 
         # 2. Marine Data Discovery Agent Execution
         step2_start = time.time()
-        point_obs = self.marine_agent.get_point_observation(port_info["lat"], port_info["lon"])
+        point_obs = self.marine_agent.get_point_observation(obs_lat, obs_lon)
         telemetry = self.marine_agent.get_satellite_telemetry()
         
         execution_trace.append({
@@ -123,7 +149,7 @@ class MasterOrchestrator:
 
         # 3. Weather & Disaster Hazard Agent Execution
         step3_start = time.time()
-        weather = self.weather_agent.get_weather_at_point(port_info["lat"], port_info["lon"])
+        weather = self.weather_agent.get_weather_at_point(obs_lat, obs_lon)
         cyclone_info = self.weather_agent.get_active_cyclones_and_warnings()
         
         execution_trace.append({
@@ -151,9 +177,9 @@ class MasterOrchestrator:
 
         # 5. Geospatial, Geofencing & Route Planning Execution
         step5_start = time.time()
-        geofence = self.geo_agent.check_geofence_status(port_info["lat"], port_info["lon"])
-        target_lat = top_pfz.get("latitude", port_info["lat"] + 0.5)
-        target_lon = top_pfz.get("longitude", port_info["lon"] + 0.5)
+        geofence = self.geo_agent.check_geofence_status(obs_lat, obs_lon)
+        target_lat = top_pfz.get("latitude", obs_lat + 0.5)
+        target_lon = top_pfz.get("longitude", obs_lon + 0.5)
         safe_route = self.geo_agent.compute_safe_route(port_key, target_lat, target_lon, dest_name=top_pfz.get("name", "PFZ"))
         
         execution_trace.append({

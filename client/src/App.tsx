@@ -64,19 +64,47 @@ const getApiBase = () => {
 
 const API_BASE = getApiBase();
 
+const INDIAN_PORTS = [
+  { key: 'kochi', name: 'Kochi Fishing Harbour', lat: 9.9416, lon: 76.2575 },
+  { key: 'chennai', name: 'Chennai Kasimedu Harbour', lat: 13.1256, lon: 80.2974 },
+  { key: 'visakhapatnam', name: 'Visakhapatnam Fishing Harbour', lat: 17.6974, lon: 83.2986 },
+  { key: 'mumbai', name: 'Sassoon Docks & Versova', lat: 18.9172, lon: 72.8228 },
+  { key: 'porbandar', name: 'Porbandar Fisheries Port', lat: 21.6417, lon: 69.6293 },
+  { key: 'rameswaram', name: 'Rameswaram / Mandapam Jetty', lat: 9.2876, lon: 79.3129 },
+  { key: 'mangalore', name: 'Mangalore Old Port', lat: 12.8596, lon: 74.8396 },
+  { key: 'paradip', name: 'Paradip Fishing Harbour', lat: 20.2644, lon: 86.6698 },
+  { key: 'kanyakumari', name: 'Kanyakumari Harbour', lat: 8.0883, lon: 77.5385 },
+  { key: 'port_blair', name: 'Port Blair Phoenix Bay', lat: 11.6670, lon: 92.7350 },
+];
+
+export const getNearestPortKey = (lat: number, lon: number): string => {
+  let closest = 'kochi';
+  let minDist = Infinity;
+  for (const p of INDIAN_PORTS) {
+    const d = (p.lat - lat) ** 2 + (p.lon - lon) ** 2;
+    if (d < minDist) {
+      minDist = d;
+      closest = p.key;
+    }
+  }
+  return closest;
+};
+
 export function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin'>('home');
   const [currentLang, setCurrentLang] = useState<string>('en');
   const [userCoords, setUserCoords] = useState<{ lat: number; lon: number } | null>(null);
+
   const [pfzHotspots, setPfzHotspots] = useState<PFZHotspot[]>([]);
   const [selectedPFZ, setSelectedPFZ] = useState<PFZHotspot | null>(null);
   const [activeRoute, setActiveRoute] = useState<NavigationRoute | null>(null);
   const [weather, setWeather] = useState<WeatherObservation | null>(null);
   const [satellites, setSatellites] = useState<SatelliteTelemetry[]>([]);
-  const [latestResponse, setLatestResponse] = useState<ChatResponsePayload | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Scoped states per studio/view to prevent cross-page state leakage
+  // Global + Source-Isolated Chat State
+  const [latestResponse, setLatestResponse] = useState<ChatResponsePayload | null>(null);
+
   const [chatResponse, setChatResponse] = useState<ChatResponsePayload | null>(null);
   const [isChatLoading, setIsChatLoading] = useState<boolean>(false);
 
@@ -96,55 +124,81 @@ export function App() {
   }, []);
 
   const requestLocationAndInitialize = async () => {
-    let lat = 9.9416;
-    let lon = 76.2575;
-
-    try {
-      if (typeof window !== 'undefined') {
-        // 1. Try Native Capacitor Geolocation Permission Request
-        try {
-          const permStatus = await Geolocation.requestPermissions();
-          if (permStatus.location === 'granted') {
-            const pos = await Geolocation.getCurrentPosition({
-              enableHighAccuracy: true,
-              timeout: 10000
-            });
-            lat = pos.coords.latitude;
-            lon = pos.coords.longitude;
-            setUserCoords({ lat, lon });
-            console.log(`[Blue Orbit GPS] Location granted: ${lat}, ${lon}`);
-          }
-        } catch (capErr) {
-          // 2. Fallback to Standard HTML5 Geolocation API
-          if ('geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition(
-              (pos) => {
-                const browserLat = pos.coords.latitude;
-                const browserLon = pos.coords.longitude;
-                setUserCoords({ lat: browserLat, lon: browserLon });
-                fetchInitialData(browserLat, browserLon);
-              },
-              (err) => {
-                console.warn('[Blue Orbit GPS] Location declined or unavailable:', err);
-                fetchInitialData(lat, lon);
-              },
-              { enableHighAccuracy: true, timeout: 8000 }
-            );
-            return;
-          }
+    // 1. Check Native Mobile Environment (Capacitor Android / iOS)
+    if (typeof window !== 'undefined' && Capacitor.isNativePlatform()) {
+      try {
+        const permStatus = await Geolocation.requestPermissions();
+        if (permStatus.location === 'granted') {
+          const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 10000 });
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          setUserCoords({ lat, lon });
+          const nearestPort = getNearestPortKey(lat, lon);
+          fetchInitialData(lat, lon, nearestPort);
+          return;
         }
+      } catch (capErr) {
+        console.warn('[Blue Orbit GPS] Native Capacitor GPS error:', capErr);
       }
-    } catch (err) {
-      console.warn('[Blue Orbit GPS] Permission initialization exception:', err);
     }
 
-    fetchInitialData(lat, lon);
+    // 2. Standard Web Browser HTML5 Geolocation API
+    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          console.log(`[Blue Orbit GPS] Live Browser Location: ${lat}, ${lon}`);
+          setUserCoords({ lat, lon });
+          const nearestPort = getNearestPortKey(lat, lon);
+          fetchInitialData(lat, lon, nearestPort);
+        },
+        async (err) => {
+          console.warn('[Blue Orbit GPS] Browser Geolocation declined/timeout:', err);
+          // 3. Fallback: Quick IP-based coastal city estimation
+          try {
+            const ipRes = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3500) });
+            if (ipRes.ok) {
+              const ipData = await ipRes.json();
+              if (ipData.latitude && ipData.longitude) {
+                const ipLat = Number(ipData.latitude);
+                const ipLon = Number(ipData.longitude);
+                console.log(`[Blue Orbit GPS] IP Location: ${ipLat}, ${ipLon} (${ipData.city || 'India'})`);
+                setUserCoords({ lat: ipLat, lon: ipLon });
+                const nearestPort = getNearestPortKey(ipLat, ipLon);
+                fetchInitialData(ipLat, ipLon, nearestPort);
+                return;
+              }
+            }
+          } catch (ipErr) {
+            console.warn('[Blue Orbit GPS] IP location service unavailable:', ipErr);
+          }
+          // Default to Kochi Harbour if completely offline
+          fetchInitialData(9.9416, 76.2575, 'kochi');
+        },
+        { enableHighAccuracy: true, timeout: 7000, maximumAge: 60000 }
+      );
+
+      // Continuous GPS Position Watcher for moving fishing vessels
+      try {
+        navigator.geolocation.watchPosition(
+          (pos) => {
+            setUserCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+          },
+          () => {},
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        );
+      } catch {}
+      return;
+    }
+
+    fetchInitialData(9.9416, 76.2575, 'kochi');
   };
 
-  const fetchInitialData = async (lat: number = 9.9416, lon: number = 76.2575) => {
+  const fetchInitialData = async (lat: number = 9.9416, lon: number = 76.2575, portKey: string = 'kochi') => {
     try {
-      // 1. Fetch PFZ Hotspots
-      const pfzRes = await fetch(`${API_BASE}/api/pfz?port=kochi`);
+      // 1. Fetch PFZ Hotspots for user's nearest port
+      const pfzRes = await fetch(`${API_BASE}/api/pfz?port=${portKey}`);
       if (pfzRes.ok) {
         const pfzData = await pfzRes.json();
         setPfzHotspots(pfzData.hotspots || []);
@@ -183,6 +237,7 @@ export function App() {
     setIsLoading(true);
 
     const targetLang = langOverride || currentLang;
+    const nearestPort = userCoords ? getNearestPortKey(userCoords.lat, userCoords.lon) : undefined;
 
     const executeChatRequest = async (baseUrl: string): Promise<ChatResponsePayload> => {
       const res = await fetch(`${baseUrl}/api/chat`, {
@@ -190,7 +245,10 @@ export function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query,
-          language: targetLang
+          language: targetLang,
+          user_lat: userCoords?.lat,
+          user_lon: userCoords?.lon,
+          reference_port: nearestPort
         })
       });
 
