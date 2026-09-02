@@ -147,26 +147,23 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={handleLogoClick}
             className="flex items-center space-x-2 cursor-pointer group shrink-0"
           >
-            {/* Minimalist Geometric Emblem */}
-            <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105 shrink-0 ${
-              !isDark 
-                ? 'bg-zinc-950 text-white shadow-xs' 
-                : 'bg-white text-zinc-950 shadow-sm'
-            }`}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
-                <path d="M3 13c4.5-6 11-8 18-2-4.5 6-11 8-18 2z" />
-                <circle cx="15" cy="9.5" r="1.25" fill="currentColor" stroke="none" />
-              </svg>
+            {/* Official Blue Orbit Logo Emblem */}
+            <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center transition-transform group-hover:scale-105 shrink-0 bg-white shadow-md ring-1 ring-white/30 p-0.5">
+              <img 
+                src="/blue_orbit_logo.jpg" 
+                alt="Blue Orbit" 
+                className="w-full h-full object-contain"
+              />
             </div>
 
             <div className="flex items-center space-x-1.5 shrink-0">
-              <span className={`text-sm sm:text-base font-black tracking-wider transition-colors ${
+              <span className={`text-sm sm:text-base font-black tracking-wider transition-colors drop-shadow-xs ${
                 !isDark ? 'text-zinc-950' : 'text-white'
               }`}>
                 BLUE ORBIT
               </span>
               <span className={`text-[9px] font-mono font-black tracking-widest px-1.5 py-0.5 rounded-md ${
-                !isDark ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-cyan-950 text-cyan-400 border border-cyan-500/30'
+                !isDark ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 backdrop-blur-sm'
               }`}>
                 ISRO
               </span>
