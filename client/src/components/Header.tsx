@@ -85,23 +85,23 @@ export const Header: React.FC<HeaderProps> = ({
   const isChat = activeTab === 'chat';
   const isHome = activeTab === 'home';
   const isAgentLab = activeTab === 'agent-lab';
-  const isDark = activeTab === 'map';
+  const isDark = activeTab === 'map' || activeTab === 'home';
 
   // Header background styling based on active view
-  const headerBgClass = isMap 
-    ? 'bg-gradient-to-b from-black/85 via-black/40 to-transparent pb-6 pt-3 sm:pt-5 text-white border-none shadow-none' 
-    : (isHome || isChat || isAgentLab)
+  const headerBgClass = (isMap || isHome)
+    ? 'bg-gradient-to-b from-black/70 via-black/30 to-transparent pb-6 pt-3 sm:pt-4 text-white border-none shadow-none' 
+    : (isChat || isAgentLab)
       ? 'bg-transparent text-zinc-900 py-3 sm:py-4 border-none shadow-none'
       : 'bg-white/90 backdrop-blur-md border-b border-slate-200/80 text-zinc-900 py-2.5 sm:py-3.5 shadow-xs';
 
   const getNavLinkClass = (tabKey: HeaderProps['activeTab']) => {
     const isActive = activeTab === tabKey;
-    if (isMap) {
+    if (isHome || isMap) {
       return isActive 
-        ? 'text-cyan-300 font-black drop-shadow-sm' 
-        : 'text-zinc-100 hover:text-white font-semibold drop-shadow-sm';
+        ? 'text-cyan-300 font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]' 
+        : 'text-white/90 hover:text-white font-semibold drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]';
     }
-    if (isHome || isChat || isAgentLab) {
+    if (isChat || isAgentLab) {
       return isActive 
         ? (tabKey === 'agent-lab' ? 'text-blue-600 font-black' : 'text-zinc-950 font-black') 
         : 'text-zinc-500 hover:text-zinc-950 font-semibold';
