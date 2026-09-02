@@ -151,13 +151,25 @@ export const AdvisoryExportModal: React.FC<AdvisoryExportModalProps> = ({
         <div className="space-y-5 print:space-y-3">
           {/* Government / ISRO Header */}
           <div className="text-center border-b-2 border-slate-800 pb-4">
-            <div className="text-xs font-black uppercase tracking-widest text-orange-600">
-              Government of India · Department of Space
+            <div className="flex items-center justify-center space-x-3 mb-2">
+              <img 
+                src="/blue_orbit_logo.jpg" 
+                alt="Blue Orbit Logo" 
+                className="w-10 h-10 object-contain rounded-md"
+              />
+              <div className="text-left">
+                <div className="text-[11px] font-black uppercase tracking-widest text-orange-600">
+                  Government of India · Department of Space
+                </div>
+                <div className="text-xs font-mono font-bold text-slate-500">
+                  ISRO SIH-2026 Problem Statement #26176
+                </div>
+              </div>
             </div>
-            <h1 className="text-xl md:text-2xl font-black text-slate-900 mt-1">
+            <h1 className="text-xl md:text-2xl font-black text-slate-900">
               INDIAN SPACE RESEARCH ORGANISATION (ISRO)
             </h1>
-            <h2 className="text-sm font-bold text-blue-700">
+            <h2 className="text-sm font-bold text-blue-700 mt-0.5">
               Joint Satellite Marine Intelligence & Potential Fishing Zone Advisory
             </h2>
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500 mt-2 font-mono">
