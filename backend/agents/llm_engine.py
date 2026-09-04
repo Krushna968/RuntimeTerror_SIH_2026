@@ -160,14 +160,33 @@ async def call_ollama_llm(user_prompt: str) -> Optional[str]:
         pass
     return None
 
+NVIDIA_MODEL_ENV = os.getenv("NVIDIA_MODEL")
+
 async def call_nvidia_nim(user_prompt: str) -> Optional[str]:
-    """Calls NVIDIA NIM API."""
+    """Calls NVIDIA NIM API with active high-performance models."""
     if not NVIDIA_API_KEY:
         return None
     
     url = "https://integrate.api.nvidia.com/v1/chat/completions"
     headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
-    models = ["meta/llama-3.1-8b-instruct", "meta/llama-3.3-70b-instruct", "nvidia/llama-3.1-nemotron-70b-instruct"]
+    
+    # Active high-performance models on NVIDIA NIM
+    candidate_models = [
+        NVIDIA_MODEL_ENV,
+        "meta/llama-3.2-11b-vision-instruct",
+        "google/diffusiongemma-26b-a4b-it",
+        "openai/gpt-oss-20b",
+        "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "nvidia/nemotron-3-super-120b-a12b"
+    ]
+    # Remove duplicates and empty values while preserving order
+    seen = set()
+    models = []
+    for m in candidate_models:
+        if m and m not in seen:
+            seen.add(m)
+            models.append(m)
+
     for model in models:
         try:
             payload = {
@@ -176,18 +195,20 @@ async def call_nvidia_nim(user_prompt: str) -> Optional[str]:
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": user_prompt}
                 ],
-                "max_tokens": 600,
+                "max_tokens": 500,
                 "temperature": 0.5
             }
-            async with httpx.AsyncClient(timeout=6.0) as client:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(18.0, connect=6.0)) as client:
                 res = await client.post(url, json=payload, headers=headers)
                 if res.status_code == 200:
                     data = res.json()
                     content = data["choices"][0]["message"]["content"].strip()
                     logger.info(f"NVIDIA NIM ({model}) generated dynamic advisory.")
                     return content
+                else:
+                    logger.warning(f"NVIDIA NIM ({model}) returned {res.status_code}: {res.text[:100]}")
         except Exception as e:
-            logger.warning(f"NVIDIA NIM API error with {model}: {e}")
+            logger.warning(f"NVIDIA NIM API error with {model}: {repr(e)}")
     return None
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
@@ -198,25 +219,31 @@ async def call_openrouter_llm(user_prompt: str) -> Optional[str]:
         return None
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}", "Content-Type": "application/json"}
-    try:
-        payload = {
-            "model": "meta-llama/llama-3.3-70b-instruct:free",
-            "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt}
-            ],
-            "max_tokens": 600,
-            "temperature": 0.5
-        }
-        async with httpx.AsyncClient(timeout=8.0) as client:
-            res = await client.post(url, json=payload, headers=headers)
-            if res.status_code == 200:
-                data = res.json()
-                content = data["choices"][0]["message"]["content"].strip()
-                logger.info("OpenRouter generated dynamic advisory.")
-                return content
-    except Exception as e:
-        logger.warning(f"OpenRouter API error: {e}")
+    openrouter_models = [
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "meta-llama/llama-3.2-3b-instruct:free",
+        "google/gemma-2-9b-it:free"
+    ]
+    for model in openrouter_models:
+        try:
+            payload = {
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt}
+                ],
+                "max_tokens": 600,
+                "temperature": 0.5
+            }
+            async with httpx.AsyncClient(timeout=8.0) as client:
+                res = await client.post(url, json=payload, headers=headers)
+                if res.status_code == 200:
+                    data = res.json()
+                    content = data["choices"][0]["message"]["content"].strip()
+                    logger.info(f"OpenRouter ({model}) generated dynamic advisory.")
+                    return content
+        except Exception as e:
+            logger.warning(f"OpenRouter API error with {model}: {e}")
     return None
 
 async def generate_llm_advisory(
@@ -258,28 +285,38 @@ Instruction:
 Directly answer the user's specific query in natural, fluent {language_name}.
 If the user asks general questions, math, facts, or greetings, answer directly and conversationally without repeating static rigid templates."""
 
-    # 1. Try Groq (Llama-3.3-70B / Llama-3.1-8B)
-    res = await call_groq_llm(user_prompt)
-    if res: return res
+    # 1. Try NVIDIA NIM (if configured)
+    if NVIDIA_API_KEY:
+        res = await call_nvidia_nim(user_prompt)
+        if res: return res
 
-    # 2. Try Google Gemini
-    res = await call_gemini_llm(user_prompt)
-    if res: return res
+    # 2. Try Groq (Llama-3.3-70B / Llama-3.1-8B)
+    if GROQ_API_KEY:
+        res = await call_groq_llm(user_prompt)
+        if res: return res
 
-    # 3. Try OpenAI
-    res = await call_openai_llm(user_prompt)
-    if res: return res
+    # 3. Try Google Gemini
+    if GEMINI_API_KEY:
+        res = await call_gemini_llm(user_prompt)
+        if res: return res
 
-    # 4. Try NVIDIA NIM
-    res = await call_nvidia_nim(user_prompt)
-    if res: return res
+    # 4. Try OpenAI
+    if OPENAI_API_KEY:
+        res = await call_openai_llm(user_prompt)
+        if res: return res
 
     # 5. Try OpenRouter
-    res = await call_openrouter_llm(user_prompt)
-    if res: return res
+    if OPENROUTER_API_KEY:
+        res = await call_openrouter_llm(user_prompt)
+        if res: return res
 
     # 6. Try Local Ollama
     res = await call_ollama_llm(user_prompt)
     if res: return res
+
+    # Fallback to general checks if any provider wasn't in explicit order
+    for fn in [call_groq_llm, call_gemini_llm, call_openai_llm, call_nvidia_nim, call_openrouter_llm]:
+        res = await fn(user_prompt)
+        if res: return res
 
     return None
