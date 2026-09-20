@@ -424,7 +424,6 @@ class MultilingualAgent:
             }
             text_out = responses.get(lang, responses["en"])
 
-
         # ----------------------------------------------------
         # 1. MATH & ARITHMETIC CALCULATOR
         # ----------------------------------------------------

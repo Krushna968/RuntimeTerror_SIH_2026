@@ -251,9 +251,6 @@ async def generate_llm_advisory(
     """
     Generate an intelligent, context-aware conversational response across available LLM providers.
     """
-    clean_q = user_query.strip().lower()
-
-
     top_pfz = context_data.get("top_pfz", {})
     weather = context_data.get("weather", {})
     geofence = context_data.get("geofence", {})

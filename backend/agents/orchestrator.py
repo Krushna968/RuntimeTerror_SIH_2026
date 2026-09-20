@@ -78,7 +78,6 @@ class MasterOrchestrator:
         """Determines primary objective of user prompt with comprehensive semantic awareness."""
         q = query.lower().strip()
 
-
         # 1. Math and Arithmetic expressions
         clean_math = re.sub(r'^(what is|calculate|evaluate|solve|compute|\?|=|\s)+', '', q).strip(' ?=')
         clean_math = re.sub(r'\bplus\b', '+', clean_math)
