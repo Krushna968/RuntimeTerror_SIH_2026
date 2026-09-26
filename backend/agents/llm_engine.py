@@ -169,11 +169,9 @@ async def call_nvidia_nim(user_prompt: str) -> Optional[str]:
     # Active high-performance models on NVIDIA NIM
     candidate_models = [
         NVIDIA_MODEL_ENV,
-        "meta/llama-3.2-11b-vision-instruct",
-        "google/diffusiongemma-26b-a4b-it",
-        "openai/gpt-oss-20b",
-        "nvidia/nemotron-3.5-lightning-30b-a3b",
-        "nvidia/nemotron-3-super-120b-a12b"
+        "meta/llama-3.1-8b-instruct",
+        "meta/llama-3.2-3b-instruct",
+        "meta/llama-3.2-11b-vision-instruct"
     ]
     # Remove duplicates and empty values while preserving order
     seen = set()
@@ -309,3 +307,60 @@ If the user asks general questions, math, facts, or greetings, answer directly a
         if res: return res
 
     return None
+
+def get_configured_llm_providers() -> Dict[str, Any]:
+    """Returns configuration status for all supported LLM providers."""
+    return {
+        "nvidia_nim": bool(NVIDIA_API_KEY),
+        "groq": bool(GROQ_API_KEY),
+        "gemini": bool(GEMINI_API_KEY),
+        "openai": bool(OPENAI_API_KEY),
+        "openrouter": bool(os.getenv("OPENROUTER_API_KEY")),
+        "ollama_host": OLLAMA_HOST,
+        "any_cloud_provider_available": bool(
+            NVIDIA_API_KEY or GROQ_API_KEY or GEMINI_API_KEY or OPENAI_API_KEY or os.getenv("OPENROUTER_API_KEY")
+        )
+    }
+
+async def probe_llm_provider() -> Dict[str, Any]:
+    """
+    Probes the active LLM provider pipeline with a diagnostic query.
+    Returns the responding provider, latency, status, and provider configuration.
+    """
+    import time
+    start = time.time()
+    res = await generate_llm_advisory(
+        user_query="Status probe: confirm Blue Orbit neural engine operational.",
+        context_data={},
+        language_name="English",
+        language_code="en"
+    )
+    latency_ms = round((time.time() - start) * 1000, 2)
+    configured = get_configured_llm_providers()
+    
+    if res:
+        active_provider = "NVIDIA NIM" if NVIDIA_API_KEY else (
+            "Groq" if GROQ_API_KEY else (
+                "Google Gemini" if GEMINI_API_KEY else (
+                    "OpenAI" if OPENAI_API_KEY else (
+                        "OpenRouter" if os.getenv("OPENROUTER_API_KEY") else "Local Ollama"
+                    )
+                )
+            )
+        )
+        return {
+            "status": "HEALTHY",
+            "provider": active_provider,
+            "latency_ms": latency_ms,
+            "sample_response": res[:120],
+            "configured_providers": configured
+        }
+    else:
+        return {
+            "status": "FALLBACK_MODE",
+            "provider": "Template Grounded Autonomous Marine Reasoning Engine",
+            "latency_ms": latency_ms,
+            "detail": "No external cloud LLM responded or keys not configured. Template-grounded Indic engine active.",
+            "configured_providers": configured
+        }
+

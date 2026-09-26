@@ -43,8 +43,9 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { Geolocation } from '@capacitor/geolocation';
 
-const PROD_API = 'https://orca-backend-0dxj.onrender.com';
-const DEV_API = 'http://localhost:8000';
+const PROD_API = (import.meta as any).env?.VITE_PROD_API_URL || (import.meta as any).env?.VITE_API_URL || 'https://orca-backend-0dxj.onrender.com';
+const FALLBACK_API = (import.meta as any).env?.VITE_FALLBACK_API_URL || 'https://blue-orbit-backend.onrender.com';
+const DEV_API = (import.meta as any).env?.VITE_DEV_API_URL || 'http://localhost:8000';
 
 const getApiBase = () => {
   const customUrl = (import.meta as any).env?.VITE_API_URL;
@@ -56,7 +57,7 @@ const getApiBase = () => {
   }
 
   // In desktop web browser on localhost, use local if running, else production
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
     return DEV_API;
   }
 
@@ -208,6 +209,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'chat' | 'map' | 'agent-lab' | 'safety' | 'bulletin'>('home');
   const [currentLang, setCurrentLang] = useState<string>('en');
   const [userCoords, setUserCoords] = useState<{ lat: number; lon: number } | null>(null);
+  const [selectedPortKey, setSelectedPortKey] = useState<string>('kochi');
 
   const [pfzHotspots, setPfzHotspots] = useState<PFZHotspot[]>([]);
   const [selectedPFZ, setSelectedPFZ] = useState<PFZHotspot | null>(null);
@@ -231,6 +233,7 @@ export function App() {
   const [isBulletinModalOpen, setIsBulletinModalOpen] = useState<boolean>(false);
   const [isSOSModalOpen, setIsSOSModalOpen] = useState<boolean>(false);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState<boolean>(false);
+  const [isAgentDrawerOpen, setIsAgentDrawerOpen] = useState<boolean>(false);
 
   // Initial load & Location Permission Prompt
   useEffect(() => {
@@ -249,6 +252,7 @@ export function App() {
           const lon = pos.coords.longitude;
           setUserCoords({ lat, lon });
           const nearestPort = getNearestPortKey(lat, lon);
+          setSelectedPortKey(nearestPort);
           fetchInitialData(lat, lon, nearestPort);
           return;
         }
@@ -266,6 +270,7 @@ export function App() {
           console.log(`[Blue Orbit GPS] Live Browser Location: ${lat}, ${lon}`);
           setUserCoords({ lat, lon });
           const nearestPort = getNearestPortKey(lat, lon);
+          setSelectedPortKey(nearestPort);
           fetchInitialData(lat, lon, nearestPort);
         },
         async (err) => {
@@ -281,6 +286,7 @@ export function App() {
                 console.log(`[Blue Orbit GPS] IP Location: ${ipLat}, ${ipLon} (${ipData.city || 'India'})`);
                 setUserCoords({ lat: ipLat, lon: ipLon });
                 const nearestPort = getNearestPortKey(ipLat, ipLon);
+                setSelectedPortKey(nearestPort);
                 fetchInitialData(ipLat, ipLon, nearestPort);
                 return;
               }
@@ -289,6 +295,7 @@ export function App() {
             console.warn('[Blue Orbit GPS] IP location service unavailable:', ipErr);
           }
           // Default to Kochi Harbour if completely offline
+          setSelectedPortKey('kochi');
           fetchInitialData(9.9416, 76.2575, 'kochi');
         },
         { enableHighAccuracy: true, timeout: 7000, maximumAge: 60000 }
@@ -381,7 +388,19 @@ export function App() {
       } catch (primaryErr) {
         if (API_BASE !== PROD_API) {
           console.warn(`[Blue Orbit] Primary API (${API_BASE}) failed, trying production failover (${PROD_API})...`, primaryErr);
-          data = await executeChatRequest(PROD_API);
+          try {
+            data = await executeChatRequest(PROD_API);
+          } catch (prodErr) {
+            if (FALLBACK_API && FALLBACK_API !== PROD_API) {
+              console.warn(`[Blue Orbit] Production API (${PROD_API}) failed, trying secondary fallback (${FALLBACK_API})...`, prodErr);
+              data = await executeChatRequest(FALLBACK_API);
+            } else {
+              throw prodErr;
+            }
+          }
+        } else if (FALLBACK_API && FALLBACK_API !== PROD_API) {
+          console.warn(`[Blue Orbit] Primary production API (${PROD_API}) failed, trying secondary fallback (${FALLBACK_API})...`, primaryErr);
+          data = await executeChatRequest(FALLBACK_API);
         } else {
           throw primaryErr;
         }
@@ -448,18 +467,47 @@ export function App() {
     }
   };
 
-  // When a PFZ is clicked on map
-  const handleSelectPFZ = async (pfz: PFZHotspot) => {
+  // When a PFZ is clicked on map or selected from dropdown
+  const handleSelectPFZ = async (pfz: PFZHotspot, customPortKey?: string) => {
     setSelectedPFZ(pfz);
+    const portToUse = customPortKey || selectedPortKey;
     try {
       const routeRes = await fetch(`${API_BASE}/api/route`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          start_port: "kochi",
+          start_port: portToUse,
           dest_lat: pfz.latitude,
           dest_lon: pfz.longitude,
           dest_name: pfz.name
+        })
+      });
+      if (routeRes.ok) {
+        const routeData = await routeRes.json();
+        setActiveRoute(routeData);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Route calculation between any arbitrary port and destination
+  const handleCalculateRoute = async (
+    originPortKey: string,
+    destLat: number,
+    destLon: number,
+    destName: string
+  ) => {
+    setSelectedPortKey(originPortKey);
+    try {
+      const routeRes = await fetch(`${API_BASE}/api/route`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          start_port: originPortKey,
+          dest_lat: destLat,
+          dest_lon: destLon,
+          dest_name: destName
         })
       });
       if (routeRes.ok) {
@@ -491,6 +539,7 @@ export function App() {
           }
         }}
         onSOSClick={() => setIsSOSModalOpen(true)}
+        onVoiceSetupClick={() => setIsVoiceModalOpen(true)}
       />
 
       {/* Tab 0: Home Landing Page */}
@@ -526,6 +575,8 @@ export function App() {
           currentLang={currentLang}
           onMapClickCoord={handleMapClickCoord}
           userCoords={userCoords}
+          selectedOriginPort={selectedPortKey}
+          onCalculateRoute={handleCalculateRoute}
         />
       )}
 
@@ -741,9 +792,24 @@ export function App() {
             </p>
 
             <div className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-200 space-y-1.5 text-left">
-              <div>Vessel ID: <strong className="text-white">IND-KL-04-M (Kochi)</strong></div>
-              <div>GPS Coordinates: <strong className="text-white">9.94°N, 76.25°E</strong></div>
-              <div>Distress Frequency: <strong className="text-emerald-400">VHF Channel 16 (156.8 MHz)</strong></div>
+              <div>
+                Vessel ID: <strong className="text-white">
+                  {`IND-${selectedPortKey === 'chennai' ? 'TN-02' : selectedPortKey === 'visakhapatnam' ? 'AP-07' : selectedPortKey === 'mumbai' ? 'MH-01' : selectedPortKey === 'porbandar' ? 'GJ-05' : selectedPortKey === 'rameswaram' ? 'TN-09' : selectedPortKey === 'mangalore' ? 'KA-03' : selectedPortKey === 'paradip' ? 'OD-08' : selectedPortKey === 'kanyakumari' ? 'TN-11' : selectedPortKey === 'port_blair' ? 'AN-06' : 'KL-04'}-M (${(INDIAN_PORTS.find(p => p.key === selectedPortKey) || INDIAN_PORTS[0]).name.split(' ')[0]})`}
+                </strong>
+              </div>
+              <div>
+                GPS Coordinates: <strong className="text-white">
+                  {userCoords 
+                    ? `${userCoords.lat.toFixed(4)}°N, ${userCoords.lon.toFixed(4)}°E (Live Device GPS)`
+                    : `${(INDIAN_PORTS.find(p => p.key === selectedPortKey) || INDIAN_PORTS[0]).lat.toFixed(4)}°N, ${(INDIAN_PORTS.find(p => p.key === selectedPortKey) || INDIAN_PORTS[0]).lon.toFixed(4)}°E (Port Datum)`}
+                </strong>
+              </div>
+              <div>Distress Frequency: <strong className="text-emerald-400">VHF Channel 16 (156.8 MHz) / INMARSAT-C</strong></div>
+              {!userCoords && (
+                <div className="text-[10px] text-amber-400 font-sans pt-1">
+                  ⚠️ Device GPS unavailable: Using base registered harbour coordinates for Coast Guard MRCC dispatch.
+                </div>
+              )}
             </div>
 
             <div className="flex items-center space-x-3 pt-2">
@@ -763,6 +829,58 @@ export function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Voice Packs Offline Audio Cache Modal */}
+      <VoicePacksModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+      />
+
+      {/* Slide-over Agentic AI Conversational & Reasoning Drawer */}
+      {isAgentDrawerOpen && (
+        <div className="fixed inset-0 z-[1050] flex justify-end bg-black/60 backdrop-blur-xs">
+          <div className="w-full max-w-lg h-full bg-white shadow-2xl flex flex-col border-l border-zinc-200">
+            <div className="flex items-center justify-between px-5 py-3.5 bg-zinc-950 text-white border-b border-zinc-800">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-7 h-7 rounded-lg bg-blue-600/30 border border-blue-500/50 flex items-center justify-center text-blue-400">
+                  <Cpu className="w-4 h-4 animate-pulse" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold tracking-wide">Agentic AI Reasoning Drawer</div>
+                  <div className="text-[10px] text-zinc-400 font-mono">Multi-Agent ISRO Telemetry Pipeline</div>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAgentDrawerOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                title="Close Drawer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden p-3 bg-zinc-50">
+              <AgentChatDrawer
+                onSendMessage={(q) => handleSendMessage(q, currentLang, 'global')}
+                isLoading={isLoading}
+                latestResponse={latestResponse}
+                currentLang={currentLang}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Agent Reasoning Drawer Trigger (available on non-chat tabs) */}
+      {activeTab !== 'chat' && (
+        <button
+          onClick={() => setIsAgentDrawerOpen(prev => !prev)}
+          className="fixed bottom-20 left-4 z-[460] flex items-center space-x-2 px-3.5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-xl border border-blue-400/40 hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
+          title="Open Agentic AI Conversational & Reasoning Drawer"
+        >
+          <Cpu className="w-4 h-4 text-cyan-200 animate-pulse" />
+          <span className="text-xs font-bold tracking-wide hidden sm:inline">Ask AI Agent</span>
+        </button>
       )}
 
       {/* Real-Time On-Device Offline GPS IMBL Geofence & Audio Siren Guard */}

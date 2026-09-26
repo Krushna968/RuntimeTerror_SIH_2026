@@ -161,7 +161,13 @@ def get_pfz_hotspots(port: Optional[str] = None):
 def get_ocean_grid(step: float = 1.0):
     """
     Returns 2D grid matrix of SST and Chlorophyll-a for geospatial GIS contour rendering.
+    Enforces minimum step threshold of 0.25 degrees to prevent server memory exhaustion.
     """
+    if step < 0.25:
+        raise HTTPException(
+            status_code=400,
+            detail="Step size must be >= 0.25 degrees to prevent server memory exhaustion."
+        )
     return marine_agent.generate_ocean_grid(step=step)
 
 @app.get("/api/weather")
@@ -226,12 +232,20 @@ def get_geodata_layers():
         "active_cyclone": ACTIVE_CYCLONE
     }
 
-
+@app.get("/api/health/llm")
+async def health_llm():
+    """
+    Health check probe for LLM providers (NVIDIA NIM, Groq, Gemini, OpenAI, Ollama).
+    Returns active provider, latency, and status.
+    """
+    from backend.agents.llm_engine import probe_llm_provider
+    return await probe_llm_provider()
 
 @app.websocket("/ws/agent-stream")
 async def websocket_agent_stream(websocket: WebSocket):
     """
     WebSocket endpoint for real-time streaming of Agent thought processes and execution DAG.
+    Streams each stage to the client as soon as the respective domain agent completes.
     """
     await websocket.accept()
     try:
@@ -247,17 +261,20 @@ async def websocket_agent_stream(websocket: WebSocket):
                 "stage": "INITIALIZING",
                 "message": "Blue Orbit Supervisor initialized. Building collaborative execution graph..."
             })
-            await asyncio.sleep(0.3)
             
-            # Run pipeline and send final result
-            result = await orchestrator.execute_query_pipeline(query, requested_lang=lang)
-            
-            for step in result["evidence_and_provenance"]["execution_trace"]:
+            # Real-time streaming callback sending each agent step as it executes
+            async def on_step(step: Dict[str, Any]):
                 await websocket.send_json({
                     "type": "AGENT_STEP",
                     "step": step
                 })
-                await asyncio.sleep(0.25)
+
+            # Run pipeline with real-time step callback
+            result = await orchestrator.execute_query_pipeline(
+                query, 
+                requested_lang=lang,
+                step_callback=on_step
+            )
                 
             await websocket.send_json({
                 "type": "PIPELINE_COMPLETE",
@@ -267,7 +284,10 @@ async def websocket_agent_stream(websocket: WebSocket):
     except WebSocketDisconnect:
         pass
     except Exception as e:
-        await websocket.send_json({"type": "ERROR", "message": str(e)})
+        try:
+            await websocket.send_json({"type": "ERROR", "message": str(e)})
+        except Exception:
+            pass
 
 if __name__ == "__main__":
     import uvicorn

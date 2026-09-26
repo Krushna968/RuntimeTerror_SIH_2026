@@ -74,9 +74,17 @@ async def run_tests():
     assert lang_agent.detect_language("ఎక్కడ చేపలు దొరుకుతాయి?") == "te"
     print("✓ Language detection passed for Hindi, Tamil, Telugu, Malayalam, English scripts.")
 
-    # 6. Test Master Orchestrator End-to-End Execution DAG
-    print_header("6. Master Supervisor & Multi-Agent Collaborative Execution DAG")
+    # 6. Test Master Orchestrator End-to-End Execution DAG & LLM Provider Pipeline
+    print_header("6. Master Supervisor, Multi-Agent Collaborative Execution DAG & LLM Engine")
     from backend.agents.orchestrator import MasterOrchestrator
+    from backend.agents.llm_engine import probe_llm_provider, get_configured_llm_providers
+
+    # Probe live LLM provider readiness
+    llm_probe = await probe_llm_provider()
+    configured = get_configured_llm_providers()
+    print(f"✓ LLM Provider Probe: Status={llm_probe['status']}, Provider='{llm_probe['provider']}', Latency={llm_probe['latency_ms']} ms")
+    print(f"✓ Configured Providers: NVIDIA NIM={configured['nvidia_nim']}, Groq={configured['groq']}, Gemini={configured['gemini']}, OpenAI={configured['openai']}")
+
     orchestrator = MasterOrchestrator()
     
     query = "Where is the nearest Potential Fishing Zone for Tuna from Kochi today?"
@@ -86,6 +94,7 @@ async def run_tests():
     
     print(f"✓ Full Multi-Agent Pipeline completed in {dt} ms.")
     print(f"✓ Agents Executed: {result['execution_metadata']['total_agents_involved']}")
+    print(f"✓ Synthesis Agent: {result['evidence_and_provenance']['execution_trace'][-1]['agent']}")
     print(f"✓ Localized Response in {result['language']['native']}:\n{result['response']['markdown'][:250]}...\n")
     assert result['execution_metadata']['total_agents_involved'] >= 5
     assert len(result['evidence_and_provenance']['execution_trace']) >= 5
@@ -94,7 +103,19 @@ async def run_tests():
     print_header("7. FastAPI REST & WebSocket Endpoints")
     from backend.main import app
     route_paths = [r.path for r in app.routes]
-    expected = ["/", "/api/chat", "/api/pfz", "/api/weather", "/api/cyclones", "/api/geofence", "/api/route", "/api/satellites", "/ws/agent-stream"]
+    expected = [
+        "/", 
+        "/api/chat", 
+        "/api/pfz", 
+        "/api/weather", 
+        "/api/cyclones", 
+        "/api/geofence", 
+        "/api/route", 
+        "/api/satellites", 
+        "/api/ocean-grid",
+        "/api/health/llm",
+        "/ws/agent-stream"
+    ]
     for ep in expected:
         assert ep in route_paths, f"Missing endpoint: {ep}"
         print(f"✓ Endpoint registered: {ep}")

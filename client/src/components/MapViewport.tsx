@@ -62,6 +62,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
   const cycloneLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const userLocationGroup = useRef<L.LayerGroup>(L.layerGroup());
   const vesselMarkerRef = useRef<L.Marker | null>(null);
+  const hasCenteredInitialGPS = useRef<boolean>(false);
 
   // Initialize Map
   useEffect(() => {
@@ -364,30 +365,32 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       routeLayerGroup.current.addLayer(endMarker);
 
       // Simulated moving boat marker
-      const currentPos = latlngs[Math.min(vesselProgress, latlngs.length - 1)];
-      const boatIcon = L.divIcon({
-        className: 'vessel-icon',
-        html: `
-          <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white border-2 border-white shadow-xl animate-pulse">
-            🚢
-          </div>
-        `,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
-      });
+      if (isSimulatingVessel) {
+        const currentPos = latlngs[Math.min(vesselProgress, latlngs.length - 1)];
+        const boatIcon = L.divIcon({
+          className: 'vessel-icon',
+          html: `
+            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white border-2 border-white shadow-xl animate-pulse">
+              🚢
+            </div>
+          `,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16]
+        });
 
-      const vesselMarker = L.marker(currentPos, { icon: boatIcon })
-        .bindPopup(`
-          <div class="p-1 text-slate-900">
-            <div class="text-xs font-bold text-blue-700">🛥️ Trawler IND-KL-04-M</div>
-            <div class="text-[11px] text-slate-600">Speed: 9.5 kts | ETA: ${activeRoute.route_metrics.estimated_transit_time_hours} hrs</div>
-          </div>
-        `);
+        const vesselMarker = L.marker(currentPos, { icon: boatIcon })
+          .bindPopup(`
+            <div class="p-1 text-slate-900">
+              <div class="text-xs font-bold text-blue-700">🛥️ Trawler IND-KL-04-M</div>
+              <div class="text-[11px] text-slate-600">Speed: 9.5 kts | ETA: ${activeRoute.route_metrics?.estimated_transit_time_hours || '4.0'} hrs</div>
+            </div>
+          `);
 
-      routeLayerGroup.current.addLayer(vesselMarker);
-      vesselMarkerRef.current = vesselMarker;
+        routeLayerGroup.current.addLayer(vesselMarker);
+        vesselMarkerRef.current = vesselMarker;
+      }
     }
-  }, [showRoute, activeRoute, vesselProgress]);
+  }, [showRoute, activeRoute, vesselProgress, isSimulatingVessel]);
 
   // Live User GPS Location Beacon Effect
   useEffect(() => {
@@ -425,7 +428,10 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       `);
 
     userLocationGroup.current.addLayer(marker);
-    mapInstanceRef.current.flyTo([userCoords.lat, userCoords.lon], 9, { duration: 1.5 });
+    if (!hasCenteredInitialGPS.current) {
+      hasCenteredInitialGPS.current = true;
+      mapInstanceRef.current.flyTo([userCoords.lat, userCoords.lon], 9, { duration: 1.5 });
+    }
   }, [userCoords]);
 
   // Vessel animation ticker
@@ -459,7 +465,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
               mapInstanceRef.current.flyTo([userCoords.lat, userCoords.lon], 10, { duration: 1.2 });
             }
           }}
-          className="absolute bottom-6 right-6 z-[400] flex items-center space-x-2 px-3.5 py-2.5 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200 shadow-xl hover:bg-slate-50 text-xs font-bold text-slate-800 active:scale-95 transition-all cursor-pointer"
+          className="absolute bottom-16 right-4 z-[450] flex items-center space-x-2 px-3.5 py-2.5 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200 shadow-xl hover:bg-slate-50 text-xs font-bold text-slate-800 active:scale-95 transition-all cursor-pointer"
           title="Recenter to your GPS location"
         >
           <Navigation className="w-4 h-4 text-blue-600 animate-pulse" />
@@ -559,7 +565,7 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       </div>
 
       {/* Floating Bottom Quick Legend */}
-      <div className="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200 text-xs font-semibold flex items-center space-x-4 text-slate-700 shadow-md hidden md:flex">
+      <div className="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200 text-xs font-semibold flex items-center space-x-4 text-slate-700 shadow-md hidden md:flex max-w-[calc(100%-8rem)] overflow-x-auto">
         <div className="flex items-center space-x-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
           <span>Potential Fishing Zone</span>

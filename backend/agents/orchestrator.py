@@ -6,7 +6,8 @@ and streams reasoning step telemetry to the frontend.
 
 import time
 import re
-from typing import Dict, Any, List, Optional
+import inspect
+from typing import Dict, Any, List, Optional, Callable, Awaitable
 from datetime import datetime, timezone
 
 from backend.agents.marine_data_agent import MarineDataAgent
@@ -129,14 +130,26 @@ class MasterOrchestrator:
         requested_lang: Optional[str] = None,
         user_lat: Optional[float] = None,
         user_lon: Optional[float] = None,
-        reference_port_override: Optional[str] = None
+        reference_port_override: Optional[str] = None,
+        step_callback: Optional[Callable[[Dict[str, Any]], Any]] = None
     ) -> Dict[str, Any]:
         """
         Executes the full multi-agent collaborative reasoning workflow.
         Returns execution DAG, synthesized answers, GIS layers, and evidence citations.
+        Streams each completed step to step_callback in real time if provided.
         """
         start_time = time.time()
         execution_trace = []
+
+        async def _notify_step(s: Dict[str, Any]):
+            if step_callback:
+                try:
+                    res = step_callback(s)
+                    if inspect.isawaitable(res):
+                        await res
+                except Exception as cb_err:
+                    import logging
+                    logging.getLogger("blueorbit.orchestrator").warning(f"Error in step_callback: {cb_err}")
 
         # 1. Supervisor Intent & Language Decomposition
         step1_start = time.time()
@@ -149,56 +162,64 @@ class MasterOrchestrator:
         obs_lat = user_lat if (user_lat is not None and abs(user_lat) > 0.1) else port_info["lat"]
         obs_lon = user_lon if (user_lon is not None and abs(user_lon) > 0.1) else port_info["lon"]
 
-        execution_trace.append({
+        step1 = {
             "step_id": "STEP_01_SUPERVISOR_PLANNING",
             "agent": "Blue Orbit Master Supervisor & DAG Planner",
             "status": "COMPLETED",
             "duration_ms": round((time.time() - step1_start) * 1000, 2),
             "thought": f"Parsed query intent: '{intent}'. Reference port: '{port_info['name']}' ({obs_lat:.3f}°N, {obs_lon:.3f}°E). Language detected: '{detected_lang}'. Formulated 6-stage collaborative execution graph.",
             "output_summary": f"Decomposed into 5 parallel agent subtasks."
-        })
+        }
+        execution_trace.append(step1)
+        await _notify_step(step1)
 
         # 2. Marine Data Discovery Agent Execution
         step2_start = time.time()
         point_obs = self.marine_agent.get_point_observation(obs_lat, obs_lon)
         telemetry = self.marine_agent.get_satellite_telemetry()
         
-        execution_trace.append({
+        step2 = {
             "step_id": "STEP_02_MARINE_DATA_INGESTION",
             "agent": "Marine Data Discovery & Ingestion Agent",
             "status": "COMPLETED",
             "duration_ms": round((time.time() - step2_start) * 1000, 2),
             "thought": f"Retrieved ISRO Oceansat-3 OCM-3 (Chl-a: {point_obs['chlorophyll_a_mg_m3']} mg/m³) and INSAT-3DR TIR (SST: {point_obs['sea_surface_temperature_c']}°C). Cloud cover: {point_obs['cloud_cover_percent']}%.",
             "output_summary": "High radiometric quality confirmed from NRSC Ground Station."
-        })
+        }
+        execution_trace.append(step2)
+        await _notify_step(step2)
 
         # 3. Weather & Disaster Hazard Agent Execution
         step3_start = time.time()
         weather = self.weather_agent.get_weather_at_point(obs_lat, obs_lon)
         cyclone_info = self.weather_agent.get_active_cyclones_and_warnings()
         
-        execution_trace.append({
+        step3 = {
             "step_id": "STEP_03_WEATHER_HAZARD_EVALUATION",
             "agent": "Weather & Marine Disaster Hazard Agent",
             "status": "COMPLETED",
             "duration_ms": round((time.time() - step3_start) * 1000, 2),
             "thought": f"Calculated significant wave height ({weather['significant_wave_height_m']}m) and Beaufort sea state ({weather['sea_state']}). Risk Index: {weather['safety_index']}/100. Status: {weather['safety_status']}.",
             "output_summary": weather["actionable_advice"]
-        })
+        }
+        execution_trace.append(step3)
+        await _notify_step(step3)
 
         # 4. Ocean Analytics & PFZ Engine Execution
         step4_start = time.time()
         pfz_list = self.ocean_agent.generate_pfz_hotspots(reference_port_key=port_key)
         top_pfz = pfz_list[0] if pfz_list else {}
         
-        execution_trace.append({
+        step4 = {
             "step_id": "STEP_04_OCEAN_PFZ_ANALYTICS",
             "agent": "Ocean Analytics & PFZ Agent",
             "status": "COMPLETED",
             "duration_ms": round((time.time() - step4_start) * 1000, 2),
             "thought": f"Computed thermal front gradient (|∇SST| = {top_pfz.get('thermal_gradient_c_per_10km')}°C/10km) × chlorophyll gradient (|∇Chl-a| = {top_pfz.get('chlorophyll_gradient_per_10km')}). Identified top PFZ '{top_pfz.get('name')}' with {top_pfz.get('catch_enhancement_multiplier')} expected catch enhancement.",
             "output_summary": f"Species Suitability: High for {top_pfz.get('dominant_species')} at depth {top_pfz.get('recommended_depth_m')}m."
-        })
+        }
+        execution_trace.append(step4)
+        await _notify_step(step4)
 
         # 5. Geospatial, Geofencing & Route Planning Execution
         step5_start = time.time()
@@ -207,14 +228,16 @@ class MasterOrchestrator:
         target_lon = top_pfz.get("longitude", obs_lon + 0.5)
         safe_route = self.geo_agent.compute_safe_route(port_key, target_lat, target_lon, dest_name=top_pfz.get("name", "PFZ"))
         
-        execution_trace.append({
+        step5 = {
             "step_id": "STEP_05_GEOSPATIAL_GEOFENCING_ROUTING",
             "agent": "Geospatial & Geofencing Agent",
             "status": "COMPLETED",
             "duration_ms": round((time.time() - step5_start) * 1000, 2),
             "thought": f"Evaluated IMBL distance ({geofence['nearest_imbl']['distance_nautical_miles']} NM to {geofence['nearest_imbl']['border_name']}). Generated A* safe route ({safe_route['route_metrics']['routed_distance_nm']} NM, transit time: {safe_route['route_metrics']['estimated_transit_time_hours']}h) avoiding restricted zones.",
             "output_summary": geofence["nearest_imbl"]["alert_message"]
-        })
+        }
+        execution_trace.append(step5)
+        await _notify_step(step5)
 
         # 6. NVIDIA NIM LLM Cognitive Synthesis & Vernacular Translation
         step6_start = time.time()
@@ -242,6 +265,11 @@ class MasterOrchestrator:
             final_markdown = llm_response_text
             model_used_name = "Blue Orbit Neural LLM Engine"
         else:
+            import logging
+            logging.getLogger("blueorbit.orchestrator").warning(
+                f"[LLM Fallback] Live LLM inference returned None for query '{query[:60]}...'. "
+                f"Falling back to template-grounded regional synthesis."
+            )
             localized_result = self.lang_agent.synthesize_localized_response(
                 intent=intent,
                 context_data=context_bundle,
@@ -255,14 +283,16 @@ class MasterOrchestrator:
         evidence_pkg = self.explain_agent.generate_evidence_package(query, execution_trace, context_bundle)
         bulletin = self.explain_agent.generate_official_marine_bulletin(port_info["name"], pfz_list, weather, geofence)
         
-        execution_trace.append({
+        step6 = {
             "step_id": "STEP_06_COGNITIVE_SYNTHESIS",
             "agent": f"Cognitive Synthesis Agent ({model_used_name})",
             "status": "COMPLETED",
             "duration_ms": round((time.time() - step6_start) * 1000, 2),
             "thought": f"Synthesized grounded natural language advisory using {model_used_name} in '{lang_info['name']}'. Generated official bulletin #{bulletin['bulletin_id']}.",
             "output_summary": f"Grounded response generated with data provenance."
-        })
+        }
+        execution_trace.append(step6)
+        await _notify_step(step6)
 
         total_latency_ms = round((time.time() - start_time) * 1000, 2)
 

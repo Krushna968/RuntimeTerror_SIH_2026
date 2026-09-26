@@ -45,7 +45,8 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   currentLang = 'en',
   setCurrentLang,
-  onSOSClick
+  onSOSClick,
+  onVoiceSetupClick
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAudioCached, setIsAudioCached] = useState(false);
@@ -214,6 +215,22 @@ export const Header: React.FC<HeaderProps> = ({
               {isCaching ? `Caching ${cacheProgress}%` : (isAudioCached ? "Audio Cached" : "Cache Audio")}
             </span>
           </button>
+
+          {/* Regional Voice Packs Setup / Test */}
+          {onVoiceSetupClick && (
+            <button
+              onClick={onVoiceSetupClick}
+              className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-full flex items-center space-x-1 backdrop-blur-md shadow-sm transition-all border cursor-pointer ${
+                !isDark 
+                  ? 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-100 hover:text-blue-600' 
+                  : 'bg-zinc-900/80 border-zinc-700/80 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-300'
+              }`}
+              title="Test & Configure 8 Regional Indian Voice Packs"
+            >
+              <Volume2 className="w-3.5 h-3.5" />
+              <span className="hidden lg:inline text-[11px] font-semibold">Voice Packs</span>
+            </button>
+          )}
 
           {/* Regional Language Switcher */}
           {setCurrentLang && (

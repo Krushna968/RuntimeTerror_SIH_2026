@@ -13,19 +13,31 @@ import {
   Fish,
   ShieldCheck,
   Download,
-  Loader2
+  Loader2,
+  History,
+  Trash2,
+  Search,
+  MessageSquare,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatResponsePayload } from '../types';
 import { speakText, stopSpeech, getBcp47LangTag, isAudioCachePreloaded, preloadAllRegionalAudioPacks } from '../utils/speechUtils';
 import { FormattedMarkdown } from './FormattedMarkdown';
 
-interface Message {
+export interface Message {
   id: string;
   sender: 'user' | 'blueorbit' | 'orca';
   text: string;
   timestamp: string;
   data?: ChatResponsePayload;
+}
+
+export interface ChatSession {
+  id: string;
+  title: string;
+  timestamp: string;
+  messages: Message[];
 }
 
 interface AIChatStudioProps {
@@ -46,6 +58,24 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
 }) => {
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [sessions, setSessions] = useState<ChatSession[]>(() => {
+    try {
+      const raw = localStorage.getItem('blueorbit_chat_history');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem('blueorbit_active_session_id') || null;
+    } catch {
+      return null;
+    }
+  });
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [searchHistoryQuery, setSearchHistoryQuery] = useState<string>('');
+
   const [isListening, setIsListening] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -54,6 +84,48 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
   const [cacheProgress, setCacheProgress] = useState(0);
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Load active session messages on initial mount if available
+  useEffect(() => {
+    if (currentSessionId) {
+      const active = sessions.find(s => s.id === currentSessionId);
+      if (active && active.messages.length > 0) {
+        setMessages(active.messages);
+      }
+    }
+  }, []);
+
+  const handleNewChat = () => {
+    setCurrentSessionId(null);
+    setMessages([]);
+    try { localStorage.removeItem('blueorbit_active_session_id'); } catch {}
+    if (window.innerWidth < 768) setIsSidebarOpen(false);
+  };
+
+  const handleSelectSession = (session: ChatSession) => {
+    setCurrentSessionId(session.id);
+    setMessages(session.messages);
+    try { localStorage.setItem('blueorbit_active_session_id', session.id); } catch {}
+    if (window.innerWidth < 768) setIsSidebarOpen(false);
+  };
+
+  const handleDeleteSession = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const updated = sessions.filter(s => s.id !== id);
+    setSessions(updated);
+    try { localStorage.setItem('blueorbit_chat_history', JSON.stringify(updated)); } catch {}
+    if (currentSessionId === id) {
+      handleNewChat();
+    }
+  };
+
+  const handleClearAllHistory = () => {
+    if (window.confirm("Are you sure you want to clear all conversation history?")) {
+      setSessions([]);
+      handleNewChat();
+      try { localStorage.removeItem('blueorbit_chat_history'); } catch {}
+    }
+  };
 
   const handleDirectCache = async () => {
     if (isCaching) return;
@@ -87,13 +159,20 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
               text: latestResponse.response.markdown,
               data: latestResponse
             };
+            if (currentSessionId) {
+              setSessions(prevSessions => {
+                const next = prevSessions.map(s => s.id === currentSessionId ? { ...s, messages: updated } : s);
+                try { localStorage.setItem('blueorbit_chat_history', JSON.stringify(next)); } catch {}
+                return next;
+              });
+            }
             return updated;
           }
         }
         return prev;
       });
     }
-  }, [latestResponse]);
+  }, [latestResponse, currentSessionId]);
 
   const handleSend = async (queryText?: string) => {
     const textToSend = queryText || inputText;
@@ -106,34 +185,57 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    let activeId = currentSessionId;
+    let nextMessages = [...messages, userMsg];
+    setMessages(nextMessages);
     setInputText('');
 
-    const res = await onSendMessage(textToSend, currentLang);
-    if (res && res.response?.markdown) {
-      const newMsgId = `msg-${Date.now()}`;
-      setMessages(prev => [
-        ...prev,
-        {
-          id: newMsgId,
-          sender: 'blueorbit',
-          text: res.response.markdown,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          data: res
-        }
-      ]);
+    if (!activeId) {
+      activeId = `session-${Date.now()}`;
+      setCurrentSessionId(activeId);
+      try { localStorage.setItem('blueorbit_active_session_id', activeId); } catch {}
+      const newSession: ChatSession = {
+        id: activeId,
+        title: textToSend.length > 38 ? textToSend.slice(0, 38) + '...' : textToSend,
+        timestamp: new Date().toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        messages: nextMessages
+      };
+      setSessions(prev => {
+        const next = [newSession, ...prev];
+        try { localStorage.setItem('blueorbit_chat_history', JSON.stringify(next)); } catch {}
+        return next;
+      });
     } else {
-      const errorMsgId = `msg-err-${Date.now()}`;
-      setMessages(prev => [
-        ...prev,
-        {
-          id: errorMsgId,
-          sender: 'blueorbit',
-          text: "⚠️ **Service Notice**: Unable to connect to Blue Orbit AI reasoning engine. Please ensure your device has internet access and try again.",
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }
-      ]);
+      setSessions(prev => {
+        const next = prev.map(s => s.id === activeId ? { ...s, messages: nextMessages } : s);
+        try { localStorage.setItem('blueorbit_chat_history', JSON.stringify(next)); } catch {}
+        return next;
+      });
     }
+
+    const res = await onSendMessage(textToSend, currentLang);
+    const aiMsg: Message = res && res.response?.markdown ? {
+      id: `msg-${Date.now()}`,
+      sender: 'blueorbit',
+      text: res.response.markdown,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      data: res
+    } : {
+      id: `msg-err-${Date.now()}`,
+      sender: 'blueorbit',
+      text: "⚠️ **Service Notice**: Unable to connect to Blue Orbit AI reasoning engine. Please ensure your device has internet access and try again.",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setMessages(prev => {
+      const fullList = [...prev, aiMsg];
+      setSessions(prevSessions => {
+        const next = prevSessions.map(s => s.id === activeId ? { ...s, messages: fullList } : s);
+        try { localStorage.setItem('blueorbit_chat_history', JSON.stringify(next)); } catch {}
+        return next;
+      });
+      return fullList;
+    });
   };
 
   // Speech to Text (STT) - Full 8 Indian Languages Support
@@ -206,6 +308,156 @@ export const AIChatStudio: React.FC<AIChatStudioProps> = ({
           }}
         />
       </div>
+
+      {/* History Sidebar Floating Trigger Button */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="absolute top-20 left-4 sm:left-6 z-30 flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-xl border border-zinc-200/90 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 shadow-sm transition-all cursor-pointer hover:border-zinc-300"
+        title="Toggle conversation history"
+      >
+        <History className="w-3.5 h-3.5 text-blue-600" />
+        <span className="hidden xs:inline">History</span>
+        {sessions.length > 0 && (
+          <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+            {sessions.length}
+          </span>
+        )}
+      </button>
+
+      {/* Quick "New Chat" button when active thread exists */}
+      {hasMessages && (
+        <button
+          onClick={handleNewChat}
+          className="absolute top-20 left-28 sm:left-32 z-30 flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-xl border border-zinc-200/90 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 shadow-sm transition-all cursor-pointer hover:border-zinc-300"
+          title="Start fresh conversation"
+        >
+          <Plus className="w-3.5 h-3.5 text-emerald-600" />
+          <span>New Chat</span>
+        </button>
+      )}
+
+      {/* Left Collapsible History Drawer */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <>
+            {/* Backdrop on mobile */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSidebarOpen(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 md:hidden"
+            />
+
+            <motion.div
+              initial={{ x: -320, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -320, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 280 }}
+              className="fixed top-0 bottom-0 left-0 w-80 max-w-[85vw] bg-white/95 backdrop-blur-2xl border-r border-zinc-200/90 shadow-2xl z-50 flex flex-col pt-16 pb-4"
+            >
+              {/* Sidebar Header */}
+              <div className="px-4 py-3 border-b border-zinc-100 flex items-center justify-between">
+                <div className="flex items-center space-x-2 text-xs font-bold text-zinc-900">
+                  <History className="w-4 h-4 text-blue-600" />
+                  <span>Chat History</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <button
+                    onClick={handleNewChat}
+                    className="p-1.5 rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition-colors cursor-pointer"
+                    title="Start New Chat"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer"
+                    title="Close Sidebar"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Search History Filter */}
+              <div className="p-3 border-b border-zinc-100">
+                <div className="relative flex items-center bg-zinc-50 border border-zinc-200 rounded-xl px-2.5 py-1.5 focus-within:border-blue-500">
+                  <Search className="w-3.5 h-3.5 text-zinc-400 mr-2 shrink-0" />
+                  <input
+                    type="text"
+                    value={searchHistoryQuery}
+                    onChange={(e) => setSearchHistoryQuery(e.target.value)}
+                    placeholder="Search past chats..."
+                    className="w-full bg-transparent text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none"
+                  />
+                  {searchHistoryQuery && (
+                    <button onClick={() => setSearchHistoryQuery('')} className="text-zinc-400 hover:text-zinc-600 p-0.5">
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Sessions List */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
+                {sessions.length === 0 ? (
+                  <div className="py-12 text-center text-xs text-zinc-400 px-4">
+                    <MessageSquare className="w-8 h-8 text-zinc-300 mx-auto mb-2 opacity-60" />
+                    No previous conversations yet. Ask a question to start history.
+                  </div>
+                ) : (
+                  sessions
+                    .filter(s => !searchHistoryQuery.trim() || s.title.toLowerCase().includes(searchHistoryQuery.toLowerCase()) || s.messages.some(m => m.text.toLowerCase().includes(searchHistoryQuery.toLowerCase())))
+                    .map(session => {
+                      const isActive = session.id === currentSessionId;
+                      return (
+                        <div
+                          key={session.id}
+                          onClick={() => handleSelectSession(session)}
+                          className={`group flex items-center justify-between p-2.5 rounded-xl text-xs transition-all cursor-pointer ${
+                            isActive
+                              ? 'bg-blue-50/80 border border-blue-200 text-blue-950 font-semibold'
+                              : 'text-zinc-700 hover:bg-zinc-100 border border-transparent'
+                          }`}
+                        >
+                          <div className="flex items-start space-x-2 min-w-0 flex-1 pr-2">
+                            <MessageSquare className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${isActive ? 'text-blue-600' : 'text-zinc-400'}`} />
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate text-xs">{session.title}</div>
+                              <div className="text-[10px] text-zinc-400">{session.timestamp} · {session.messages.length} msgs</div>
+                            </div>
+                          </div>
+                          <button
+                            onClick={(e) => handleDeleteSession(session.id, e)}
+                            className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer shrink-0"
+                            title="Delete thread"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      );
+                    })
+                )}
+              </div>
+
+              {/* Sidebar Footer */}
+              {sessions.length > 0 && (
+                <div className="p-3 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-500">
+                  <span>{sessions.length} saved chats</span>
+                  <button
+                    onClick={handleClearAllHistory}
+                    className="text-red-600 hover:text-red-700 font-medium hover:underline cursor-pointer flex items-center space-x-1"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    <span>Clear All</span>
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* STATE 1: EXACT 1:1 LOVABLE HERO WITH CENTER CHATBOX */}
       {!hasMessages && (

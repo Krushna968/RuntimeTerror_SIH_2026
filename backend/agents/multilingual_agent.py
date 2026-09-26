@@ -17,6 +17,8 @@ and dynamic grounded vernacular response synthesis.
 from typing import Dict, Any, Optional
 import re
 import math
+import ast
+import operator
 
 class MultilingualAgent:
     def __init__(self):
@@ -84,6 +86,83 @@ class MultilingualAgent:
             return "mr"
             
         return "en"
+
+    @staticmethod
+    def _safe_eval_math(expr: str) -> Optional[float]:
+        """
+        Safely evaluates an arithmetic expression using AST parsing.
+        Prevents arbitrary code execution, attribute access, and resource exhaustion.
+        """
+        allowed_operators = {
+            ast.Add: operator.add,
+            ast.Sub: operator.sub,
+            ast.Mult: operator.mul,
+            ast.Div: operator.truediv,
+            ast.FloorDiv: operator.floordiv,
+            ast.Mod: operator.mod,
+            ast.Pow: operator.pow,
+            ast.UAdd: operator.pos,
+            ast.USub: operator.neg,
+        }
+
+        allowed_functions = {
+            'sqrt': math.sqrt,
+            'sin': math.sin,
+            'cos': math.cos,
+            'tan': math.tan,
+            'abs': abs,
+            'round': round,
+        }
+
+        allowed_constants = {
+            'pi': math.pi,
+            'e': math.e,
+        }
+
+        def _eval_node(node):
+            if isinstance(node, ast.Constant):
+                if isinstance(node.value, (int, float)):
+                    return node.value
+                raise ValueError("Unsupported constant type")
+            elif isinstance(node, getattr(ast, 'Num', (type(None),))):
+                return getattr(node, 'n', None)
+            elif isinstance(node, ast.BinOp):
+                op_type = type(node.op)
+                if op_type not in allowed_operators:
+                    raise ValueError(f"Operator {op_type} not allowed")
+                left = _eval_node(node.left)
+                right = _eval_node(node.right)
+                if op_type is ast.Pow:
+                    if abs(right) > 50 or abs(left) > 1e9:
+                        raise ValueError("Exponent or base too large")
+                if op_type in (ast.Div, ast.FloorDiv, ast.Mod) and right == 0:
+                    raise ZeroDivisionError("Division by zero")
+                return allowed_operators[op_type](left, right)
+            elif isinstance(node, ast.UnaryOp):
+                op_type = type(node.op)
+                if op_type not in allowed_operators:
+                    raise ValueError(f"Unary operator {op_type} not allowed")
+                operand = _eval_node(node.operand)
+                return allowed_operators[op_type](operand)
+            elif isinstance(node, ast.Name):
+                if node.id in allowed_constants:
+                    return allowed_constants[node.id]
+                raise ValueError(f"Identifier {node.id} not allowed")
+            elif isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Name) and node.func.id in allowed_functions:
+                    args = [_eval_node(arg) for arg in node.args]
+                    return allowed_functions[node.func.id](*args)
+                raise ValueError("Function call not allowed")
+            elif isinstance(node, ast.Expression):
+                return _eval_node(node.body)
+            else:
+                raise ValueError(f"AST node {type(node)} not allowed")
+
+        try:
+            parsed = ast.parse(expr, mode='eval')
+            return _eval_node(parsed)
+        except Exception:
+            return None
 
     def synthesize_localized_response(
         self,
@@ -436,7 +515,7 @@ class MultilingualAgent:
             res_val = None
             try:
                 expr = clean_math.replace('^', '**')
-                res = eval(expr, {'__builtins__': None}, {'sqrt': math.sqrt, 'sin': math.sin, 'cos': math.cos, 'pi': math.pi})
+                res = self._safe_eval_math(expr)
                 if isinstance(res, (int, float)):
                     res_val = int(res) if isinstance(res, float) and res.is_integer() else round(res, 4)
             except Exception:

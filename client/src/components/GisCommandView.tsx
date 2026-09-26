@@ -25,7 +25,7 @@ import { INDIAN_EEZ_BOUNDARY, INDIAN_TERRITORIAL_WATERS_12NM } from '../utils/in
 interface GisCommandViewProps {
   pfzHotspots: PFZHotspot[];
   selectedPFZ: PFZHotspot | null;
-  onSelectPFZ: (pfz: PFZHotspot) => void;
+  onSelectPFZ: (pfz: PFZHotspot, originPort?: string) => void;
   activeRoute: NavigationRoute | null;
   weather: WeatherObservation | null;
   satellites: SatelliteTelemetry[];
@@ -35,6 +35,8 @@ interface GisCommandViewProps {
   currentLang: string;
   onMapClickCoord: (lat: number, lon: number) => void;
   userCoords?: { lat: number; lon: number } | null;
+  selectedOriginPort?: string;
+  onCalculateRoute?: (originPort: string, destLat: number, destLon: number, destName: string) => void;
 }
 
 const INDIAN_PORTS = [
@@ -61,10 +63,13 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   latestResponse,
   currentLang = 'en',
   onMapClickCoord,
-  userCoords
+  userCoords,
+  selectedOriginPort = 'kochi',
+  onCalculateRoute
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const hasCenteredInitialGPS = useRef<boolean>(false);
 
   // Layer Toggles
   const [showPFZ, setShowPFZ] = useState(true);
@@ -73,11 +78,20 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   const [showMPA, setShowMPA] = useState(true);
   const [showCyclone, setShowCyclone] = useState(true);
   const [showPorts, setShowPorts] = useState(true);
+  const [showRoute, setShowRoute] = useState(true);
   const [isLayersExpanded, setIsLayersExpanded] = useState(true);
 
-  // Simulation
+  // Simulation & Route Configuration
+  const [originPortKey, setOriginPortKey] = useState<string>(selectedOriginPort || 'kochi');
+  const [showVesselMarker, setShowVesselMarker] = useState<boolean>(true);
   const [isSimulatingVessel, setIsSimulatingVessel] = useState(false);
   const [vesselProgress, setVesselProgress] = useState(0);
+
+  useEffect(() => {
+    if (selectedOriginPort) {
+      setOriginPortKey(selectedOriginPort);
+    }
+  }, [selectedOriginPort]);
 
   // Clicked Location Feedback
   const [clickedCoord, setClickedCoord] = useState<{ lat: number; lng: number } | null>(null);
@@ -378,16 +392,35 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
           </div>
         `);
 
+        if (isSelected) {
+          setTimeout(() => {
+            marker.openPopup();
+          }, 350);
+        }
+
         marker.on('click', () => onSelectPFZ(pfz));
         pfzLayerGroup.current.addLayer(marker);
       });
     }
   }, [showPFZ, pfzHotspots, selectedPFZ]);
 
+  // Fly to selected PFZ on selection (e.g., from Advisory Bulletin "View on Map")
+  const prevSelectedPFZId = useRef<string | null>(null);
+  useEffect(() => {
+    if (!mapInstanceRef.current || !selectedPFZ) return;
+    if (prevSelectedPFZId.current !== selectedPFZ.id) {
+      prevSelectedPFZId.current = selectedPFZ.id;
+      mapInstanceRef.current.flyTo([selectedPFZ.latitude, selectedPFZ.longitude], 10, { duration: 1.5 });
+    }
+  }, [selectedPFZ]);
+
   // Render Navigation Route & Vessel
   useEffect(() => {
     if (!mapInstanceRef.current) return;
     routeLayerGroup.current.clearLayers();
+
+    // Respect layer toggles: If route or harbours/ports are turned off, hide route & vessel
+    if (!showRoute || !showPorts) return;
 
     if (activeRoute && activeRoute.waypoints && activeRoute.waypoints.length > 1) {
       const latlngs: [number, number][] = activeRoute.waypoints.map(w => [w.latitude, w.longitude]);
@@ -399,23 +432,52 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       });
       routeLayerGroup.current.addLayer(poly);
 
-      // Moving vessel marker
-      const currentPos = latlngs[Math.min(vesselProgress, latlngs.length - 1)];
-      const boatIcon = L.divIcon({
-        className: 'vessel-icon',
-        html: `
-          <div class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs border border-white shadow-md">
-            🚢
-          </div>
-        `,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-      });
+      // Start & End waypoint pins
+      const startMarker = L.circleMarker(latlngs[0], {
+        radius: 6,
+        color: '#FFF',
+        fillColor: '#059669',
+        fillOpacity: 1,
+        weight: 2
+      }).bindPopup(`<div class="text-xs font-bold text-emerald-800">Departure: ${activeRoute.origin?.name || 'Harbour'}</div>`);
 
-      const vesselMarker = L.marker(currentPos, { icon: boatIcon });
-      routeLayerGroup.current.addLayer(vesselMarker);
+      const endMarker = L.circleMarker(latlngs[latlngs.length - 1], {
+        radius: 6,
+        color: '#FFF',
+        fillColor: '#0284C7',
+        fillOpacity: 1,
+        weight: 2
+      }).bindPopup(`<div class="text-xs font-bold text-blue-800">Destination: ${activeRoute.destination?.name || 'Target PFZ'}</div>`);
+
+      routeLayerGroup.current.addLayer(startMarker);
+      routeLayerGroup.current.addLayer(endMarker);
+
+      // Moving vessel marker - only displayed if simulating or if vessel marker toggle is on
+      if (isSimulatingVessel || showVesselMarker) {
+        const currentPos = latlngs[Math.min(vesselProgress, latlngs.length - 1)];
+        const boatIcon = L.divIcon({
+          className: 'vessel-icon',
+          html: `
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs border border-white shadow-md ${isSimulatingVessel ? 'animate-pulse' : ''}">
+              🚢
+            </div>
+          `,
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        });
+
+        const vesselMarker = L.marker(currentPos, { icon: boatIcon })
+          .bindPopup(`
+            <div class="p-1 font-['Outfit',sans-serif]">
+              <div class="text-xs font-bold text-blue-700">🛥️ Trawler IND-KL-04-M</div>
+              <div class="text-[11px] text-zinc-600">Origin: ${activeRoute.origin?.name || 'Harbour'}</div>
+              <div class="text-[11px] text-zinc-600">ETA: ${activeRoute.route_metrics?.estimated_transit_time_hours || '4.0'} hrs</div>
+            </div>
+          `);
+        routeLayerGroup.current.addLayer(vesselMarker);
+      }
     }
-  }, [activeRoute, vesselProgress]);
+  }, [showRoute, showPorts, activeRoute, vesselProgress, isSimulatingVessel, showVesselMarker]);
 
   // Live User GPS Location Beacon Effect
   useEffect(() => {
@@ -453,22 +515,42 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       `);
 
     userLocationGroup.current.addLayer(marker);
-    mapInstanceRef.current.flyTo([userCoords.lat, userCoords.lon], 9, { duration: 1.5 });
+    if (!hasCenteredInitialGPS.current) {
+      hasCenteredInitialGPS.current = true;
+      mapInstanceRef.current.flyTo([userCoords.lat, userCoords.lon], 9, { duration: 1.5 });
+    }
   }, [userCoords]);
 
   // Trawler animation ticker
   useEffect(() => {
-    if (!isSimulatingVessel) return;
-    const waypoints = activeRoute?.waypoints || [
-      { latitude: 9.94, longitude: 76.25 },
-      { latitude: 9.85, longitude: 75.95 },
-      { latitude: 9.75, longitude: 75.65 }
-    ];
+    if (!isSimulatingVessel || !activeRoute?.waypoints || activeRoute.waypoints.length <= 1) return;
+    const waypoints = activeRoute.waypoints;
     const interval = setInterval(() => {
       setVesselProgress(prev => (prev >= waypoints.length - 1 ? 0 : prev + 1));
     }, 1200);
     return () => clearInterval(interval);
   }, [isSimulatingVessel, activeRoute]);
+
+  // Origin & Destination Change Handlers for Trawler Route
+  const handleOriginPortChange = (portId: string) => {
+    setOriginPortKey(portId);
+    const dest = selectedPFZ || pfzHotspots[0];
+    if (onCalculateRoute && dest) {
+      onCalculateRoute(portId, dest.latitude, dest.longitude, dest.name);
+    } else if (dest) {
+      onSelectPFZ(dest, portId);
+    }
+  };
+
+  const handleDestinationChange = (pfzId: string) => {
+    const dest = pfzHotspots.find(p => p.id === pfzId);
+    if (dest) {
+      onSelectPFZ(dest, originPortKey);
+      if (onCalculateRoute) {
+        onCalculateRoute(originPortKey, dest.latitude, dest.longitude, dest.name);
+      }
+    }
+  };
 
   const handleSendQuery = (text?: string) => {
     const q = text || chatInput;
@@ -623,26 +705,86 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
                   {showPorts ? 'ON' : 'OFF'}
                 </span>
               </div>
+
+              {/* Trawler Route Layer Toggle */}
+              <div 
+                onClick={() => setShowRoute(!showRoute)}
+                className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors"
+              >
+                <span className="flex items-center space-x-2 text-zinc-700">
+                  <span className={`w-2 h-2 rounded-full ${showRoute ? 'bg-sky-500' : 'bg-zinc-300'}`} />
+                  <span className="text-[11px] font-medium">Trawler Route</span>
+                </span>
+                <span className={`text-[10px] font-mono font-semibold ${showRoute ? 'text-sky-700' : 'text-zinc-400'}`}>
+                  {showRoute ? 'ON' : 'OFF'}
+                </span>
+              </div>
             </div>
 
-            {/* Trawler Simulation Row */}
-            <div className="pt-2 border-t border-zinc-100 flex items-center justify-between">
-              <span className="text-zinc-500 text-[11px]">Trawler Route</span>
-              <div className="flex items-center space-x-1">
-                <button
-                  onClick={() => setIsSimulatingVessel(!isSimulatingVessel)}
-                  className="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-semibold flex items-center space-x-1 transition-all cursor-pointer"
+            {/* Trawler Simulation & Route Panel */}
+            <div className="pt-2 border-t border-zinc-100 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-zinc-700 font-semibold text-[11px]">Trawler Route Simulator</span>
+                <div className="flex items-center space-x-1">
+                  <button
+                    onClick={() => setIsSimulatingVessel(!isSimulatingVessel)}
+                    disabled={!activeRoute || activeRoute.waypoints.length <= 1}
+                    className="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-semibold flex items-center space-x-1 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    title={activeRoute ? (isSimulatingVessel ? 'Pause' : 'Start Simulation') : 'Calculate or select route first'}
+                  >
+                    <Play className="w-2.5 h-2.5 fill-current" />
+                    <span>{isSimulatingVessel ? 'Pause' : 'Simulate'}</span>
+                  </button>
+                  <button
+                    onClick={() => { setIsSimulatingVessel(false); setVesselProgress(0); }}
+                    className="p-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition-colors cursor-pointer"
+                    title="Reset Simulation"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Origin Port Picker */}
+              <div className="space-y-0.5">
+                <label className="text-[10px] text-zinc-500 font-medium">Departure Port:</label>
+                <select
+                  value={originPortKey}
+                  onChange={(e) => handleOriginPortChange(e.target.value)}
+                  className="w-full text-[11px] bg-zinc-50 border border-zinc-200 rounded-lg p-1 text-zinc-800 focus:outline-none focus:border-blue-500"
                 >
-                  <Play className="w-2.5 h-2.5 fill-current" />
-                  <span>{isSimulatingVessel ? 'Pause' : 'Simulate'}</span>
-                </button>
-                <button
-                  onClick={() => { setIsSimulatingVessel(false); setVesselProgress(0); }}
-                  className="p-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition-colors cursor-pointer"
-                  title="Reset"
+                  {INDIAN_PORTS.map(p => (
+                    <option key={p.id} value={p.id}>{p.name} ({p.state})</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Destination PFZ Picker */}
+              <div className="space-y-0.5">
+                <label className="text-[10px] text-zinc-500 font-medium">Destination Zone:</label>
+                <select
+                  value={selectedPFZ?.id || (pfzHotspots[0]?.id || '')}
+                  onChange={(e) => handleDestinationChange(e.target.value)}
+                  className="w-full text-[11px] bg-zinc-50 border border-zinc-200 rounded-lg p-1 text-zinc-800 focus:outline-none focus:border-blue-500"
                 >
-                  <RotateCcw className="w-3 h-3" />
-                </button>
+                  {pfzHotspots.map(pfz => (
+                    <option key={pfz.id} value={pfz.id}>{pfz.name}</option>
+                  ))}
+                  {pfzHotspots.length === 0 && (
+                    <option value="">No Active Hotspot in View</option>
+                  )}
+                </select>
+              </div>
+
+              {/* Vessel Marker Visibility Checkbox */}
+              <div className="flex items-center justify-between text-[10px] text-zinc-600 pt-0.5">
+                <span>Display Ship Marker</span>
+                <input
+                  type="checkbox"
+                  checked={showVesselMarker}
+                  onChange={(e) => setShowVesselMarker(e.target.checked)}
+                  className="w-3.5 h-3.5 accent-blue-600 rounded cursor-pointer"
+                />
               </div>
             </div>
           </div>

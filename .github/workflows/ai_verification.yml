@@ -37,7 +37,6 @@ jobs:
       - name: 🧪 Run 7-Stage Multi-Agent Verification Suite
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           python3 verify_system.py
 

@@ -220,23 +220,23 @@ export const INDIAN_HARBOURS_DATA: HarbourTelemetry[] = [
     weather: {
       latitude: 20.2667,
       longitude: 86.6667,
-      safety_status: 'HAZARDOUS_NO_VENTURE',
-      safety_index: 28.0,
-      safety_badge_color: 'red',
-      actionable_advice: "🚨 SEVERE WEATHER DIRECTIVE: Intense gale squalls associated with Northern Bay of Bengal cyclonic depression. Complete fishing suspension in effect. Do not venture into the sea.",
-      significant_wave_height_m: 3.20,
-      swell_period_seconds: 11.4,
-      wind_speed_knots: 31.5,
-      wind_speed_kmph: 58.3,
-      wind_direction_degrees: 95,
-      beaufort_scale: 7,
-      sea_state: "Very Rough / High Gale",
-      lightning_probability_percent: 65,
-      visibility_km: 4.5,
+      safety_status: 'SAFE_FOR_VENTURE',
+      safety_index: 81.0,
+      safety_badge_color: 'emerald',
+      actionable_advice: "Favorable sea state along Odisha coastline. Normal artisanal and mechanized fishing permitted with continuous VHF watch on Coast Guard Channel 16.",
+      significant_wave_height_m: 1.15,
+      swell_period_seconds: 6.8,
+      wind_speed_knots: 11.2,
+      wind_speed_kmph: 20.7,
+      wind_direction_degrees: 180,
+      beaufort_scale: 3,
+      sea_state: "Slight / Smooth",
+      lightning_probability_percent: 10,
+      visibility_km: 15.0,
       cyclone_influence: {
-        active_cyclone: "Cyclonic Storm 'MIDHILI'",
-        distance_km: 210,
-        intensity: "Severe Cyclonic Storm (Gale 65 kts)"
+        active_cyclone: null,
+        distance_km: null,
+        intensity: null
       },
       timestamp: new Date().toISOString()
     }
@@ -279,25 +279,40 @@ export const SeaSafetyBarometer: React.FC<SeaSafetyBarometerProps> = ({
   onPortSelect
 }) => {
   const [selectedHarbourId, setSelectedHarbourId] = useState<string>('kochi');
+  const [harbourWeatherMap, setHarbourWeatherMap] = useState<Record<string, WeatherObservation>>(() => {
+    const map: Record<string, WeatherObservation> = {};
+    INDIAN_HARBOURS_DATA.forEach(h => {
+      map[h.id] = h.weather;
+    });
+    return map;
+  });
   const [activeWeather, setActiveWeather] = useState<WeatherObservation>(
     INDIAN_HARBOURS_DATA[0].weather
   );
   const [activePortName, setActivePortName] = useState<string>(
     INDIAN_HARBOURS_DATA[0].name
   );
+  const [isVerifyingTelemetry, setIsVerifyingTelemetry] = useState<boolean>(false);
 
   // If parent passes a live weather update for a selected coord
   useEffect(() => {
     if (parentWeather) {
       setActiveWeather(parentWeather);
+      setHarbourWeatherMap(prev => ({
+        ...prev,
+        [selectedHarbourId]: parentWeather
+      }));
+      setIsVerifyingTelemetry(false);
       if (portName) setActivePortName(portName);
     }
-  }, [parentWeather, portName]);
+  }, [parentWeather, portName, selectedHarbourId]);
 
   const handlePortClick = (harbour: HarbourTelemetry) => {
     setSelectedHarbourId(harbour.id);
-    setActiveWeather(harbour.weather);
+    const existing = harbourWeatherMap[harbour.id] || harbour.weather;
+    setActiveWeather(existing);
     setActivePortName(harbour.name);
+    setIsVerifyingTelemetry(true);
 
     if (onPortSelect) {
       onPortSelect(harbour.lat, harbour.lon, harbour.name);
@@ -325,8 +340,9 @@ export const SeaSafetyBarometer: React.FC<SeaSafetyBarometerProps> = ({
         <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1">
           {INDIAN_HARBOURS_DATA.map((h) => {
             const isSelected = selectedHarbourId === h.id;
-            const portSafe = h.weather.safety_status === 'SAFE_FOR_VENTURE';
-            const portCaution = h.weather.safety_status === 'EXERCISE_CAUTION';
+            const portWeather = harbourWeatherMap[h.id] || h.weather;
+            const portSafe = portWeather.safety_status === 'SAFE_FOR_VENTURE';
+            const portCaution = portWeather.safety_status === 'EXERCISE_CAUTION';
 
             return (
               <button
@@ -349,6 +365,13 @@ export const SeaSafetyBarometer: React.FC<SeaSafetyBarometerProps> = ({
             );
           })}
         </div>
+
+        {isVerifyingTelemetry && (
+          <div className="flex items-center space-x-2 text-[10px] text-blue-700 bg-blue-50/80 px-2.5 py-1 rounded-lg border border-blue-100">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping" />
+            <span>Synchronizing live ISRO Oceansat-3 telemetry for {activePortName}...</span>
+          </div>
+        )}
       </div>
 
       {/* Top Main Verdict Card */}
