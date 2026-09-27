@@ -588,6 +588,16 @@ export function App() {
           isLoading={isDagLoading}
           onSendMessage={(q, l) => handleSendMessage(q, l, 'dag-lab')}
           currentLang={currentLang}
+          apiBase={API_BASE}
+          onDirectResponse={(data) => {
+            setDagResponse(data);
+            setLatestResponse(data);
+            if (data.all_pfz_hotspots) setPfzHotspots(data.all_pfz_hotspots);
+            if (data.top_pfz) setSelectedPFZ(data.top_pfz);
+            if (data.safe_navigation_route) setActiveRoute(data.safe_navigation_route);
+            if (data.weather_and_safety) setWeather(data.weather_and_safety);
+            if (data.satellite_telemetry) setSatellites(data.satellite_telemetry);
+          }}
         />
       )}
 

@@ -62,16 +62,21 @@ export const MapViewport: React.FC<MapViewportProps> = ({
   const cycloneLayerGroup = useRef<L.LayerGroup>(L.layerGroup());
   const userLocationGroup = useRef<L.LayerGroup>(L.layerGroup());
   const vesselMarkerRef = useRef<L.Marker | null>(null);
-  const hasCenteredInitialGPS = useRef<boolean>(false);
+  const hasCenteredInitialGPS = useRef<boolean>(Boolean(selectedPFZ));
 
   // Initialize Map
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
+    const initialCenter: [number, number] = selectedPFZ
+      ? [selectedPFZ.latitude, selectedPFZ.longitude]
+      : (userCoords ? [userCoords.lat, userCoords.lon] : [14.0, 78.5]);
+    const initialZoom = selectedPFZ ? 10 : (userCoords ? 8 : 6);
+
     // Center on Indian Peninsula / Arabian Sea & Bay of Bengal
     const map = L.map(mapContainerRef.current, {
-      center: [14.0, 78.5],
-      zoom: 6,
+      center: initialCenter,
+      zoom: initialZoom,
       minZoom: 4,
       maxZoom: 14,
       zoomControl: false,
@@ -392,6 +397,12 @@ export const MapViewport: React.FC<MapViewportProps> = ({
     }
   }, [showRoute, activeRoute, vesselProgress, isSimulatingVessel]);
 
+  // Fly to selected PFZ on selection
+  useEffect(() => {
+    if (!mapInstanceRef.current || !selectedPFZ) return;
+    mapInstanceRef.current.flyTo([selectedPFZ.latitude, selectedPFZ.longitude], 10, { duration: 1.5 });
+  }, [selectedPFZ]);
+
   // Live User GPS Location Beacon Effect
   useEffect(() => {
     userLocationGroup.current.clearLayers();
@@ -428,11 +439,11 @@ export const MapViewport: React.FC<MapViewportProps> = ({
       `);
 
     userLocationGroup.current.addLayer(marker);
-    if (!hasCenteredInitialGPS.current) {
+    if (!hasCenteredInitialGPS.current && !selectedPFZ) {
       hasCenteredInitialGPS.current = true;
       mapInstanceRef.current.flyTo([userCoords.lat, userCoords.lon], 9, { duration: 1.5 });
     }
-  }, [userCoords]);
+  }, [userCoords, selectedPFZ]);
 
   // Vessel animation ticker
   useEffect(() => {

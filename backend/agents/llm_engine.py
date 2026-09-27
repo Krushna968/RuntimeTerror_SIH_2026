@@ -169,9 +169,9 @@ async def call_nvidia_nim(user_prompt: str) -> Optional[str]:
     # Active high-performance models on NVIDIA NIM
     candidate_models = [
         NVIDIA_MODEL_ENV,
-        "meta/llama-3.1-8b-instruct",
-        "meta/llama-3.2-3b-instruct",
-        "meta/llama-3.2-11b-vision-instruct"
+        "meta/llama-3.2-11b-vision-instruct",
+        "nvidia/nemotron-3-super-120b-a12b",
+        "meta/llama-3.2-90b-vision-instruct"
     ]
     # Remove duplicates and empty values while preserving order
     seen = set()

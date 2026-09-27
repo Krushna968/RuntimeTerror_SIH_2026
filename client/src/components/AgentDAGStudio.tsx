@@ -35,6 +35,8 @@ interface AgentDAGStudioProps {
   isLoading: boolean;
   onSendMessage: (query: string, lang?: string) => void;
   currentLang: string;
+  apiBase?: string;
+  onDirectResponse?: (payload: ChatResponsePayload) => void;
 }
 
 const PRESET_QUERIES = [
@@ -100,11 +102,17 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
   latestResponse,
   isLoading,
   onSendMessage,
-  currentLang
+  currentLang,
+  apiBase,
+  onDirectResponse
 }) => {
   const [inputText, setInputText] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showFullTrace, setShowFullTrace] = useState(true);
+  const [streamingSteps, setStreamingSteps] = useState<any[]>([]);
+  const [streamingStage, setStreamingStage] = useState<string>('');
+  const [isWsStreaming, setIsWsStreaming] = useState<boolean>(false);
+  const activeWsRef = useRef<WebSocket | null>(null);
   const responseSectionRef = useRef<HTMLDivElement>(null);
 
   // Smoothly scroll to response when newly generated
@@ -114,10 +122,86 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
     }
   }, [latestResponse]);
 
+  const runDagQuery = (query: string) => {
+    if (!query.trim() || isLoading || isWsStreaming) return;
+
+    setStreamingSteps([]);
+    setStreamingStage('Connecting to Blue Orbit Supervisor DAG Stream...');
+    setIsWsStreaming(true);
+
+    const base = apiBase || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8000');
+    const wsUrl = base.replace(/^http/, 'ws') + '/ws/agent-stream';
+
+    let ws: WebSocket;
+    try {
+      ws = new WebSocket(wsUrl);
+      activeWsRef.current = ws;
+    } catch (e) {
+      console.warn('WebSocket connection failed, using HTTP fallback:', e);
+      setIsWsStreaming(false);
+      onSendMessage(query, currentLang);
+      return;
+    }
+
+    const fallbackTimeout = setTimeout(() => {
+      if (ws && ws.readyState !== WebSocket.OPEN) {
+        console.warn('WebSocket timeout, falling back to HTTP');
+        ws.close();
+        setIsWsStreaming(false);
+        onSendMessage(query, currentLang);
+      }
+    }, 4000);
+
+    ws.onopen = () => {
+      clearTimeout(fallbackTimeout);
+      ws.send(JSON.stringify({ query, language: currentLang }));
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.type === 'STAGE_UPDATE') {
+          setStreamingStage(msg.message || msg.stage);
+        } else if (msg.type === 'AGENT_STEP') {
+          setStreamingSteps(prev => [...prev, msg.step]);
+          setStreamingStage(`Executing ${msg.step.agent || 'Agent Stage'}...`);
+        } else if (msg.type === 'PIPELINE_COMPLETE') {
+          setIsWsStreaming(false);
+          setStreamingStage('Collaborative multi-agent consensus reached.');
+          if (onDirectResponse) {
+            onDirectResponse(msg.payload);
+          } else {
+            onSendMessage(query, currentLang);
+          }
+          ws.close();
+        } else if (msg.type === 'ERROR') {
+          console.warn('WebSocket returned error:', msg.message);
+          setIsWsStreaming(false);
+          onSendMessage(query, currentLang);
+          ws.close();
+        }
+      } catch (err) {
+        console.error('Error parsing WS message:', err);
+      }
+    };
+
+    ws.onerror = (err) => {
+      clearTimeout(fallbackTimeout);
+      console.warn('WebSocket error, falling back to HTTP pipeline:', err);
+      setIsWsStreaming(false);
+      onSendMessage(query, currentLang);
+    };
+
+    ws.onclose = () => {
+      clearTimeout(fallbackTimeout);
+      setIsWsStreaming(false);
+    };
+  };
+
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() || isLoading) return;
-    onSendMessage(inputText);
+    if (!inputText.trim() || isLoading || isWsStreaming) return;
+    runDagQuery(inputText);
     setInputText('');
   };
 
@@ -218,49 +302,90 @@ export const AgentDAGStudio: React.FC<AgentDAGStudioProps> = ({
             </button>
           </form>
 
-          {/* Borderless Preset Chips */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-            {PRESET_QUERIES.map((preset, idx) => (
-              <button
-                key={idx}
-                onClick={() => onSendMessage(preset.query)}
-                disabled={isLoading}
-                className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-slate-800 hover:text-blue-700 transition-all shadow-xs hover:shadow-sm cursor-pointer active:scale-95 whitespace-nowrap border-0"
-              >
-                {preset.label}
-              </button>
-            ))}
+            {/* Borderless Preset Chips */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+              {PRESET_QUERIES.map((preset, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => runDagQuery(preset.query)}
+                  disabled={isLoading || isWsStreaming}
+                  className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-slate-800 hover:text-blue-700 transition-all shadow-xs hover:shadow-sm cursor-pointer active:scale-95 whitespace-nowrap border-0"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Loading Spinner / Thinking State right under the input */}
-        <AnimatePresence>
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="p-5 rounded-3xl bg-white/95 border border-blue-200 shadow-xl backdrop-blur-xl space-y-3"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-xl bg-blue-50 text-blue-600 animate-spin">
-                  <RefreshCw className="w-5 h-5" />
+          {/* Loading Spinner / Real-Time WebSocket Streaming DAG Progress */}
+          <AnimatePresence>
+            {(isLoading || isWsStreaming) && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="p-5 md:p-6 rounded-3xl bg-white/95 border border-blue-200 shadow-xl backdrop-blur-xl space-y-4"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 rounded-xl bg-blue-50 text-blue-600 animate-spin">
+                      <RefreshCw className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">
+                        {streamingStage || "Executing Asynchronous Multi-Agent DAG..."}
+                      </h4>
+                      <p className="text-xs text-slate-500 font-medium">
+                        Live real-time WebSocket agent stream active (/ws/agent-stream)
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[11px] font-mono font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200 animate-pulse">
+                    {streamingSteps.length} of 6 Agents Completed
+                  </span>
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900">
-                    Executing Asynchronous Multi-Agent DAG...
-                  </h4>
-                  <p className="text-xs text-slate-500 font-medium">
-                    Coordinating 6 domain agents across Oceansat-3, INSAT-3DR, and IMD/INCOIS hydrodynamics.
-                  </p>
+
+                {/* Real-time Streaming Agent Step Cards */}
+                {streamingSteps.length > 0 && (
+                  <div className="space-y-2 pt-1">
+                    {streamingSteps.map((step, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-3 text-xs"
+                      >
+                        <div className="flex items-start space-x-2.5">
+                          <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-[10px] mt-0.5">
+                            ✓
+                          </span>
+                          <div>
+                            <div className="font-bold text-slate-900">{step.agent}</div>
+                            <div className="text-slate-600 text-[11px]">{step.thought || step.action}</div>
+                            {step.output_summary && (
+                              <div className="text-emerald-700 font-mono text-[10px] mt-0.5">
+                                ➔ {step.output_summary}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-mono font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200 whitespace-nowrap">
+                          {step.duration_ms ? `${step.duration_ms} ms` : 'DONE'}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-blue-600 via-cyan-500 to-rose-500 h-full rounded-full transition-all duration-300"
+                    style={{ width: `${Math.max(15, Math.min(100, (streamingSteps.length / 6) * 100))}%` }}
+                  />
                 </div>
-              </div>
-              <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 via-cyan-500 to-rose-500 h-full w-2/3 animate-pulse rounded-full" />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
         {/* AI Answer & Execution Inspector: PLACED DIRECTLY UNDER THE QUERY LAUNCHER */}
         {latestResponse && (

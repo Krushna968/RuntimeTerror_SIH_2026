@@ -69,7 +69,7 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
-  const hasCenteredInitialGPS = useRef<boolean>(false);
+  const hasCenteredInitialGPS = useRef<boolean>(Boolean(selectedPFZ));
 
   // Layer Toggles
   const [showPFZ, setShowPFZ] = useState(true);
@@ -123,9 +123,14 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
+    const initialCenter: [number, number] = selectedPFZ
+      ? [selectedPFZ.latitude, selectedPFZ.longitude]
+      : (userCoords ? [userCoords.lat, userCoords.lon] : [14.0, 78.5]);
+    const initialZoom = selectedPFZ ? 10 : (userCoords ? 8 : 6);
+
     const map = L.map(mapContainerRef.current, {
-      center: userCoords ? [userCoords.lat, userCoords.lon] : [14.0, 78.5],
-      zoom: userCoords ? 8 : 6,
+      center: initialCenter,
+      zoom: initialZoom,
       minZoom: 4,
       maxZoom: 15,
       zoomControl: false,
@@ -515,11 +520,11 @@ export const GisCommandView: React.FC<GisCommandViewProps> = ({
       `);
 
     userLocationGroup.current.addLayer(marker);
-    if (!hasCenteredInitialGPS.current) {
+    if (!hasCenteredInitialGPS.current && !selectedPFZ) {
       hasCenteredInitialGPS.current = true;
       mapInstanceRef.current.flyTo([userCoords.lat, userCoords.lon], 9, { duration: 1.5 });
     }
-  }, [userCoords]);
+  }, [userCoords, selectedPFZ]);
 
   // Trawler animation ticker
   useEffect(() => {
